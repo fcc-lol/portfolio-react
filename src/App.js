@@ -12,12 +12,16 @@ const Page = styled.div`
   min-height: 100vh;
   padding: 1.25rem;
   margin-bottom: 6rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem 0 0 0;
+  }
 `;
 
 const Container = styled.div`
   max-width: 64rem;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1rem;
 
   @media (min-width: 1024px) {
     padding: 0 3rem;
@@ -29,6 +33,12 @@ const TabNavigation = styled.nav`
   justify-content: center;
   margin-bottom: 2rem;
   user-select: none;
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
 `;
 
 const TabButton = styled.button`
@@ -36,19 +46,23 @@ const TabButton = styled.button`
   border: none;
   color: ${(props) =>
     props.$isActive ? "rgba(0,0,0, 1)" : "rgba(0,0,0, 0.5)"};
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
+  padding: 1rem;
+  font-size: 1.125rem;
   cursor: pointer;
   transition: all 0.2s ease;
   backface-visibility: hidden;
   will-change: transform;
+  -webkit-tap-highlight-color: transparent;
 
-  &:hover {
-    color: rgba(0, 0, 0, 1);
-    transform: scale(1.05);
+  @media (hover: hover) {
+    &:hover {
+      color: rgba(0, 0, 0, 1);
+      transform: scale(1.05);
+    }
   }
 
   &:active {
+    color: rgba(0, 0, 0, 1);
     transform: scale(0.95);
   }
 `;
@@ -193,6 +207,10 @@ const VStack = styled.div`
   display: flex;
   flex-direction: column;
   gap: 3rem;
+
+  @media (max-width: 1024px) {
+    gap: 2rem;
+  }
 `;
 
 const HStack = styled.div`
@@ -203,6 +221,7 @@ const HStack = styled.div`
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
 `;
 
