@@ -9,12 +9,12 @@ import {
 } from "react-router-dom";
 
 const Page = styled.div`
-  min-height: 100vh;
   padding: 1.25rem;
-  margin-bottom: 6rem;
+  margin-bottom: 4rem;
 
   @media (max-width: 768px) {
     padding: 1rem 0 0 0;
+    margin-bottom: 3rem;
   }
 `;
 
@@ -31,7 +31,7 @@ const Container = styled.div`
 const TabNavigation = styled.nav`
   display: flex;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   user-select: none;
   gap: 1.5rem;
 
@@ -57,13 +57,13 @@ const TabButton = styled.button`
   @media (hover: hover) {
     &:hover {
       color: rgba(0, 0, 0, 1);
-      transform: scale(1.05);
+      transform: scale(1.1);
     }
   }
 
   &:active {
     color: rgba(0, 0, 0, 1);
-    transform: scale(0.95);
+    transform: scale(0.9);
   }
 `;
 
@@ -71,9 +71,9 @@ const Card = styled.div`
   background: rgb(255, 255, 255);
   border-radius: 1.5rem;
   overflow: hidden;
-  box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.5rem 3rem rgba(0, 0, 0, 0.1);
   position: relative;
-  padding: 1.5rem;
+  padding: 1rem;
   font-size: 0;
 `;
 
@@ -82,7 +82,6 @@ const TextContent = styled.div`
   font-size: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 
   ::selection {
     background: rgba(0, 0, 0, 1);
@@ -107,6 +106,13 @@ const Header = styled.h1`
 
 const Subheader = styled.h2`
   font-size: 1.75rem;
+  font-weight: bold;
+  margin: 1rem 0 0.5rem 0;
+  line-height: 1.25;
+`;
+
+const LargeText = styled.p`
+  font-size: 2rem;
   font-weight: normal;
   margin: 1rem 0;
   line-height: 1.25;
@@ -141,7 +147,6 @@ const ProjectCard = styled(Card)`
 
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.15);
   }
 
   &:active {
@@ -339,13 +344,13 @@ function AppContent() {
                     We are a technology and art collective that makes fun
                     software and hardware.
                   </Header>
-                  <Subheader>We think computing should be fun.</Subheader>
+                  <LargeText>We think computing should be fun.</LargeText>
                 </TextContent>
               </Card>
               <HStack>
-                <Card style={{ padding: "1rem" }}>
-                  <TextContent style={{ gap: "0" }}>
-                    <Subheader style={{ fontWeight: "bold" }}>Zach</Subheader>
+                <Card>
+                  <TextContent>
+                    <Subheader>Zach</Subheader>
                     <Text>
                       I’m a curious tinkerer, who learns by doing. I like to
                       work on projects that present opportunities to think
@@ -353,17 +358,17 @@ function AppContent() {
                     </Text>
                   </TextContent>
                 </Card>
-                <Card style={{ padding: "1rem" }}>
-                  <TextContent style={{ gap: "0" }}>
-                    <Subheader style={{ fontWeight: "bold" }}>Dan</Subheader>
+                <Card>
+                  <TextContent>
+                    <Subheader>Dan</Subheader>
                     <Text>
                       I'm a guy that likes design and code. More to come.
                     </Text>
                   </TextContent>
                 </Card>
-                <Card style={{ padding: "1rem" }}>
-                  <TextContent style={{ gap: "0" }}>
-                    <Subheader style={{ fontWeight: "bold" }}>Leo</Subheader>
+                <Card>
+                  <TextContent>
+                    <Subheader>Leo</Subheader>
                     <Text>
                       I’m a designer, engineer, and artist. I believe design and
                       technology should encourage community, equal opportunity,
