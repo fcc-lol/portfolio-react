@@ -7,19 +7,19 @@ export const Header = styled.h1`
   line-height: 1.25;
 
   @media (max-width: 1024px) {
-    font-size: 2rem;
+    font-size: 2.5rem;
   }
 `;
 
 export const Subheader = styled.h2`
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: bold;
   margin: 1rem 0 0.5rem 0;
   line-height: 1.25;
 `;
 
 export const LargeText = styled.p`
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: normal;
   margin: 0;
   line-height: 1.25;
@@ -49,13 +49,7 @@ export const TextContent = styled.div`
   flex-direction: column;
   gap: 1rem;
 
-  ::selection {
-    background: rgba(0, 0, 0, 1);
-    color: rgba(255, 255, 255, 1);
-  }
-
   @media (max-width: 1024px) {
-    gap: 0rem;
     padding: 0 1rem;
   }
 `;
