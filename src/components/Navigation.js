@@ -1,12 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 
 const TabNavigation = styled.nav`
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 2.5rem;
   user-select: none;
   height: 3.5rem;
 
@@ -29,7 +31,7 @@ const TabButton = styled.button`
   background: none;
   border: none;
   color: ${(props) =>
-    props.$isActive ? "rgba(0,0,0, 1)" : "rgba(0,0,0, 0.45)"};
+    props.$isActive ? props.theme.textPrimary : props.theme.textSecondary};
   padding: 1rem;
   font-size: 1.25rem;
   cursor: pointer;
@@ -40,13 +42,13 @@ const TabButton = styled.button`
 
   @media (hover: hover) {
     &:hover {
-      color: rgba(0, 0, 0, 1);
+      color: ${(props) => props.theme.textPrimary};
       transform: scale(1.1);
     }
   }
 
   &:active {
-    color: rgba(0, 0, 0, 1);
+    color: ${(props) => props.theme.textPrimary};
     transform: scale(0.9);
   }
 `;
@@ -104,7 +106,9 @@ function Navigation({ showBackButton = false }) {
           About
         </TabButton>
       </Tabs>
-      <div></div>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <ThemeToggle />
+      </div>
     </TabNavigation>
   );
 }

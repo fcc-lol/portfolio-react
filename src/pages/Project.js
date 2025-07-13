@@ -49,7 +49,7 @@ function ProjectPage() {
       <Page>
         <Container>
           <Navigation />
-          <Loading>Loading...</Loading>
+          <Loading />
         </Container>
       </Page>
     );

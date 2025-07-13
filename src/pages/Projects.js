@@ -19,11 +19,12 @@ const Grid = styled.div`
 const Project = styled(Card)`
   backface-visibility: hidden;
   will-change: transform;
-  background: #000000;
   padding: 0;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: unset;
+  position: relative;
+  height: 20rem;
 
   &:hover {
     transform: scale(1.05);
@@ -37,12 +38,12 @@ const Project = styled(Card)`
 const Image = styled.div.attrs((props) => ({
   "data-image-url": props.imageurl
 }))`
-  height: 20rem;
+  width: 100%;
+  height: 100%;
   background: ${(props) =>
-    props.imageurl ? `url(${props.imageurl})` : "#f0f0f0"};
+    props.imageurl ? `url(${props.imageurl})` : props.theme.cardBackground};
   background-size: cover;
   background-position: center;
-  position: relative;
 `;
 
 const Content = styled.div`
@@ -104,7 +105,7 @@ function ProjectsPage() {
 
   const renderContent = () => {
     if (loading) {
-      return <Loading>Loading...</Loading>;
+      return <Loading />;
     }
 
     if (error) {

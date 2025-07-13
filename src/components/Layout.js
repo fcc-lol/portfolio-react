@@ -2,7 +2,9 @@ import styled from "styled-components";
 
 export const Page = styled.div`
   padding: 1.25rem;
-  margin-bottom: 4rem;
+  padding-bottom: 5rem;
+  min-height: calc(100vh - 6.25rem);
+  background: ${(props) => props.theme.background};
 
   @media (max-width: 768px) {
     padding: 1rem 0 0 0;

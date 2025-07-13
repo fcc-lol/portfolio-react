@@ -5,6 +5,7 @@ export const Header = styled.h1`
   font-weight: bold;
   margin: 1rem 0;
   line-height: 1.25;
+  color: ${(props) => props.theme.textPrimary};
 
   @media (max-width: 1024px) {
     font-size: 2.5rem;
@@ -16,6 +17,7 @@ export const Subheader = styled.h2`
   font-weight: bold;
   margin: 1rem 0 0.5rem 0;
   line-height: 1.25;
+  color: ${(props) => props.theme.textPrimary};
 `;
 
 export const LargeText = styled.p`
@@ -23,6 +25,7 @@ export const LargeText = styled.p`
   font-weight: normal;
   margin: 0;
   line-height: 1.25;
+  color: ${(props) => props.theme.textPrimary};
 `;
 
 export const MediumText = styled.p`
@@ -30,15 +33,15 @@ export const MediumText = styled.p`
   font-weight: normal;
   margin: 0;
   line-height: 1.25;
-  color: rgba(0, 0, 0, 1);
+  color: ${(props) => props.theme.textPrimary};
 `;
 
 export const SmallText = styled.p`
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: normal;
   margin: 0;
-  line-height: 1.25;
-  color: rgba(0, 0, 0, 0.5);
+  line-height: 1.375;
+  color: ${(props) => props.theme.textSecondary};
 `;
 
 export const TextContent = styled.div`
