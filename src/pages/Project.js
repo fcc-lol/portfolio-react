@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import Navigation from "../components/Navigation";
@@ -34,10 +34,6 @@ const MediaCard = styled(Card)`
 
 const HeaderCard = styled(Card)`
   min-height: 10rem;
-
-  @media (max-width: 768px) {
-    min-height: 8rem;
-  }
 `;
 
 const MediaContainer = styled.div`
@@ -123,17 +119,29 @@ function MediaItem({ mediaUrl, projectName, index }) {
   const [shouldAnimate, setShouldAnimate] = useState(
     !wasLoadedBefore && mediaUrl
   );
+  const imageRef = useRef(null);
 
   useEffect(() => {
-    if (mediaUrl) {
+    if (mediaUrl && !isVideo) {
       // If we've seen this media before in this session, don't animate
       if (isImageLoaded(mediaUrl)) {
         setLoaded(true);
         setShouldAnimate(false);
         return;
       }
+
+      // Check if it's already loaded in the DOM
+      if (
+        imageRef.current &&
+        imageRef.current.complete &&
+        imageRef.current.naturalWidth > 0
+      ) {
+        setLoaded(true);
+        setShouldAnimate(false);
+        markImageAsLoaded(mediaUrl);
+      }
     }
-  }, [mediaUrl, isImageLoaded]);
+  }, [mediaUrl, isImageLoaded, markImageAsLoaded, isVideo]);
 
   const handleMediaLoad = () => {
     setLoaded(true);
@@ -164,7 +172,12 @@ function MediaItem({ mediaUrl, projectName, index }) {
 
   return (
     <MediaContainer>
-      <HiddenImage src={mediaUrl} onLoad={handleMediaLoad} alt="" />
+      <HiddenImage
+        ref={imageRef}
+        src={mediaUrl}
+        onLoad={handleMediaLoad}
+        alt=""
+      />
       <FadeInImage
         src={mediaUrl}
         alt={`${projectName} - ${index + 1}`}

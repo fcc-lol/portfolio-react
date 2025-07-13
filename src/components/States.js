@@ -56,15 +56,15 @@ const ProjectSkeletonContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 3rem;
+
+  @media (max-width: 768px) {
+    gap: 2rem;
+  }
 `;
 
 const ProjectInfoSkeleton = styled(Card)`
   background: ${(props) => props.theme.cardBackground};
   min-height: 10rem;
-
-  @media (max-width: 768px) {
-    min-height: 8rem;
-  }
 `;
 
 const ProjectMediaSkeleton = styled(Card)`
