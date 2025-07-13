@@ -42,19 +42,25 @@ const MediaCard = styled(Card)`
 const LinksContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    gap: 1rem;
+  }
 `;
 
 const LinkButton = styled.a`
   display: inline-block;
   color: ${(props) => props.theme.textSecondary};
   text-decoration: underline;
-  font-weight: 500;
+  font-weight: normal;
   transition: all 0.2s ease-in-out;
+  font-size: 1.125rem;
 
-  &:hover {
-    color: ${(props) => props.theme.textPrimary};
+  @media (hover: hover) {
+    &:hover {
+      color: ${(props) => props.theme.textPrimary};
+    }
   }
 
   &:active {
