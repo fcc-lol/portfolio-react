@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import Navigation from "../components/Navigation";
 import Card from "../components/Card";
@@ -26,11 +26,18 @@ function SpacePage() {
     image3: true
   });
 
-  const imageRefs = {
-    image1: useRef(null),
-    image2: useRef(null),
-    image3: useRef(null)
-  };
+  const image1Ref = useRef(null);
+  const image2Ref = useRef(null);
+  const image3Ref = useRef(null);
+
+  const imageRefs = useMemo(
+    () => ({
+      image1: image1Ref,
+      image2: image2Ref,
+      image3: image3Ref
+    }),
+    []
+  );
 
   useEffect(() => {
     // Check if images are already loaded (cached)
@@ -63,7 +70,7 @@ function SpacePage() {
         <VStack>
           <Card style={{ padding: "0" }}>
             <FadeInImage
-              ref={imageRefs.image1}
+              ref={image1Ref}
               src="https://static.fcc.lol/studio-photos/IMG_8796.jpeg"
               alt="1"
               loaded={imageLoaded.image1}
@@ -73,7 +80,7 @@ function SpacePage() {
           </Card>
           <Card style={{ padding: "0" }}>
             <FadeInImage
-              ref={imageRefs.image2}
+              ref={image2Ref}
               src="https://static.fcc.lol/studio-photos/IMG_8806.jpeg"
               alt="1"
               loaded={imageLoaded.image2}
@@ -83,7 +90,7 @@ function SpacePage() {
           </Card>
           <Card style={{ padding: "0" }}>
             <FadeInImage
-              ref={imageRefs.image3}
+              ref={image3Ref}
               src="https://static.fcc.lol/studio-photos/IMG_8813.jpeg"
               alt="1"
               loaded={imageLoaded.image3}
