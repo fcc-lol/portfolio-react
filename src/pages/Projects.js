@@ -5,6 +5,7 @@ import Navigation from "../components/Navigation";
 import Card from "../components/Card";
 import { Page, Container } from "../components/Layout";
 import { Loading, Error } from "../components/States";
+import { useTheme } from "../contexts/ThemeContext";
 
 const Grid = styled.div`
   display: grid;
@@ -25,6 +26,20 @@ const Project = styled(Card)`
   font-size: unset;
   position: relative;
   height: 20rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: ${(props) =>
+      props.$isDarkMode ? "none" : "1px solid rgba(0, 0, 0, 0.1)"};
+    pointer-events: none;
+    z-index: 1;
+    border-radius: calc(1.5rem + 1px);
+  }
 
   &:hover {
     transform: scale(1.05);
@@ -76,6 +91,7 @@ function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -118,6 +134,7 @@ function ProjectsPage() {
           <Project
             key={project.id}
             onClick={() => navigate(`/project/${project.id}`)}
+            $isDarkMode={isDarkMode}
           >
             <Image imageurl={getPrimaryImage(project)} />
             <Content>

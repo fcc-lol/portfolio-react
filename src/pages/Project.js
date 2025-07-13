@@ -6,14 +6,50 @@ import Card from "../components/Card";
 import { Page, Container, VStack } from "../components/Layout";
 import { Loading, Error } from "../components/States";
 import { Header, MediumText, TextContent } from "../components/Typography";
+import { useTheme } from "../contexts/ThemeContext";
 
 const MediaCard = styled(Card)`
   padding: 0;
   overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: ${(props) =>
+      props.$isDarkMode ? "none" : "1px solid rgba(0, 0, 0, 0.1)"};
+    pointer-events: none;
+    z-index: 1;
+    border-radius: calc(1.5rem + 1px);
+  }
 
   img {
     width: 100%;
     object-fit: cover;
+    display: block;
+  }
+`;
+
+const LinksContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
+const LinkButton = styled.a`
+  display: inline-block;
+  color: ${(props) => props.theme.textSecondary};
+  text-decoration: underline;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    color: ${(props) => props.theme.textPrimary};
   }
 `;
 
@@ -22,6 +58,7 @@ function ProjectPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { projectId } = useParams();
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -76,13 +113,27 @@ function ProjectPage() {
             <TextContent>
               <Header>{project.name}</Header>
               <MediumText>{project.description}</MediumText>
+              {project.links && project.links.length > 0 && (
+                <LinksContainer>
+                  {project.links.map((link, index) => (
+                    <LinkButton
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label}
+                    </LinkButton>
+                  ))}
+                </LinksContainer>
+              )}
             </TextContent>
           </Card>
 
-          {project.media && project.media.length > 1 && (
+          {project.media && (
             <VStack>
               {project.media.map((mediaUrl, index) => (
-                <MediaCard key={index}>
+                <MediaCard key={index} $isDarkMode={isDarkMode}>
                   <img src={mediaUrl} alt={`${project.name} - ${index + 1}`} />
                 </MediaCard>
               ))}
