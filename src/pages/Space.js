@@ -29,6 +29,7 @@ function SpacePage() {
   const image1Ref = useRef(null);
   const image2Ref = useRef(null);
   const image3Ref = useRef(null);
+  const mountTimeRef = useRef(Date.now());
 
   const imageRefs = useMemo(
     () => ({
@@ -40,7 +41,7 @@ function SpacePage() {
   );
 
   useEffect(() => {
-    // Check if images are already loaded (cached)
+    // Check if images are already loaded (cached) on mount
     Object.keys(imageRefs).forEach((key) => {
       const img = imageRefs[key].current;
       if (img && img.complete && img.naturalWidth > 0) {
@@ -57,10 +58,23 @@ function SpacePage() {
   }, [imageRefs]);
 
   const handleImageLoad = (imageKey) => {
+    const loadTime = Date.now();
+    const timeSinceMount = loadTime - mountTimeRef.current;
+
+    // If image loaded very quickly (< 50ms), it's likely cached
+    const isLikelyCached = timeSinceMount < 50;
+
     setImageLoaded((prev) => ({
       ...prev,
       [imageKey]: true
     }));
+
+    if (isLikelyCached) {
+      setShouldAnimate((prev) => ({
+        ...prev,
+        [imageKey]: false
+      }));
+    }
   };
 
   return (

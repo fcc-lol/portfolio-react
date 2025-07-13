@@ -111,6 +111,7 @@ function ProjectImage({ imageUrl, ...props }) {
   const [loaded, setLoaded] = useState(false);
   const [shouldAnimate, setShouldAnimate] = useState(true);
   const imageRef = useRef(null);
+  const mountTimeRef = useRef(Date.now());
 
   useEffect(() => {
     if (imageUrl && imageRef.current) {
@@ -124,7 +125,17 @@ function ProjectImage({ imageUrl, ...props }) {
   }, [imageUrl]);
 
   const handleImageLoad = () => {
+    const loadTime = Date.now();
+    const timeSinceMount = loadTime - mountTimeRef.current;
+
+    // If image loaded very quickly (< 50ms), it's likely cached
+    const isLikelyCached = timeSinceMount < 50;
+
     setLoaded(true);
+
+    if (isLikelyCached) {
+      setShouldAnimate(false);
+    }
   };
 
   return (
