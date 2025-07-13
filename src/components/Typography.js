@@ -4,7 +4,6 @@ export const Header = styled.h1`
   font-size: 3rem;
   font-weight: bold;
   margin: 0;
-  line-height: 1.25;
   color: ${(props) => props.theme.textPrimary};
 
   @media (max-width: 1024px) {
