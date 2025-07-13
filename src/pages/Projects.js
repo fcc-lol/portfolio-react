@@ -11,6 +11,7 @@ const Grid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
+  user-select: none;
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(3, 1fr);

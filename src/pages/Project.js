@@ -5,7 +5,11 @@ import Navigation from "../components/Navigation";
 import Card from "../components/Card";
 import { Page, Container, VStack } from "../components/Layout";
 import { Loading, Error } from "../components/States";
-import { Header, MediumText, TextContent } from "../components/Typography";
+import {
+  Header,
+  MediumText,
+  HeaderTextContent
+} from "../components/Typography";
 import { useTheme } from "../contexts/ThemeContext";
 
 const MediaCard = styled(Card)`
@@ -121,7 +125,7 @@ function ProjectPage() {
 
         <VStack>
           <Card>
-            <TextContent>
+            <HeaderTextContent>
               <Header>{project.name}</Header>
               <MediumText>{project.description}</MediumText>
               {project.links && project.links.length > 0 && (
@@ -138,7 +142,7 @@ function ProjectPage() {
                   ))}
                 </LinksContainer>
               )}
-            </TextContent>
+            </HeaderTextContent>
           </Card>
 
           {project.media && (

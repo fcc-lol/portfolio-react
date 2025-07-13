@@ -24,10 +24,10 @@ const Tabs = styled.div`
 
   @media (max-width: 768px) {
     gap: 0;
-    ${(props) => props.$hideOnMobile && "display: none;"}
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     width: 100%;
+    ${(props) => props.$hideOnMobile && "display: none;"}
   }
 `;
 
@@ -57,7 +57,7 @@ const TabButton = styled.button`
   }
 
   @media (max-width: 768px) {
-    padding: 0 1.75rem;
+    padding: 0 1rem;
   }
 `;
 
