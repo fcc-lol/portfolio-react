@@ -58,6 +58,12 @@ const Project = styled(Card)`
   }
 `;
 
+const ImageContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+`;
+
 const Image = styled.div.attrs((props) => ({
   "data-image-url": props.$imageurl
 }))`
@@ -67,6 +73,12 @@ const Image = styled.div.attrs((props) => ({
     props.$imageurl ? `url(${props.$imageurl})` : props.theme.cardBackground};
   background-size: cover;
   background-position: center;
+  opacity: ${(props) => (props.loaded ? 1 : 0)};
+  transition: opacity 0.5s ease-in-out;
+`;
+
+const HiddenImage = styled.img`
+  display: none;
 `;
 
 const Content = styled.div`
@@ -93,6 +105,23 @@ const Description = styled.p`
   text-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
   margin: 0;
 `;
+
+function ProjectImage({ imageUrl, ...props }) {
+  const [loaded, setLoaded] = useState(false);
+
+  const handleImageLoad = () => {
+    setLoaded(true);
+  };
+
+  return (
+    <ImageContainer>
+      {imageUrl && (
+        <HiddenImage src={imageUrl} onLoad={handleImageLoad} alt="" />
+      )}
+      <Image $imageurl={imageUrl} loaded={loaded || !imageUrl} {...props} />
+    </ImageContainer>
+  );
+}
 
 function ProjectsPage() {
   const [projects, setProjects] = useState([]);
@@ -144,7 +173,7 @@ function ProjectsPage() {
             onClick={() => navigate(`/project/${project.id}`)}
             $isDarkMode={isDarkMode}
           >
-            <Image $imageurl={getPrimaryImage(project)} />
+            <ProjectImage imageUrl={getPrimaryImage(project)} />
             <Content>
               <Title>{project.name}</Title>
               <Description>{project.description}</Description>

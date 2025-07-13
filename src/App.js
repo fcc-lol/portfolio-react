@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { StyleSheetManager } from "styled-components";
+import isPropValid from "@emotion/is-prop-valid";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ProjectsPage from "./pages/Projects";
 import ProjectPage from "./pages/Project";
@@ -8,17 +10,26 @@ import AboutPage from "./pages/About";
 
 function App() {
   return (
-    <ThemeProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<ProjectsPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/space" element={<SpacePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/project/:projectId" element={<ProjectPage />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <StyleSheetManager
+      shouldForwardProp={(prop, defaultValidatorFn) => {
+        // Don't forward our custom props
+        if (prop === "loaded") return false;
+        // Use emotion's isPropValid for other props
+        return isPropValid(prop);
+      }}
+    >
+      <ThemeProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<ProjectsPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/space" element={<SpacePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/project/:projectId" element={<ProjectPage />} />
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </StyleSheetManager>
   );
 }
 
