@@ -21,13 +21,14 @@ const MediaCard = styled(Card)`
     right: 0;
     bottom: 0;
     border: ${(props) =>
-      props.$isDarkMode ? "none" : "1px solid rgba(0, 0, 0, 0.1)"};
+      props.$isDarkMode ? "none" : "2px solid rgba(0, 0, 0, 0.1)"};
     pointer-events: none;
     z-index: 1;
-    border-radius: calc(1.5rem + 1px);
+    border-radius: 1.5rem;
   }
 
-  img {
+  img,
+  video {
     width: 100%;
     object-fit: cover;
     display: block;
@@ -52,6 +53,12 @@ const LinkButton = styled.a`
     color: ${(props) => props.theme.textPrimary};
   }
 `;
+
+// Helper function to determine if a URL is a video
+const isVideoFile = (url) => {
+  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv"];
+  return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
+};
 
 function ProjectPage() {
   const [project, setProject] = useState(null);
@@ -134,7 +141,14 @@ function ProjectPage() {
             <VStack>
               {project.media.map((mediaUrl, index) => (
                 <MediaCard key={index} $isDarkMode={isDarkMode}>
-                  <img src={mediaUrl} alt={`${project.name} - ${index + 1}`} />
+                  {isVideoFile(mediaUrl) ? (
+                    <video src={mediaUrl} autoPlay muted loop playsInline />
+                  ) : (
+                    <img
+                      src={mediaUrl}
+                      alt={`${project.name} - ${index + 1}`}
+                    />
+                  )}
                 </MediaCard>
               ))}
             </VStack>

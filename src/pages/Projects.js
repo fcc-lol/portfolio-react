@@ -35,14 +35,18 @@ const Project = styled(Card)`
     right: 0;
     bottom: 0;
     border: ${(props) =>
-      props.$isDarkMode ? "none" : "1px solid rgba(0, 0, 0, 0.1)"};
+      props.$isDarkMode ? "none" : "2px solid rgba(0, 0, 0, 0.1)"};
     pointer-events: none;
     z-index: 1;
-    border-radius: calc(1.5rem + 1px);
+    border-radius: 1.5rem;
   }
 
   &:hover {
     transform: scale(1.05);
+
+    @media (max-width: 1024px) {
+      transform: scale(1.025);
+    }
   }
 
   &:active {
@@ -63,7 +67,7 @@ const Image = styled.div.attrs((props) => ({
 
 const Content = styled.div`
   padding: 1.5rem;
-  line-height: 1.5;
+  line-height: 1.375;
   position: absolute;
   z-index: 1;
   bottom: -0.25rem;
@@ -73,7 +77,7 @@ const Content = styled.div`
 `;
 
 const Title = styled.h2`
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.5rem 0;
   color: rgba(255, 255, 255, 1);
   text-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5);
   font-size: 1.5rem;

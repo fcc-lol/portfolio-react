@@ -12,7 +12,7 @@ const TabNavigation = styled.nav`
   user-select: none;
   height: 3.5rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     margin-bottom: 1rem;
   }
 `;
@@ -22,7 +22,7 @@ const Tabs = styled.div`
   gap: 1.5rem;
   justify-content: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     gap: 1rem;
   }
 `;

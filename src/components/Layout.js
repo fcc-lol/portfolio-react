@@ -6,7 +6,7 @@ export const Page = styled.div`
   min-height: calc(100vh - 6.25rem);
   background: ${(props) => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     padding: 1rem 0 0 0;
     margin-bottom: 3rem;
   }
