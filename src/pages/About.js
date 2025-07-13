@@ -59,12 +59,7 @@ function AboutPage() {
                 We design and build custom products to explore novel ways of
                 interacting with electronics.
               </LargeText>
-              <a
-                href="mailto:studio@fcc.lol"
-                style={{ textDecoration: "none" }}
-              >
-                <Button>Contact us</Button>
-              </a>
+              <Button link="mailto:studio@fcc.lol">Contact us</Button>
             </HeaderTextContent>
           </Card>
           <HStack>

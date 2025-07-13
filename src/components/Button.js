@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const Button = styled.button`
+const StyledButton = styled.button`
   background: ${(props) => props.theme.textPrimary};
   color: ${(props) => props.theme.background};
   padding: 0.75rem 1.5rem;
@@ -34,5 +34,9 @@ const Button = styled.button`
     width: 100%;
   }
 `;
+
+const Button = ({ link, ...props }) => {
+  return <StyledButton as={link ? "a" : "button"} href={link} {...props} />;
+};
 
 export default Button;
