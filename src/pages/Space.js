@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Navigation from "../components/Navigation";
 import Card from "../components/Card";
 import { Page, Container, VStack } from "../components/Layout";
+import { useTheme } from "../contexts/ThemeContext";
 
 const FadeInImage = styled.img`
   width: 100%;
@@ -13,7 +14,15 @@ const FadeInImage = styled.img`
     props.shouldAnimate ? "opacity 0.5s ease-in-out" : "none"};
 `;
 
+const imageUrls = [
+  "https://static.fcc.lol/studio-photos/IMG_8796.jpeg",
+  "https://static.fcc.lol/studio-photos/IMG_8806.jpeg",
+  "https://static.fcc.lol/studio-photos/IMG_8813.jpeg"
+];
+
 function SpacePage() {
+  const { markImageAsLoaded, isImageLoaded } = useTheme();
+
   const [imageLoaded, setImageLoaded] = useState({
     image1: false,
     image2: false,
@@ -29,7 +38,6 @@ function SpacePage() {
   const image1Ref = useRef(null);
   const image2Ref = useRef(null);
   const image3Ref = useRef(null);
-  const mountTimeRef = useRef(Date.now());
 
   const imageRefs = useMemo(
     () => ({
@@ -42,9 +50,12 @@ function SpacePage() {
 
   useEffect(() => {
     // Check if images are already loaded (cached) on mount
-    Object.keys(imageRefs).forEach((key) => {
+    Object.keys(imageRefs).forEach((key, index) => {
       const img = imageRefs[key].current;
-      if (img && img.complete && img.naturalWidth > 0) {
+      const imageUrl = imageUrls[index];
+
+      // If we've seen this image before in this session, don't animate
+      if (isImageLoaded(imageUrl)) {
         setImageLoaded((prev) => ({
           ...prev,
           [key]: true
@@ -54,27 +65,29 @@ function SpacePage() {
           [key]: false
         }));
       }
+      // Or if it's already loaded in the DOM
+      else if (img && img.complete && img.naturalWidth > 0) {
+        setImageLoaded((prev) => ({
+          ...prev,
+          [key]: true
+        }));
+        setShouldAnimate((prev) => ({
+          ...prev,
+          [key]: false
+        }));
+        markImageAsLoaded(imageUrl);
+      }
     });
-  }, [imageRefs]);
+  }, [imageRefs, isImageLoaded, markImageAsLoaded]);
 
-  const handleImageLoad = (imageKey) => {
-    const loadTime = Date.now();
-    const timeSinceMount = loadTime - mountTimeRef.current;
-
-    // If image loaded very quickly (< 50ms), it's likely cached
-    const isLikelyCached = timeSinceMount < 50;
-
+  const handleImageLoad = (imageKey, imageUrl) => {
     setImageLoaded((prev) => ({
       ...prev,
       [imageKey]: true
     }));
 
-    if (isLikelyCached) {
-      setShouldAnimate((prev) => ({
-        ...prev,
-        [imageKey]: false
-      }));
-    }
+    // Mark this image as loaded in the global state
+    markImageAsLoaded(imageUrl);
   };
 
   return (
@@ -85,31 +98,31 @@ function SpacePage() {
           <Card style={{ padding: "0" }}>
             <FadeInImage
               ref={image1Ref}
-              src="https://static.fcc.lol/studio-photos/IMG_8796.jpeg"
+              src={imageUrls[0]}
               alt="1"
               loaded={imageLoaded.image1}
               shouldAnimate={shouldAnimate.image1}
-              onLoad={() => handleImageLoad("image1")}
+              onLoad={() => handleImageLoad("image1", imageUrls[0])}
             />
           </Card>
           <Card style={{ padding: "0" }}>
             <FadeInImage
               ref={image2Ref}
-              src="https://static.fcc.lol/studio-photos/IMG_8806.jpeg"
+              src={imageUrls[1]}
               alt="1"
               loaded={imageLoaded.image2}
               shouldAnimate={shouldAnimate.image2}
-              onLoad={() => handleImageLoad("image2")}
+              onLoad={() => handleImageLoad("image2", imageUrls[1])}
             />
           </Card>
           <Card style={{ padding: "0" }}>
             <FadeInImage
               ref={image3Ref}
-              src="https://static.fcc.lol/studio-photos/IMG_8813.jpeg"
+              src={imageUrls[2]}
               alt="1"
               loaded={imageLoaded.image3}
               shouldAnimate={shouldAnimate.image3}
-              onLoad={() => handleImageLoad("image3")}
+              onLoad={() => handleImageLoad("image3", imageUrls[2])}
             />
           </Card>
         </VStack>

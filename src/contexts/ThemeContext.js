@@ -50,6 +50,8 @@ const getInitialTheme = () => {
 // Theme provider component
 export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
+  const [loadedImages, setLoadedImages] = useState(new Set());
+  const [cachedProjects, setCachedProjects] = useState(null);
 
   // Save theme preference to localStorage
   useEffect(() => {
@@ -60,21 +62,41 @@ export const ThemeProvider = ({ children }) => {
     setIsDarkMode(!isDarkMode);
   };
 
+  const markImageAsLoaded = (imageUrl) => {
+    setLoadedImages((prev) => new Set(prev).add(imageUrl));
+  };
+
+  const isImageLoaded = (imageUrl) => {
+    return loadedImages.has(imageUrl);
+  };
+
+  const setCachedProjectsData = (projects) => {
+    setCachedProjects(projects);
+  };
+
+  const getCachedProjectsData = () => {
+    return cachedProjects;
+  };
+
   const theme = isDarkMode ? darkTheme : lightTheme;
 
-  const contextValue = {
+  const value = {
     theme,
     isDarkMode,
-    toggleTheme
+    toggleTheme,
+    markImageAsLoaded,
+    isImageLoaded,
+    setCachedProjectsData,
+    getCachedProjectsData
   };
 
   return (
-    <ThemeContext.Provider value={contextValue}>
-      <StyledThemeProvider theme={theme}>
+    <StyledThemeProvider theme={theme}>
+      <ThemeContext.Provider value={value}>
         <GlobalStyles />
         {children}
-      </StyledThemeProvider>
-    </ThemeContext.Provider>
+      </ThemeContext.Provider>
+    </StyledThemeProvider>
   );
 };
 

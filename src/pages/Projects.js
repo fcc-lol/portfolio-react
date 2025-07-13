@@ -73,7 +73,12 @@ const Image = styled.div.attrs((props) => ({
     props.$imageurl ? `url(${props.$imageurl})` : props.theme.cardBackground};
   background-size: cover;
   background-position: center;
-  opacity: ${(props) => (props.loaded ? 1 : 0)};
+  opacity: ${(props) => {
+    // If image was loaded before, start with opacity 1 immediately
+    if (props.wasLoadedBefore) return 1;
+    // Otherwise use the loaded state
+    return props.loaded ? 1 : 0;
+  }};
   transition: ${(props) =>
     props.shouldAnimate ? "opacity 0.5s ease-in-out" : "none"};
 `;
@@ -108,33 +113,45 @@ const Description = styled.p`
 `;
 
 function ProjectImage({ imageUrl, ...props }) {
-  const [loaded, setLoaded] = useState(false);
-  const [shouldAnimate, setShouldAnimate] = useState(true);
+  const { markImageAsLoaded, isImageLoaded } = useTheme();
+
+  // Check if image was already loaded in this session immediately
+  const wasLoadedBefore = imageUrl ? isImageLoaded(imageUrl) : false;
+
+  const [loaded, setLoaded] = useState(wasLoadedBefore || !imageUrl);
+  const [shouldAnimate, setShouldAnimate] = useState(
+    !wasLoadedBefore && imageUrl
+  );
   const imageRef = useRef(null);
-  const mountTimeRef = useRef(Date.now());
 
   useEffect(() => {
-    if (imageUrl && imageRef.current) {
-      // Check if image is already loaded (cached)
-      const img = imageRef.current;
-      if (img.complete && img.naturalWidth > 0) {
+    if (imageUrl) {
+      // If we've seen this image before in this session, don't animate
+      if (isImageLoaded(imageUrl)) {
         setLoaded(true);
         setShouldAnimate(false);
+        return;
+      }
+
+      // Check if it's already loaded in the DOM
+      if (
+        imageRef.current &&
+        imageRef.current.complete &&
+        imageRef.current.naturalWidth > 0
+      ) {
+        setLoaded(true);
+        setShouldAnimate(false);
+        markImageAsLoaded(imageUrl);
       }
     }
-  }, [imageUrl]);
+  }, [imageUrl, isImageLoaded, markImageAsLoaded]);
 
   const handleImageLoad = () => {
-    const loadTime = Date.now();
-    const timeSinceMount = loadTime - mountTimeRef.current;
-
-    // If image loaded very quickly (< 50ms), it's likely cached
-    const isLikelyCached = timeSinceMount < 50;
-
     setLoaded(true);
 
-    if (isLikelyCached) {
-      setShouldAnimate(false);
+    // Mark this image as loaded in the global state
+    if (imageUrl) {
+      markImageAsLoaded(imageUrl);
     }
   };
 
@@ -150,8 +167,9 @@ function ProjectImage({ imageUrl, ...props }) {
       )}
       <Image
         $imageurl={imageUrl}
-        loaded={loaded || !imageUrl}
-        shouldAnimate={shouldAnimate && imageUrl}
+        loaded={loaded}
+        shouldAnimate={shouldAnimate}
+        wasLoadedBefore={wasLoadedBefore}
         {...props}
       />
     </ImageContainer>
@@ -159,13 +177,23 @@ function ProjectImage({ imageUrl, ...props }) {
 }
 
 function ProjectsPage() {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { isDarkMode, setCachedProjectsData, getCachedProjectsData } =
+    useTheme();
   const navigate = useNavigate();
-  const { isDarkMode } = useTheme();
+
+  // Try to get cached projects first
+  const cachedProjects = getCachedProjectsData();
+
+  const [projects, setProjects] = useState(cachedProjects || []);
+  const [loading, setLoading] = useState(!cachedProjects);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    // If we already have cached data, don't fetch again
+    if (cachedProjects) {
+      return;
+    }
+
     const fetchProjects = async () => {
       try {
         const response = await fetch("https://portfolio-api.fcc.lol/projects");
@@ -174,6 +202,7 @@ function ProjectsPage() {
         }
         const data = await response.json();
         setProjects(data);
+        setCachedProjectsData(data); // Cache the data
       } catch (err) {
         setError(err.message);
       } finally {
@@ -182,7 +211,7 @@ function ProjectsPage() {
     };
 
     fetchProjects();
-  }, []);
+  }, [cachedProjects, setCachedProjectsData]);
 
   const getPrimaryImage = (project) => {
     return (
