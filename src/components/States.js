@@ -52,6 +52,40 @@ export const ProjectsSkeleton = () => {
   );
 };
 
+const ProjectSkeletonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+`;
+
+const ProjectInfoSkeleton = styled(Card)`
+  background: ${(props) => props.theme.cardBackground};
+  min-height: 10rem;
+
+  @media (max-width: 768px) {
+    min-height: 8rem;
+  }
+`;
+
+const ProjectMediaSkeleton = styled(Card)`
+  padding: 0;
+  height: 24rem;
+  overflow: hidden;
+  position: relative;
+  background: ${(props) => props.theme.cardBackground};
+`;
+
+export const ProjectSkeleton = () => {
+  return (
+    <ProjectSkeletonContainer>
+      <ProjectInfoSkeleton />
+      {Array.from({ length: 3 }).map((_, index) => (
+        <ProjectMediaSkeleton key={index} />
+      ))}
+    </ProjectSkeletonContainer>
+  );
+};
+
 export const Error = styled.div`
   text-align: center;
   color: ${(props) => props.theme.error};

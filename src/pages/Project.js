@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import Navigation from "../components/Navigation";
 import Card from "../components/Card";
 import { Page, Container, VStack } from "../components/Layout";
-import { Loading, Error } from "../components/States";
+import { ProjectSkeleton, Error } from "../components/States";
 import {
   Header,
   MediumText,
@@ -30,13 +30,51 @@ const MediaCard = styled(Card)`
     z-index: 1;
     border-radius: 1.5rem;
   }
+`;
 
-  img,
-  video {
-    width: 100%;
-    object-fit: cover;
-    display: block;
+const HeaderCard = styled(Card)`
+  min-height: 10rem;
+
+  @media (max-width: 768px) {
+    min-height: 8rem;
   }
+`;
+
+const MediaContainer = styled.div`
+  width: 100%;
+  position: relative;
+`;
+
+const FadeInImage = styled.img`
+  width: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: ${(props) => {
+    // If image was loaded before, start with opacity 1 immediately
+    if (props.wasLoadedBefore) return 1;
+    // Otherwise use the loaded state
+    return props.loaded ? 1 : 0;
+  }};
+  transition: ${(props) =>
+    props.shouldAnimate ? "opacity 0.5s ease-in-out" : "none"};
+`;
+
+const FadeInVideo = styled.video`
+  width: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: ${(props) => {
+    // If video was loaded before, start with opacity 1 immediately
+    if (props.wasLoadedBefore) return 1;
+    // Otherwise use the loaded state
+    return props.loaded ? 1 : 0;
+  }};
+  transition: ${(props) =>
+    props.shouldAnimate ? "opacity 0.5s ease-in-out" : "none"};
+`;
+
+const HiddenImage = styled.img`
+  display: none;
 `;
 
 const LinksContainer = styled.div`
@@ -74,6 +112,70 @@ const isVideoFile = (url) => {
   return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
 };
 
+function MediaItem({ mediaUrl, projectName, index }) {
+  const { markImageAsLoaded, isImageLoaded } = useTheme();
+  const isVideo = isVideoFile(mediaUrl);
+
+  // Check if media was already loaded in this session immediately
+  const wasLoadedBefore = mediaUrl ? isImageLoaded(mediaUrl) : false;
+
+  const [loaded, setLoaded] = useState(wasLoadedBefore || !mediaUrl);
+  const [shouldAnimate, setShouldAnimate] = useState(
+    !wasLoadedBefore && mediaUrl
+  );
+
+  useEffect(() => {
+    if (mediaUrl) {
+      // If we've seen this media before in this session, don't animate
+      if (isImageLoaded(mediaUrl)) {
+        setLoaded(true);
+        setShouldAnimate(false);
+        return;
+      }
+    }
+  }, [mediaUrl, isImageLoaded]);
+
+  const handleMediaLoad = () => {
+    setLoaded(true);
+
+    // Mark this media as loaded in the global state
+    if (mediaUrl) {
+      markImageAsLoaded(mediaUrl);
+    }
+  };
+
+  if (isVideo) {
+    return (
+      <MediaContainer>
+        <FadeInVideo
+          src={mediaUrl}
+          autoPlay
+          muted
+          loop
+          playsInline
+          loaded={loaded}
+          shouldAnimate={shouldAnimate}
+          wasLoadedBefore={wasLoadedBefore}
+          onLoadedData={handleMediaLoad}
+        />
+      </MediaContainer>
+    );
+  }
+
+  return (
+    <MediaContainer>
+      <HiddenImage src={mediaUrl} onLoad={handleMediaLoad} alt="" />
+      <FadeInImage
+        src={mediaUrl}
+        alt={`${projectName} - ${index + 1}`}
+        loaded={loaded}
+        shouldAnimate={shouldAnimate}
+        wasLoadedBefore={wasLoadedBefore}
+      />
+    </MediaContainer>
+  );
+}
+
 function ProjectPage() {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -107,7 +209,7 @@ function ProjectPage() {
       <Page>
         <Container>
           <Navigation />
-          <Loading />
+          <ProjectSkeleton />
         </Container>
       </Page>
     );
@@ -130,7 +232,7 @@ function ProjectPage() {
         <Navigation showBackButton={true} />
 
         <VStack>
-          <Card>
+          <HeaderCard $isDarkMode={isDarkMode}>
             <HeaderTextContent>
               <Header>{project.name}</Header>
               <MediumText>{project.description}</MediumText>
@@ -149,20 +251,17 @@ function ProjectPage() {
                 </LinksContainer>
               )}
             </HeaderTextContent>
-          </Card>
+          </HeaderCard>
 
           {project.media && (
             <VStack>
               {project.media.map((mediaUrl, index) => (
                 <MediaCard key={index} $isDarkMode={isDarkMode}>
-                  {isVideoFile(mediaUrl) ? (
-                    <video src={mediaUrl} autoPlay muted loop playsInline />
-                  ) : (
-                    <img
-                      src={mediaUrl}
-                      alt={`${project.name} - ${index + 1}`}
-                    />
-                  )}
+                  <MediaItem
+                    mediaUrl={mediaUrl}
+                    projectName={project.name}
+                    index={index}
+                  />
                 </MediaCard>
               ))}
             </VStack>
