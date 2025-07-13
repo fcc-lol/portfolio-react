@@ -47,7 +47,7 @@ function SpacePage() {
         }));
       }
     });
-  }, []);
+  }, [imageRefs]);
 
   const handleImageLoad = (imageKey) => {
     setImageLoaded((prev) => ({

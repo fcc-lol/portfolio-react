@@ -13,7 +13,7 @@ function App() {
     <StyleSheetManager
       shouldForwardProp={(prop, defaultValidatorFn) => {
         // Don't forward our custom props
-        if (prop === "loaded") return false;
+        if (prop === "loaded" || prop === "shouldAnimate") return false;
         // Use emotion's isPropValid for other props
         return isPropValid(prop);
       }}
