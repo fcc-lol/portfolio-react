@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navigation from "../components/Navigation";
 import Card from "../components/Card";
 import { Page, Container } from "../components/Layout";
-import { Loading, Error } from "../components/States";
+import { Error, ProjectsSkeleton } from "../components/States";
 import { useTheme } from "../contexts/ThemeContext";
 
 const Grid = styled.div`
@@ -59,12 +59,12 @@ const Project = styled(Card)`
 `;
 
 const Image = styled.div.attrs((props) => ({
-  "data-image-url": props.imageurl
+  "data-image-url": props.$imageurl
 }))`
   width: 100%;
   height: 100%;
   background: ${(props) =>
-    props.imageurl ? `url(${props.imageurl})` : props.theme.cardBackground};
+    props.$imageurl ? `url(${props.$imageurl})` : props.theme.cardBackground};
   background-size: cover;
   background-position: center;
 `;
@@ -129,7 +129,7 @@ function ProjectsPage() {
 
   const renderContent = () => {
     if (loading) {
-      return <Loading />;
+      return <ProjectsSkeleton />;
     }
 
     if (error) {
@@ -144,7 +144,7 @@ function ProjectsPage() {
             onClick={() => navigate(`/project/${project.id}`)}
             $isDarkMode={isDarkMode}
           >
-            <Image imageurl={getPrimaryImage(project)} />
+            <Image $imageurl={getPrimaryImage(project)} />
             <Content>
               <Title>{project.name}</Title>
               <Description>{project.description}</Description>
