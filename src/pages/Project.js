@@ -52,6 +52,10 @@ const LinkButton = styled.a`
   &:hover {
     color: ${(props) => props.theme.textPrimary};
   }
+
+  &:active {
+    transform: scale(0.9);
+  }
 `;
 
 // Helper function to determine if a URL is a video
