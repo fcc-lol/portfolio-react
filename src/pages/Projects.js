@@ -22,7 +22,7 @@ const Project = styled(Card)`
   will-change: transform;
   padding: 0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease-in-out;
   font-size: unset;
   position: relative;
   height: 20rem;
