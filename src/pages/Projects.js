@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Navigation from "../components/Navigation";
@@ -74,7 +74,8 @@ const Image = styled.div.attrs((props) => ({
   background-size: cover;
   background-position: center;
   opacity: ${(props) => (props.loaded ? 1 : 0)};
-  transition: opacity 0.5s ease-in-out;
+  transition: ${(props) =>
+    props.shouldAnimate ? "opacity 0.5s ease-in-out" : "none"};
 `;
 
 const HiddenImage = styled.img`
@@ -108,6 +109,19 @@ const Description = styled.p`
 
 function ProjectImage({ imageUrl, ...props }) {
   const [loaded, setLoaded] = useState(false);
+  const [shouldAnimate, setShouldAnimate] = useState(true);
+  const imageRef = useRef(null);
+
+  useEffect(() => {
+    if (imageUrl && imageRef.current) {
+      // Check if image is already loaded (cached)
+      const img = imageRef.current;
+      if (img.complete && img.naturalWidth > 0) {
+        setLoaded(true);
+        setShouldAnimate(false);
+      }
+    }
+  }, [imageUrl]);
 
   const handleImageLoad = () => {
     setLoaded(true);
@@ -116,9 +130,19 @@ function ProjectImage({ imageUrl, ...props }) {
   return (
     <ImageContainer>
       {imageUrl && (
-        <HiddenImage src={imageUrl} onLoad={handleImageLoad} alt="" />
+        <HiddenImage
+          ref={imageRef}
+          src={imageUrl}
+          onLoad={handleImageLoad}
+          alt=""
+        />
       )}
-      <Image $imageurl={imageUrl} loaded={loaded || !imageUrl} {...props} />
+      <Image
+        $imageurl={imageUrl}
+        loaded={loaded || !imageUrl}
+        shouldAnimate={shouldAnimate && imageUrl}
+        {...props}
+      />
     </ImageContainer>
   );
 }
