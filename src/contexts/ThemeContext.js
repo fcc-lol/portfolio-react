@@ -36,21 +36,20 @@ const darkTheme = {
 // Create context
 const ThemeContext = createContext();
 
+// Function to get initial theme state
+const getInitialTheme = () => {
+  const savedTheme = localStorage.getItem("darkMode");
+  if (savedTheme) {
+    return JSON.parse(savedTheme);
+  }
+  // Check system preference
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  return mediaQuery.matches;
+};
+
 // Theme provider component
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // Load theme preference from localStorage on mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("darkMode");
-    if (savedTheme) {
-      setIsDarkMode(JSON.parse(savedTheme));
-    } else {
-      // Check system preference
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      setIsDarkMode(mediaQuery.matches);
-    }
-  }, []);
+  const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
 
   // Save theme preference to localStorage
   useEffect(() => {
