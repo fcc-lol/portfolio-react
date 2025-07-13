@@ -2,13 +2,14 @@ import React from "react";
 import styled from "styled-components";
 import Navigation from "../components/Navigation";
 import Card from "../components/Card";
+import Button from "../components/Button";
 import { Page, Container, VStack, HStack } from "../components/Layout";
 import {
   Header,
   Subheader,
   LargeText,
   SmallText,
-  TextContent
+  HeaderTextContent
 } from "../components/Typography";
 
 const ProfileCard = styled(Card)`
@@ -20,6 +21,10 @@ const ProfileCard = styled(Card)`
   text-align: center;
   padding: 2rem 2rem 3rem 2rem;
   gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    padding: 2rem;
+  }
 `;
 
 const ProfilePicture = styled.img`
@@ -30,6 +35,12 @@ const ProfilePicture = styled.img`
   margin-bottom: 0.5rem;
   user-select: none;
   pointer-events: none;
+
+  @media (max-width: 768px) {
+    width: 6rem;
+    height: 6rem;
+    margin-bottom: 0;
+  }
 `;
 
 function AboutPage() {
@@ -39,16 +50,22 @@ function AboutPage() {
         <Navigation />
         <VStack>
           <Card>
-            <TextContent style={{ padding: "1.5rem 2rem" }}>
+            <HeaderTextContent>
               <Header>
                 FCC Studio is a technology and art collective that makes fun
                 software and hardware.
               </Header>
               <LargeText>
                 We design and build custom products to explore novel ways of
-                interacting with computers.
+                interacting with electronics.
               </LargeText>
-            </TextContent>
+              <a
+                href="mailto:studio@fcc.lol"
+                style={{ textDecoration: "none" }}
+              >
+                <Button>Contact us</Button>
+              </a>
+            </HeaderTextContent>
           </Card>
           <HStack>
             <ProfileCard>

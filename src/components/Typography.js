@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Header = styled.h1`
   font-size: 3rem;
   font-weight: bold;
-  margin: 1rem 0;
+  margin: 0;
   line-height: 1.25;
   color: ${(props) => props.theme.textPrimary};
 
@@ -42,6 +42,13 @@ export const SmallText = styled.p`
   margin: 0;
   line-height: 1.375;
   color: ${(props) => props.theme.textSecondary};
+`;
+
+export const HeaderTextContent = styled.div`
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 `;
 
 export const TextContent = styled.div`

@@ -26,6 +26,7 @@ const Project = styled(Card)`
   font-size: unset;
   position: relative;
   height: 20rem;
+  user-select: none;
 
   &::before {
     content: "";
@@ -41,11 +42,13 @@ const Project = styled(Card)`
     border-radius: 1.5rem;
   }
 
-  &:hover {
-    transform: scale(1.05);
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.05);
 
-    @media (max-width: 1024px) {
-      transform: scale(1.025);
+      @media (max-width: 1024px) {
+        transform: scale(1.025);
+      }
     }
   }
 

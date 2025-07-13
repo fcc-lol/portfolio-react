@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
-import ThemeToggle from "./ThemeToggle";
 
 const TabNavigation = styled.nav`
   display: grid;
@@ -12,8 +11,9 @@ const TabNavigation = styled.nav`
   user-select: none;
   height: 3.5rem;
 
-  @media (max-width: 1024px) {
+  @media (max-width: 768px) {
     margin-bottom: 1rem;
+    display: flex;
   }
 `;
 
@@ -22,8 +22,12 @@ const Tabs = styled.div`
   gap: 1.5rem;
   justify-content: center;
 
-  @media (max-width: 1024px) {
-    gap: 1rem;
+  @media (max-width: 768px) {
+    gap: 0;
+    ${(props) => props.$hideOnMobile && "display: none;"}
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
   }
 `;
 
@@ -51,9 +55,15 @@ const TabButton = styled.button`
     color: ${(props) => props.theme.textPrimary};
     transform: scale(0.9);
   }
+
+  @media (max-width: 768px) {
+    padding: 0 1.75rem;
+  }
 `;
 
-const BackButton = styled(TabButton)``;
+const BackButton = styled(TabButton)`
+  padding: 1rem 0;
+`;
 
 function Navigation({ showBackButton = false }) {
   const location = useLocation();
@@ -86,7 +96,7 @@ function Navigation({ showBackButton = false }) {
           <BackButton onClick={() => navigate("/")}>← back</BackButton>
         )}
       </div>
-      <Tabs>
+      <Tabs $hideOnMobile={showBackButton}>
         <TabButton
           $isActive={activeTab === "projects"}
           onClick={() => handleTabClick("projects")}
@@ -106,9 +116,6 @@ function Navigation({ showBackButton = false }) {
           About
         </TabButton>
       </Tabs>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <ThemeToggle />
-      </div>
     </TabNavigation>
   );
 }
