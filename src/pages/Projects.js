@@ -194,8 +194,6 @@ function ProjectsPage() {
   useEffect(() => {
     // If we already have cached data, don't fetch again
     if (cachedProjects) {
-      // Show content immediately if we have cached data
-      setContentVisible(true);
       return;
     }
 
@@ -218,16 +216,16 @@ function ProjectsPage() {
     fetchProjects();
   }, [cachedProjects, setCachedProjectsData]);
 
-  // Trigger fade-in animation when content loads
+  // Trigger fade-in animation when content is ready (both cached and fetched)
   useEffect(() => {
-    if (!loading && !cachedProjects) {
+    if (!loading) {
       // Small delay to ensure smooth fade-in
       const timer = setTimeout(() => {
         setContentVisible(true);
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [loading, cachedProjects]);
+  }, [loading]);
 
   // Handle project click with fade-out animation
   const handleProjectClick = (projectId) => {
