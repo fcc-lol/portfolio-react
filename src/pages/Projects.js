@@ -99,6 +99,8 @@ const Content = styled.div`
   left: 0;
   right: 0;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  opacity: ${(props) => (props.visible ? 1 : 0)};
+  transition: ${FADE_TRANSITION};
 `;
 
 const Title = styled.h2`
@@ -270,7 +272,7 @@ function ProjectsPage() {
               $isDarkMode={isDarkMode}
             >
               <ProjectImage imageUrl={getPrimaryImage(project)} />
-              <Content>
+              <Content visible={visible}>
                 <Title>{project.name}</Title>
                 <Description>{project.description}</Description>
               </Content>
