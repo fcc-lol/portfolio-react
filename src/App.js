@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  ScrollRestoration,
+  Outlet
+} from "react-router-dom";
 import { StyleSheetManager } from "styled-components";
 import isPropValid from "@emotion/is-prop-valid";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -7,6 +12,51 @@ import ProjectsPage from "./pages/Projects";
 import ProjectPage from "./pages/Project";
 import SpacePage from "./pages/Space";
 import AboutPage from "./pages/About";
+
+// Root layout component that includes ScrollRestoration
+function RootLayout() {
+  return (
+    <>
+      <Outlet />
+      <ScrollRestoration
+        getKey={(location, matches) => {
+          // Use location.pathname + location.search as the key
+          return location.pathname + location.search;
+        }}
+      />
+    </>
+  );
+}
+
+// Create the router configuration
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      {
+        path: "/",
+        element: <ProjectsPage />
+      },
+      {
+        path: "/projects",
+        element: <ProjectsPage />
+      },
+      {
+        path: "/space",
+        element: <SpacePage />
+      },
+      {
+        path: "/about",
+        element: <AboutPage />
+      },
+      {
+        path: "/project/:projectId",
+        element: <ProjectPage />
+      }
+    ]
+  }
+]);
 
 function App() {
   return (
@@ -24,15 +74,7 @@ function App() {
       }}
     >
       <ThemeProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<ProjectsPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/space" element={<SpacePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/project/:projectId" element={<ProjectPage />} />
-          </Routes>
-        </Router>
+        <RouterProvider router={router} />
       </ThemeProvider>
     </StyleSheetManager>
   );
