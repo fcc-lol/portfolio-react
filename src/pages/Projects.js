@@ -6,6 +6,12 @@ import Card from "../components/Card";
 import { Page, Container } from "../components/Layout";
 import { Error, ProjectsSkeleton } from "../components/States";
 import { useTheme } from "../contexts/ThemeContext";
+import { FADE_TRANSITION } from "../constants";
+
+const FadeInWrapper = styled.div`
+  opacity: ${(props) => (props.visible ? 1 : 0)};
+  transition: ${FADE_TRANSITION};
+`;
 
 const Grid = styled.div`
   display: grid;
@@ -79,8 +85,7 @@ const Image = styled.div.attrs((props) => ({
     // Otherwise use the loaded state
     return props.loaded ? 1 : 0;
   }};
-  transition: ${(props) =>
-    props.shouldAnimate ? "opacity 0.5s ease-in-out" : "none"};
+  transition: ${(props) => (props.shouldAnimate ? FADE_TRANSITION : "none")};
 `;
 
 const HiddenImage = styled.img`
@@ -99,16 +104,16 @@ const Content = styled.div`
 `;
 
 const Title = styled.h2`
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.2rem 0;
   color: rgba(255, 255, 255, 1);
-  text-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0.25rem 0.2rem rgba(0, 0, 0, 0.2);
   font-size: 1.5rem;
   font-weight: bold;
 `;
 
 const Description = styled.p`
   color: rgba(255, 255, 255, 0.75);
-  text-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.2);
   margin: 0;
 `;
 
@@ -184,6 +189,7 @@ function ProjectsPage() {
   const [projects, setProjects] = useState(cachedProjects || []);
   const [loading, setLoading] = useState(!cachedProjects);
   const [error, setError] = useState(null);
+  const [pageVisible, setPageVisible] = useState(false);
 
   useEffect(() => {
     // If we already have cached data, don't fetch again
@@ -210,10 +216,27 @@ function ProjectsPage() {
     fetchProjects();
   }, [cachedProjects, setCachedProjectsData]);
 
+  // Trigger fade-in animation when component mounts and loading is complete
+  useEffect(() => {
+    if (!loading) {
+      // Small delay to ensure smooth fade-in
+      const timer = setTimeout(() => {
+        setPageVisible(true);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
+  // Handle project click with fade-out animation
+  const handleProjectClick = (projectId) => {
+    setPageVisible(false);
+    navigate(`/project/${projectId}`);
+  };
+
   const getPrimaryImage = (project) => {
     return (
-      project.primaryImage ||
-      (project.media && project.media.length > 0 ? project.media[0] : null)
+      project.primaryImage.url ||
+      (project.media && project.media.length > 0 ? project.media[0].url : null)
     );
   };
 
@@ -231,7 +254,7 @@ function ProjectsPage() {
         {projects.map((project) => (
           <Project
             key={project.id}
-            onClick={() => navigate(`/project/${project.id}`)}
+            onClick={() => handleProjectClick(project.id)}
             $isDarkMode={isDarkMode}
           >
             <ProjectImage imageUrl={getPrimaryImage(project)} />
@@ -249,7 +272,7 @@ function ProjectsPage() {
     <Page>
       <Container>
         <Navigation />
-        {renderContent()}
+        <FadeInWrapper visible={pageVisible}>{renderContent()}</FadeInWrapper>
       </Container>
     </Page>
   );

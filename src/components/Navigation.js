@@ -65,7 +65,7 @@ const BackButton = styled(TabButton)`
   padding: 1rem 0;
 `;
 
-function Navigation({ showBackButton = false }) {
+function Navigation({ showBackButton = false, onBackClick }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -89,11 +89,20 @@ function Navigation({ showBackButton = false }) {
     }
   };
 
+  // Handle back button click
+  const handleBackClick = () => {
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <TabNavigation>
       <div>
         {showBackButton && (
-          <BackButton onClick={() => navigate("/")}>← back</BackButton>
+          <BackButton onClick={handleBackClick}>← back</BackButton>
         )}
       </div>
       <Tabs $hideOnMobile={showBackButton}>
