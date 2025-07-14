@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FADE_TRANSITION_MS } from "../constants";
@@ -70,6 +70,7 @@ function Navigation({ showBackButton = false, onBackClick, onFadeOut }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [isNavigating, setIsNavigating] = useState(false);
+  const [pendingTab, setPendingTab] = useState(null);
 
   // Get current tab from pathname
   const getCurrentTab = () => {
@@ -81,6 +82,13 @@ function Navigation({ showBackButton = false, onBackClick, onFadeOut }) {
   };
 
   const activeTab = getCurrentTab();
+  // Use pendingTab for immediate visual feedback, fallback to activeTab
+  const displayActiveTab = pendingTab || activeTab;
+
+  // Reset pendingTab when location changes (navigation completes)
+  useEffect(() => {
+    setPendingTab(null);
+  }, [location.pathname]);
 
   // Handle tab click
   const handleTabClick = (tab) => {
@@ -88,6 +96,7 @@ function Navigation({ showBackButton = false, onBackClick, onFadeOut }) {
     if (isNavigating || activeTab === tab) return;
 
     setIsNavigating(true);
+    setPendingTab(tab); // Set immediately for visual feedback
 
     // Trigger fade-out if callback is provided
     if (onFadeOut) {
@@ -123,19 +132,19 @@ function Navigation({ showBackButton = false, onBackClick, onFadeOut }) {
       </div>
       <Tabs $hideOnMobile={showBackButton}>
         <TabButton
-          $isActive={activeTab === "projects"}
+          $isActive={displayActiveTab === "projects"}
           onClick={() => handleTabClick("projects")}
         >
           Projects
         </TabButton>
         <TabButton
-          $isActive={activeTab === "space"}
+          $isActive={displayActiveTab === "space"}
           onClick={() => handleTabClick("space")}
         >
           Space
         </TabButton>
         <TabButton
-          $isActive={activeTab === "about"}
+          $isActive={displayActiveTab === "about"}
           onClick={() => handleTabClick("about")}
         >
           About

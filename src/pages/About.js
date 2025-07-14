@@ -114,9 +114,20 @@ function ProfilePicture({ src, alt }) {
 
 function AboutPage() {
   const { pageVisible } = useOutletContext();
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  useEffect(() => {
+    // Start fade-in after a short delay to ensure proper animation
+    setTimeout(() => {
+      setDataLoaded(true);
+    }, 50);
+  }, []);
+
+  // Combine pageVisible (for fade-out) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && dataLoaded;
 
   return (
-    <FadeInWrapper visible={pageVisible}>
+    <FadeInWrapper visible={visible}>
       <VStack>
         <Card>
           <HeaderTextContent>

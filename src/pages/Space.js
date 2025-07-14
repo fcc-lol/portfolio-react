@@ -77,12 +77,23 @@ function SpaceImageComponent({ imageUrl, imageKey, imageRef }) {
 
 function SpacePage() {
   const { pageVisible } = useOutletContext();
+  const [dataLoaded, setDataLoaded] = useState(false);
   const image1Ref = useRef(null);
   const image2Ref = useRef(null);
   const image3Ref = useRef(null);
 
+  useEffect(() => {
+    // Start fade-in after a short delay to ensure proper animation
+    setTimeout(() => {
+      setDataLoaded(true);
+    }, 50);
+  }, []);
+
+  // Combine pageVisible (for fade-out) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && dataLoaded;
+
   return (
-    <FadeInWrapper visible={pageVisible}>
+    <FadeInWrapper visible={visible}>
       <VStack>
         <Card style={{ padding: "0" }}>
           <SpaceImageComponent
