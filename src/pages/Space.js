@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import Navigation from "../components/Navigation";
+import { useOutletContext } from "react-router-dom";
 import Card from "../components/Card";
-import { Page, Container, VStack } from "../components/Layout";
+import { VStack } from "../components/Layout";
 import { useTheme } from "../contexts/ThemeContext";
 import { FADE_TRANSITION } from "../constants";
 
@@ -76,56 +76,37 @@ function SpaceImageComponent({ imageUrl, imageKey, imageRef }) {
 }
 
 function SpacePage() {
-  const [pageVisible, setPageVisible] = useState(false);
+  const { pageVisible } = useOutletContext();
   const image1Ref = useRef(null);
   const image2Ref = useRef(null);
   const image3Ref = useRef(null);
 
-  // Trigger fade-in animation when component mounts
-  useEffect(() => {
-    // Small delay to ensure smooth fade-in
-    const timer = setTimeout(() => {
-      setPageVisible(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Handle fade-out when navigating away
-  const handleFadeOut = () => {
-    setPageVisible(false);
-  };
-
   return (
-    <Page>
-      <Container>
-        <Navigation onFadeOut={handleFadeOut} />
-        <FadeInWrapper visible={pageVisible}>
-          <VStack>
-            <Card style={{ padding: "0" }}>
-              <SpaceImageComponent
-                imageUrl={imageUrls[0]}
-                imageKey="image1"
-                imageRef={image1Ref}
-              />
-            </Card>
-            <Card style={{ padding: "0" }}>
-              <SpaceImageComponent
-                imageUrl={imageUrls[1]}
-                imageKey="image2"
-                imageRef={image2Ref}
-              />
-            </Card>
-            <Card style={{ padding: "0" }}>
-              <SpaceImageComponent
-                imageUrl={imageUrls[2]}
-                imageKey="image3"
-                imageRef={image3Ref}
-              />
-            </Card>
-          </VStack>
-        </FadeInWrapper>
-      </Container>
-    </Page>
+    <FadeInWrapper visible={pageVisible}>
+      <VStack>
+        <Card style={{ padding: "0" }}>
+          <SpaceImageComponent
+            imageUrl={imageUrls[0]}
+            imageKey="image1"
+            imageRef={image1Ref}
+          />
+        </Card>
+        <Card style={{ padding: "0" }}>
+          <SpaceImageComponent
+            imageUrl={imageUrls[1]}
+            imageKey="image2"
+            imageRef={image2Ref}
+          />
+        </Card>
+        <Card style={{ padding: "0" }}>
+          <SpaceImageComponent
+            imageUrl={imageUrls[2]}
+            imageKey="image3"
+            imageRef={image3Ref}
+          />
+        </Card>
+      </VStack>
+    </FadeInWrapper>
   );
 }
 

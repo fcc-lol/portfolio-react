@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { useParams, useNavigate } from "react-router-dom";
-import Navigation from "../components/Navigation";
+import { useParams, useOutletContext } from "react-router-dom";
 import Card from "../components/Card";
-import { Page, Container, VStack } from "../components/Layout";
+import { VStack } from "../components/Layout";
 import { ProjectSkeleton, Error } from "../components/States";
 import {
   Header,
@@ -11,7 +10,7 @@ import {
   HeaderTextContent
 } from "../components/Typography";
 import { useTheme } from "../contexts/ThemeContext";
-import { FADE_TRANSITION, FADE_TRANSITION_MS } from "../constants";
+import { FADE_TRANSITION } from "../constants";
 
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
@@ -204,12 +203,15 @@ function ProjectPage() {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pageVisible, setPageVisible] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const { projectId } = useParams();
-  const navigate = useNavigate();
   const { isDarkMode } = useTheme();
+  const { pageVisible } = useOutletContext();
 
   useEffect(() => {
+    // Reset data loaded state when projectId changes
+    setDataLoaded(false);
+
     const fetchProject = async () => {
       try {
         const response = await fetch(
@@ -224,129 +226,86 @@ function ProjectPage() {
         setError(err.message);
       } finally {
         setLoading(false);
+        // Start fade-in after data is loaded
+        setTimeout(() => {
+          setDataLoaded(true);
+        }, 50);
       }
     };
 
     fetchProject();
   }, [projectId]);
 
-  // Trigger fade-in animation when component mounts and loading is complete
-  useEffect(() => {
-    if (!loading) {
-      // Small delay to ensure smooth fade-in
-      const timer = setTimeout(() => {
-        setPageVisible(true);
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [loading]);
-
-  // Handle back button click with fade-out animation
-  const handleBackClick = () => {
-    setPageVisible(false);
-    // Wait for fade-out animation to complete before navigating
-    setTimeout(() => {
-      navigate("/");
-    }, FADE_TRANSITION_MS);
-  };
-
-  // Handle fade-out when navigating away via tabs
-  const handleFadeOut = () => {
-    setPageVisible(false);
-  };
+  // Combine pageVisible (for fade-out) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && dataLoaded;
 
   if (loading) {
     return (
-      <Page>
-        <Container>
-          <Navigation
-            showBackButton={true}
-            onBackClick={handleBackClick}
-            onFadeOut={handleFadeOut}
-          />
-          <ProjectSkeleton mediaItems={project?.media} />
-        </Container>
-      </Page>
+      <FadeInWrapper visible={false}>
+        <ProjectSkeleton mediaItems={project?.media} />
+      </FadeInWrapper>
     );
   }
 
   if (error || !project) {
     return (
-      <Page>
-        <Container>
-          <Navigation
-            showBackButton={true}
-            onBackClick={handleBackClick}
-            onFadeOut={handleFadeOut}
-          />
-          <FadeInWrapper visible={pageVisible}>
-            <Error>Error: {error || "Project not found"}</Error>
-          </FadeInWrapper>
-        </Container>
-      </Page>
+      <FadeInWrapper visible={visible}>
+        <Error>Error: {error || "Project not found"}</Error>
+      </FadeInWrapper>
     );
   }
 
   return (
-    <Page>
-      <Container>
-        <Navigation
-          showBackButton={true}
-          onBackClick={handleBackClick}
-          onFadeOut={handleFadeOut}
-        />
-        <FadeInWrapper visible={pageVisible}>
-          <VStack>
-            <HeaderCard $isDarkMode={isDarkMode}>
-              <HeaderTextContent>
-                <Header>{project.name}</Header>
-                <MediumText>{project.description}</MediumText>
-                {project.links && project.links.length > 0 && (
-                  <LinksContainer>
-                    {project.links.map((link, index) => (
-                      <LinkButton
-                        key={index}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {link.label}
-                      </LinkButton>
-                    ))}
-                  </LinksContainer>
-                )}
-              </HeaderTextContent>
-            </HeaderCard>
-
-            {project.media && (
-              <VStack>
-                {project.media.map((mediaItem, index) => {
-                  // Calculate aspect ratio for the card
-                  const aspectRatio =
-                    typeof mediaItem === "object" && mediaItem.dimensions
-                      ? mediaItem.dimensions.width / mediaItem.dimensions.height
-                      : null;
-
-                  return (
-                    <MediaCard
-                      key={index}
-                      $isDarkMode={isDarkMode}
-                      $aspectRatio={aspectRatio}
-                    >
-                      <MediaItem
-                        mediaItem={mediaItem}
-                        projectName={project.name}
-                        index={index}
-                      />
-                    </MediaCard>
-                  );
-                })}
-              </VStack>
+    <FadeInWrapper visible={visible}>
+      <VStack>
+        <HeaderCard $isDarkMode={isDarkMode}>
+          <HeaderTextContent>
+            <Header>{project.name}</Header>
+            <MediumText>{project.description}</MediumText>
+            {project.links && project.links.length > 0 && (
+              <LinksContainer>
+                {project.links.map((link, index) => (
+                  <LinkButton
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {link.label}
+                  </LinkButton>
+                ))}
+              </LinksContainer>
             )}
+          </HeaderTextContent>
+        </HeaderCard>
+
+        {project.media && (
+          <VStack>
+            {project.media.map((mediaItem, index) => {
+              // Calculate aspect ratio for the card
+              const aspectRatio =
+                typeof mediaItem === "object" && mediaItem.dimensions
+                  ? mediaItem.dimensions.width / mediaItem.dimensions.height
+                  : null;
+
+              return (
+                <MediaCard
+                  key={index}
+                  $isDarkMode={isDarkMode}
+                  $aspectRatio={aspectRatio}
+                >
+                  <MediaItem
+                    mediaItem={mediaItem}
+                    projectName={project.name}
+                    index={index}
+                  />
+                </MediaCard>
+              );
+            })}
           </VStack>
-        </FadeInWrapper>
-      </Container>
-    </Page>
+        )}
+      </VStack>
+    </FadeInWrapper>
   );
 }
 

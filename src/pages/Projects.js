@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import Navigation from "../components/Navigation";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import Card from "../components/Card";
-import { Page, Container } from "../components/Layout";
 import { Error, ProjectsSkeleton } from "../components/States";
 import { useTheme } from "../contexts/ThemeContext";
 import { FADE_TRANSITION, FADE_TRANSITION_MS } from "../constants";
@@ -182,6 +180,7 @@ function ProjectsPage() {
   const { isDarkMode, setCachedProjectsData, getCachedProjectsData } =
     useTheme();
   const navigate = useNavigate();
+  const { pageVisible, handleFadeOut } = useOutletContext();
 
   // Try to get cached projects first
   const cachedProjects = getCachedProjectsData();
@@ -189,17 +188,16 @@ function ProjectsPage() {
   const [projects, setProjects] = useState(cachedProjects || []);
   const [loading, setLoading] = useState(!cachedProjects);
   const [error, setError] = useState(null);
-  const [contentVisible, setContentVisible] = useState(false);
-  const [skeletonVisible, setSkeletonVisible] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
     // If we already have cached data, don't fetch again
     if (cachedProjects) {
-      // Show content immediately if we have cached data
-      const timer = setTimeout(() => {
-        setContentVisible(true);
+      // Start fade-in after a short delay to ensure proper animation
+      setTimeout(() => {
+        setDataLoaded(true);
       }, 50);
-      return () => clearTimeout(timer);
+      return;
     }
 
     // Start fetching immediately
@@ -216,63 +214,23 @@ function ProjectsPage() {
         setError(err.message);
       } finally {
         setLoading(false);
+        // Start fade-in after data is loaded
+        setTimeout(() => {
+          setDataLoaded(true);
+        }, 50);
       }
     };
 
     fetchProjects();
-
-    // Show the skeleton after a short delay
-    const skeletonTimer = setTimeout(() => {
-      setSkeletonVisible(true);
-    }, 50);
-
-    return () => {
-      clearTimeout(skeletonTimer);
-    };
   }, [cachedProjects, setCachedProjectsData]);
-
-  // Show loading skeleton when it becomes visible
-  useEffect(() => {
-    if (loading && skeletonVisible) {
-      setContentVisible(true);
-    }
-  }, [loading, skeletonVisible]);
-
-  // Handle transition from loading to loaded state
-  useEffect(() => {
-    if (!loading && !error && projects.length > 0 && skeletonVisible) {
-      // Reset visibility and then fade in the content
-      setContentVisible(false);
-      const timer = setTimeout(() => {
-        setContentVisible(true);
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [loading, error, projects.length, skeletonVisible]);
-
-  // Handle error state
-  useEffect(() => {
-    if (error && skeletonVisible) {
-      setContentVisible(false);
-      const timer = setTimeout(() => {
-        setContentVisible(true);
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [error, skeletonVisible]);
 
   // Handle project click with fade-out animation
   const handleProjectClick = (projectId) => {
-    setContentVisible(false);
+    handleFadeOut(); // This triggers pageVisible = false and setIsNavigating = true
     // Wait for fade-out animation to complete before navigating
     setTimeout(() => {
       navigate(`/project/${projectId}`);
     }, FADE_TRANSITION_MS);
-  };
-
-  // Handle fade-out when navigating away via tabs
-  const handleFadeOut = () => {
-    setContentVisible(false);
   };
 
   const getPrimaryImage = (project) => {
@@ -282,10 +240,13 @@ function ProjectsPage() {
     );
   };
 
+  // Combine pageVisible (for fade-out) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && dataLoaded;
+
   const renderContent = () => {
     if (loading) {
       return (
-        <FadeInWrapper visible={contentVisible}>
+        <FadeInWrapper visible={false}>
           <ProjectsSkeleton />
         </FadeInWrapper>
       );
@@ -293,14 +254,14 @@ function ProjectsPage() {
 
     if (error) {
       return (
-        <FadeInWrapper visible={contentVisible}>
+        <FadeInWrapper visible={visible}>
           <Error>Error: {error}</Error>
         </FadeInWrapper>
       );
     }
 
     return (
-      <FadeInWrapper visible={contentVisible}>
+      <FadeInWrapper visible={visible}>
         <Grid>
           {projects.map((project) => (
             <Project
@@ -320,14 +281,7 @@ function ProjectsPage() {
     );
   };
 
-  return (
-    <Page>
-      <Container>
-        <Navigation onFadeOut={handleFadeOut} />
-        {renderContent()}
-      </Container>
-    </Page>
-  );
+  return <>{renderContent()}</>;
 }
 
 export default ProjectsPage;

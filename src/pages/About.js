@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import Navigation from "../components/Navigation";
+import { useOutletContext } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
-import { Page, Container, VStack, HStack } from "../components/Layout";
+import { VStack, HStack } from "../components/Layout";
 import {
   Header,
   Subheader,
@@ -113,72 +113,53 @@ function ProfilePicture({ src, alt }) {
 }
 
 function AboutPage() {
-  const [pageVisible, setPageVisible] = useState(false);
-
-  // Trigger fade-in animation when component mounts
-  useEffect(() => {
-    // Small delay to ensure smooth fade-in
-    const timer = setTimeout(() => {
-      setPageVisible(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Handle fade-out when navigating away
-  const handleFadeOut = () => {
-    setPageVisible(false);
-  };
+  const { pageVisible } = useOutletContext();
 
   return (
-    <Page>
-      <Container>
-        <Navigation onFadeOut={handleFadeOut} />
-        <FadeInWrapper visible={pageVisible}>
-          <VStack>
-            <Card>
-              <HeaderTextContent>
-                <Header>
-                  FCC Studio is a technology and art collective that makes fun
-                  software and hardware.
-                </Header>
-                <LargeText>
-                  We design and build custom products to explore novel ways of
-                  interacting with electronics.
-                </LargeText>
-                <Button link="mailto:studio@fcc.lol">Contact us</Button>
-              </HeaderTextContent>
-            </Card>
-            <HStack>
-              <ProfileCard>
-                <ProfilePicture src="/images/zach.jpg" alt="Zach" />
-                <Subheader>Zach</Subheader>
-                <SmallText>
-                  I'm a curious tinkerer, who learns by doing. I like to work on
-                  projects that present opportunities to think strategically and
-                  execute nimbly.
-                </SmallText>
-              </ProfileCard>
-              <ProfileCard>
-                <ProfilePicture src="/images/dan.jpg" alt="Dan" />
-                <Subheader>Dan</Subheader>
-                <SmallText>
-                  I'm a guy that likes design and code. More to come.
-                </SmallText>
-              </ProfileCard>
-              <ProfileCard>
-                <ProfilePicture src="/images/leo.jpg" alt="Leo" />
-                <Subheader>Leo</Subheader>
-                <SmallText>
-                  I'm a designer, engineer, and artist. I believe design and
-                  technology should encourage community, equal opportunity, and
-                  social progress.
-                </SmallText>
-              </ProfileCard>
-            </HStack>
-          </VStack>
-        </FadeInWrapper>
-      </Container>
-    </Page>
+    <FadeInWrapper visible={pageVisible}>
+      <VStack>
+        <Card>
+          <HeaderTextContent>
+            <Header>
+              FCC Studio is a technology and art collective that makes fun
+              software and hardware.
+            </Header>
+            <LargeText>
+              We design and build custom products to explore novel ways of
+              interacting with electronics.
+            </LargeText>
+            <Button link="mailto:studio@fcc.lol">Contact us</Button>
+          </HeaderTextContent>
+        </Card>
+        <HStack>
+          <ProfileCard>
+            <ProfilePicture src="/images/zach.jpg" alt="Zach" />
+            <Subheader>Zach</Subheader>
+            <SmallText>
+              I'm a curious tinkerer, who learns by doing. I like to work on
+              projects that present opportunities to think strategically and
+              execute nimbly.
+            </SmallText>
+          </ProfileCard>
+          <ProfileCard>
+            <ProfilePicture src="/images/dan.jpg" alt="Dan" />
+            <Subheader>Dan</Subheader>
+            <SmallText>
+              I'm a guy that likes design and code. More to come.
+            </SmallText>
+          </ProfileCard>
+          <ProfileCard>
+            <ProfilePicture src="/images/leo.jpg" alt="Leo" />
+            <Subheader>Leo</Subheader>
+            <SmallText>
+              I'm a designer, engineer, and artist. I believe design and
+              technology should encourage community, equal opportunity, and
+              social progress.
+            </SmallText>
+          </ProfileCard>
+        </HStack>
+      </VStack>
+    </FadeInWrapper>
   );
 }
 
