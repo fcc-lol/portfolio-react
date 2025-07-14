@@ -11,7 +11,7 @@ import {
   HeaderTextContent
 } from "../components/Typography";
 import { useTheme } from "../contexts/ThemeContext";
-import { FADE_TRANSITION } from "../constants";
+import { FADE_TRANSITION, FADE_TRANSITION_MS } from "../constants";
 
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
@@ -244,7 +244,10 @@ function ProjectPage() {
   // Handle back button click with fade-out animation
   const handleBackClick = () => {
     setPageVisible(false);
-    navigate("/");
+    // Wait for fade-out animation to complete before navigating
+    setTimeout(() => {
+      navigate("/");
+    }, FADE_TRANSITION_MS);
   };
 
   if (loading) {

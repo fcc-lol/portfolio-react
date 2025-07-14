@@ -6,7 +6,7 @@ import Card from "../components/Card";
 import { Page, Container } from "../components/Layout";
 import { Error, ProjectsSkeleton } from "../components/States";
 import { useTheme } from "../contexts/ThemeContext";
-import { FADE_TRANSITION } from "../constants";
+import { FADE_TRANSITION, FADE_TRANSITION_MS } from "../constants";
 
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
@@ -230,7 +230,10 @@ function ProjectsPage() {
   // Handle project click with fade-out animation
   const handleProjectClick = (projectId) => {
     setContentVisible(false);
-    navigate(`/project/${projectId}`);
+    // Wait for fade-out animation to complete before navigating
+    setTimeout(() => {
+      navigate(`/project/${projectId}`);
+    }, FADE_TRANSITION_MS);
   };
 
   const getPrimaryImage = (project) => {
