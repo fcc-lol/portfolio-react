@@ -246,7 +246,7 @@ function ProjectsPage() {
   const renderContent = () => {
     if (loading) {
       return (
-        <FadeInWrapper visible={false}>
+        <FadeInWrapper visible={pageVisible}>
           <ProjectsSkeleton />
         </FadeInWrapper>
       );
