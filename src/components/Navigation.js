@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
+import { FADE_TRANSITION_MS } from "../constants";
 
 const TabNavigation = styled.nav`
   display: grid;
@@ -65,9 +66,10 @@ const BackButton = styled(TabButton)`
   padding: 1rem 0;
 `;
 
-function Navigation({ showBackButton = false, onBackClick }) {
+function Navigation({ showBackButton = false, onBackClick, onFadeOut }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // Get current tab from pathname
   const getCurrentTab = () => {
@@ -82,11 +84,25 @@ function Navigation({ showBackButton = false, onBackClick }) {
 
   // Handle tab click
   const handleTabClick = (tab) => {
-    if (tab === "projects") {
-      navigate("/");
-    } else {
-      navigate(`/${tab}`);
+    // Don't navigate if already navigating or if already on the same tab
+    if (isNavigating || activeTab === tab) return;
+
+    setIsNavigating(true);
+
+    // Trigger fade-out if callback is provided
+    if (onFadeOut) {
+      onFadeOut();
     }
+
+    // Wait for fade-out animation to complete before navigating
+    setTimeout(() => {
+      if (tab === "projects") {
+        navigate("/");
+      } else {
+        navigate(`/${tab}`);
+      }
+      setIsNavigating(false);
+    }, FADE_TRANSITION_MS);
   };
 
   // Handle back button click

@@ -250,11 +250,20 @@ function ProjectPage() {
     }, FADE_TRANSITION_MS);
   };
 
+  // Handle fade-out when navigating away via tabs
+  const handleFadeOut = () => {
+    setPageVisible(false);
+  };
+
   if (loading) {
     return (
       <Page>
         <Container>
-          <Navigation showBackButton={true} onBackClick={handleBackClick} />
+          <Navigation
+            showBackButton={true}
+            onBackClick={handleBackClick}
+            onFadeOut={handleFadeOut}
+          />
           <ProjectSkeleton mediaItems={project?.media} />
         </Container>
       </Page>
@@ -265,7 +274,11 @@ function ProjectPage() {
     return (
       <Page>
         <Container>
-          <Navigation showBackButton={true} onBackClick={handleBackClick} />
+          <Navigation
+            showBackButton={true}
+            onBackClick={handleBackClick}
+            onFadeOut={handleFadeOut}
+          />
           <FadeInWrapper visible={pageVisible}>
             <Error>Error: {error || "Project not found"}</Error>
           </FadeInWrapper>
@@ -277,7 +290,11 @@ function ProjectPage() {
   return (
     <Page>
       <Container>
-        <Navigation showBackButton={true} onBackClick={handleBackClick} />
+        <Navigation
+          showBackButton={true}
+          onBackClick={handleBackClick}
+          onFadeOut={handleFadeOut}
+        />
         <FadeInWrapper visible={pageVisible}>
           <VStack>
             <HeaderCard $isDarkMode={isDarkMode}>

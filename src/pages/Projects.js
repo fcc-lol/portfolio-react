@@ -236,6 +236,11 @@ function ProjectsPage() {
     }, FADE_TRANSITION_MS);
   };
 
+  // Handle fade-out when navigating away via tabs
+  const handleFadeOut = () => {
+    setContentVisible(false);
+  };
+
   const getPrimaryImage = (project) => {
     return (
       project.primaryImage.url ||
@@ -276,7 +281,7 @@ function ProjectsPage() {
   return (
     <Page>
       <Container>
-        <Navigation />
+        <Navigation onFadeOut={handleFadeOut} />
         {renderContent()}
       </Container>
     </Page>

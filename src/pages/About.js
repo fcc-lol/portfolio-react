@@ -124,10 +124,15 @@ function AboutPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Handle fade-out when navigating away
+  const handleFadeOut = () => {
+    setPageVisible(false);
+  };
+
   return (
     <Page>
       <Container>
-        <Navigation />
+        <Navigation onFadeOut={handleFadeOut} />
         <FadeInWrapper visible={pageVisible}>
           <VStack>
             <Card>
