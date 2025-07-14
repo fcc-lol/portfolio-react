@@ -221,7 +221,7 @@ function ProjectPage() {
     return (
       <Page>
         <Container>
-          <Navigation />
+          <Navigation showBackButton={true} />
           <ProjectSkeleton />
         </Container>
       </Page>
