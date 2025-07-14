@@ -3,7 +3,7 @@ import styled from "styled-components";
 const StyledButton = styled.button`
   background: ${(props) => props.theme.textPrimary};
   color: ${(props) => props.theme.background};
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 3rem;
   border-radius: 0.5em;
   font-size: 1.25rem;
   font-weight: bold;
@@ -17,6 +17,11 @@ const StyledButton = styled.button`
   justify-content: center;
   flex: 0;
   width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   will-change: transform;
 
   @media (hover: hover) {
@@ -32,6 +37,8 @@ const StyledButton = styled.button`
 
   @media (max-width: 768px) {
     width: 100%;
+    min-width: 0;
+    flex-shrink: 1;
   }
 `;
 
