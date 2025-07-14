@@ -190,13 +190,19 @@ function ProjectsPage() {
   const [loading, setLoading] = useState(!cachedProjects);
   const [error, setError] = useState(null);
   const [contentVisible, setContentVisible] = useState(false);
+  const [skeletonVisible, setSkeletonVisible] = useState(false);
 
   useEffect(() => {
     // If we already have cached data, don't fetch again
     if (cachedProjects) {
-      return;
+      // Show content immediately if we have cached data
+      const timer = setTimeout(() => {
+        setContentVisible(true);
+      }, 50);
+      return () => clearTimeout(timer);
     }
 
+    // Start fetching immediately
     const fetchProjects = async () => {
       try {
         const response = await fetch("https://portfolio-api.fcc.lol/projects");
@@ -214,16 +220,46 @@ function ProjectsPage() {
     };
 
     fetchProjects();
+
+    // Show the skeleton after a short delay
+    const skeletonTimer = setTimeout(() => {
+      setSkeletonVisible(true);
+    }, 50);
+
+    return () => {
+      clearTimeout(skeletonTimer);
+    };
   }, [cachedProjects, setCachedProjectsData]);
 
-  // Trigger fade-in animation immediately when component mounts
+  // Show loading skeleton when it becomes visible
   useEffect(() => {
-    // Small delay to ensure smooth fade-in
-    const timer = setTimeout(() => {
+    if (loading && skeletonVisible) {
       setContentVisible(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }, [loading, skeletonVisible]);
+
+  // Handle transition from loading to loaded state
+  useEffect(() => {
+    if (!loading && !error && projects.length > 0 && skeletonVisible) {
+      // Reset visibility and then fade in the content
+      setContentVisible(false);
+      const timer = setTimeout(() => {
+        setContentVisible(true);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, error, projects.length, skeletonVisible]);
+
+  // Handle error state
+  useEffect(() => {
+    if (error && skeletonVisible) {
+      setContentVisible(false);
+      const timer = setTimeout(() => {
+        setContentVisible(true);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [error, skeletonVisible]);
 
   // Handle project click with fade-out animation
   const handleProjectClick = (projectId) => {
