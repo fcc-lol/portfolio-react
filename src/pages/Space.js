@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import Navigation from "../components/Navigation";
 import Card from "../components/Card";
