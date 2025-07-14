@@ -13,7 +13,7 @@ const FadeInWrapper = styled.div`
 
 const ImageContainer = styled.div`
   width: 100%;
-  aspect-ratio: 4032 / 3024; /* 4:3 aspect ratio */
+  aspect-ratio: 4 / 3;
   overflow: hidden;
 `;
 
