@@ -189,11 +189,13 @@ function ProjectsPage() {
   const [projects, setProjects] = useState(cachedProjects || []);
   const [loading, setLoading] = useState(!cachedProjects);
   const [error, setError] = useState(null);
-  const [pageVisible, setPageVisible] = useState(false);
+  const [contentVisible, setContentVisible] = useState(false);
 
   useEffect(() => {
     // If we already have cached data, don't fetch again
     if (cachedProjects) {
+      // Show content immediately if we have cached data
+      setContentVisible(true);
       return;
     }
 
@@ -216,20 +218,20 @@ function ProjectsPage() {
     fetchProjects();
   }, [cachedProjects, setCachedProjectsData]);
 
-  // Trigger fade-in animation when component mounts and loading is complete
+  // Trigger fade-in animation when content loads
   useEffect(() => {
-    if (!loading) {
+    if (!loading && !cachedProjects) {
       // Small delay to ensure smooth fade-in
       const timer = setTimeout(() => {
-        setPageVisible(true);
+        setContentVisible(true);
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [loading]);
+  }, [loading, cachedProjects]);
 
   // Handle project click with fade-out animation
   const handleProjectClick = (projectId) => {
-    setPageVisible(false);
+    setContentVisible(false);
     navigate(`/project/${projectId}`);
   };
 
@@ -250,21 +252,23 @@ function ProjectsPage() {
     }
 
     return (
-      <Grid>
-        {projects.map((project) => (
-          <Project
-            key={project.id}
-            onClick={() => handleProjectClick(project.id)}
-            $isDarkMode={isDarkMode}
-          >
-            <ProjectImage imageUrl={getPrimaryImage(project)} />
-            <Content>
-              <Title>{project.name}</Title>
-              <Description>{project.description}</Description>
-            </Content>
-          </Project>
-        ))}
-      </Grid>
+      <FadeInWrapper visible={contentVisible}>
+        <Grid>
+          {projects.map((project) => (
+            <Project
+              key={project.id}
+              onClick={() => handleProjectClick(project.id)}
+              $isDarkMode={isDarkMode}
+            >
+              <ProjectImage imageUrl={getPrimaryImage(project)} />
+              <Content>
+                <Title>{project.name}</Title>
+                <Description>{project.description}</Description>
+              </Content>
+            </Project>
+          ))}
+        </Grid>
+      </FadeInWrapper>
     );
   };
 
@@ -272,7 +276,7 @@ function ProjectsPage() {
     <Page>
       <Container>
         <Navigation />
-        <FadeInWrapper visible={pageVisible}>{renderContent()}</FadeInWrapper>
+        {renderContent()}
       </Container>
     </Page>
   );
