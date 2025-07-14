@@ -55,7 +55,11 @@ export const ProjectsSkeleton = () => {
 const ProjectSkeletonContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 3rem;
+
+  @media (max-width: 1024px) {
+    gap: 2rem;
+  }
 `;
 
 const ProjectInfoSkeleton = styled(Card)`

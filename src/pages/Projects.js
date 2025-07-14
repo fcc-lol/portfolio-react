@@ -118,18 +118,16 @@ function ProjectImage({ imageUrl, ...props }) {
   // Check if image was already loaded in this session immediately
   const wasLoadedBefore = imageUrl ? isImageLoaded(imageUrl) : false;
 
-  const [loaded, setLoaded] = useState(wasLoadedBefore || !imageUrl);
-  const [shouldAnimate, setShouldAnimate] = useState(
-    !wasLoadedBefore && imageUrl
-  );
+  // Always start as false to trigger fade-in animation on page load
+  const [loaded, setLoaded] = useState(!imageUrl);
   const imageRef = useRef(null);
 
   useEffect(() => {
     if (imageUrl) {
-      // If we've seen this image before in this session, don't animate
-      if (isImageLoaded(imageUrl)) {
-        setLoaded(true);
-        setShouldAnimate(false);
+      // If image was already loaded before, trigger fade-in immediately
+      if (wasLoadedBefore) {
+        // Small delay to ensure fade-in effect is visible
+        setTimeout(() => setLoaded(true), 50);
         return;
       }
 
@@ -140,11 +138,10 @@ function ProjectImage({ imageUrl, ...props }) {
         imageRef.current.naturalWidth > 0
       ) {
         setLoaded(true);
-        setShouldAnimate(false);
         markImageAsLoaded(imageUrl);
       }
     }
-  }, [imageUrl, isImageLoaded, markImageAsLoaded]);
+  }, [imageUrl, wasLoadedBefore, markImageAsLoaded]);
 
   const handleImageLoad = () => {
     setLoaded(true);
@@ -168,7 +165,7 @@ function ProjectImage({ imageUrl, ...props }) {
       <Image
         $imageurl={imageUrl}
         loaded={loaded}
-        shouldAnimate={shouldAnimate}
+        shouldAnimate={!!imageUrl}
         wasLoadedBefore={wasLoadedBefore}
         {...props}
       />

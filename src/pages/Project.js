@@ -115,18 +115,16 @@ function MediaItem({ mediaUrl, projectName, index }) {
   // Check if media was already loaded in this session immediately
   const wasLoadedBefore = mediaUrl ? isImageLoaded(mediaUrl) : false;
 
-  const [loaded, setLoaded] = useState(wasLoadedBefore || !mediaUrl);
-  const [shouldAnimate, setShouldAnimate] = useState(
-    !wasLoadedBefore && mediaUrl
-  );
+  // Always start as false to trigger fade-in animation on page load
+  const [loaded, setLoaded] = useState(!mediaUrl);
   const imageRef = useRef(null);
 
   useEffect(() => {
     if (mediaUrl && !isVideo) {
-      // If we've seen this media before in this session, don't animate
-      if (isImageLoaded(mediaUrl)) {
-        setLoaded(true);
-        setShouldAnimate(false);
+      // If media was already loaded before, trigger fade-in immediately
+      if (wasLoadedBefore) {
+        // Small delay to ensure fade-in effect is visible
+        setTimeout(() => setLoaded(true), 50);
         return;
       }
 
@@ -137,11 +135,15 @@ function MediaItem({ mediaUrl, projectName, index }) {
         imageRef.current.naturalWidth > 0
       ) {
         setLoaded(true);
-        setShouldAnimate(false);
         markImageAsLoaded(mediaUrl);
       }
+    } else if (mediaUrl && isVideo) {
+      // For videos, handle fade-in similarly
+      if (wasLoadedBefore) {
+        setTimeout(() => setLoaded(true), 50);
+      }
     }
-  }, [mediaUrl, isImageLoaded, markImageAsLoaded, isVideo]);
+  }, [mediaUrl, wasLoadedBefore, markImageAsLoaded, isVideo]);
 
   const handleMediaLoad = () => {
     setLoaded(true);
@@ -162,7 +164,7 @@ function MediaItem({ mediaUrl, projectName, index }) {
           loop
           playsInline
           loaded={loaded}
-          shouldAnimate={shouldAnimate}
+          shouldAnimate={!!mediaUrl}
           wasLoadedBefore={wasLoadedBefore}
           onLoadedData={handleMediaLoad}
         />
@@ -182,7 +184,7 @@ function MediaItem({ mediaUrl, projectName, index }) {
         src={mediaUrl}
         alt={`${projectName} - ${index + 1}`}
         loaded={loaded}
-        shouldAnimate={shouldAnimate}
+        shouldAnimate={!!mediaUrl}
         wasLoadedBefore={wasLoadedBefore}
       />
     </MediaContainer>

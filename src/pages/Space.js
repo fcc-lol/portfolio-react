@@ -9,7 +9,12 @@ const FadeInImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: ${(props) => (props.loaded ? 1 : 0)};
+  opacity: ${(props) => {
+    // If image was loaded before, start with opacity 1 immediately
+    if (props.wasLoadedBefore) return 1;
+    // Otherwise use the loaded state
+    return props.loaded ? 1 : 0;
+  }};
   transition: ${(props) =>
     props.shouldAnimate ? "opacity 0.5s ease-in-out" : "none"};
 `;
@@ -20,75 +25,55 @@ const imageUrls = [
   "https://static.fcc.lol/studio-photos/IMG_8813.jpeg"
 ];
 
-function SpacePage() {
+function SpaceImageComponent({ imageUrl, imageKey, imageRef }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
 
-  const [imageLoaded, setImageLoaded] = useState({
-    image1: false,
-    image2: false,
-    image3: false
-  });
+  // Check if image was already loaded in this session immediately
+  const wasLoadedBefore = isImageLoaded(imageUrl);
 
-  const [shouldAnimate, setShouldAnimate] = useState({
-    image1: true,
-    image2: true,
-    image3: true
-  });
+  // Always start as false to trigger fade-in animation on page load
+  const [loaded, setLoaded] = useState(false);
 
+  useEffect(() => {
+    // If image was already loaded before, trigger fade-in with delay
+    if (wasLoadedBefore) {
+      setTimeout(() => setLoaded(true), 50);
+      return;
+    }
+
+    // Check if it's already loaded in the DOM
+    if (
+      imageRef.current &&
+      imageRef.current.complete &&
+      imageRef.current.naturalWidth > 0
+    ) {
+      setLoaded(true);
+      markImageAsLoaded(imageUrl);
+    }
+  }, [imageUrl, wasLoadedBefore, markImageAsLoaded, imageRef]);
+
+  const handleImageLoad = () => {
+    setLoaded(true);
+    markImageAsLoaded(imageUrl);
+  };
+
+  return (
+    <FadeInImage
+      ref={imageRef}
+      src={imageUrl}
+      alt="Studio photo"
+      loaded={loaded}
+      shouldAnimate={!!imageUrl}
+      wasLoadedBefore={wasLoadedBefore}
+      onLoad={handleImageLoad}
+    />
+  );
+}
+
+function SpacePage() {
   const image1Ref = useRef(null);
   const image2Ref = useRef(null);
   const image3Ref = useRef(null);
-
-  const imageRefs = useMemo(
-    () => ({
-      image1: image1Ref,
-      image2: image2Ref,
-      image3: image3Ref
-    }),
-    []
-  );
-
-  useEffect(() => {
-    // Check if images are already loaded (cached) on mount
-    Object.keys(imageRefs).forEach((key, index) => {
-      const img = imageRefs[key].current;
-      const imageUrl = imageUrls[index];
-
-      // If we've seen this image before in this session, don't animate
-      if (isImageLoaded(imageUrl)) {
-        setImageLoaded((prev) => ({
-          ...prev,
-          [key]: true
-        }));
-        setShouldAnimate((prev) => ({
-          ...prev,
-          [key]: false
-        }));
-      }
-      // Or if it's already loaded in the DOM
-      else if (img && img.complete && img.naturalWidth > 0) {
-        setImageLoaded((prev) => ({
-          ...prev,
-          [key]: true
-        }));
-        setShouldAnimate((prev) => ({
-          ...prev,
-          [key]: false
-        }));
-        markImageAsLoaded(imageUrl);
-      }
-    });
-  }, [imageRefs, isImageLoaded, markImageAsLoaded]);
-
-  const handleImageLoad = (imageKey, imageUrl) => {
-    setImageLoaded((prev) => ({
-      ...prev,
-      [imageKey]: true
-    }));
-
-    // Mark this image as loaded in the global state
-    markImageAsLoaded(imageUrl);
-  };
 
   return (
     <Page>
@@ -96,33 +81,24 @@ function SpacePage() {
         <Navigation />
         <VStack>
           <Card style={{ padding: "0" }}>
-            <FadeInImage
-              ref={image1Ref}
-              src={imageUrls[0]}
-              alt="1"
-              loaded={imageLoaded.image1}
-              shouldAnimate={shouldAnimate.image1}
-              onLoad={() => handleImageLoad("image1", imageUrls[0])}
+            <SpaceImageComponent
+              imageUrl={imageUrls[0]}
+              imageKey="image1"
+              imageRef={image1Ref}
             />
           </Card>
           <Card style={{ padding: "0" }}>
-            <FadeInImage
-              ref={image2Ref}
-              src={imageUrls[1]}
-              alt="1"
-              loaded={imageLoaded.image2}
-              shouldAnimate={shouldAnimate.image2}
-              onLoad={() => handleImageLoad("image2", imageUrls[1])}
+            <SpaceImageComponent
+              imageUrl={imageUrls[1]}
+              imageKey="image2"
+              imageRef={image2Ref}
             />
           </Card>
           <Card style={{ padding: "0" }}>
-            <FadeInImage
-              ref={image3Ref}
-              src={imageUrls[2]}
-              alt="1"
-              loaded={imageLoaded.image3}
-              shouldAnimate={shouldAnimate.image3}
-              onLoad={() => handleImageLoad("image3", imageUrls[2])}
+            <SpaceImageComponent
+              imageUrl={imageUrls[2]}
+              imageKey="image3"
+              imageRef={image3Ref}
             />
           </Card>
         </VStack>

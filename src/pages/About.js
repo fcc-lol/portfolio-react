@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import Navigation from "../components/Navigation";
 import Card from "../components/Card";
@@ -11,6 +11,7 @@ import {
   SmallText,
   HeaderTextContent
 } from "../components/Typography";
+import { useTheme } from "../contexts/ThemeContext";
 
 const ProfileCard = styled(Card)`
   padding: 0;
@@ -27,7 +28,7 @@ const ProfileCard = styled(Card)`
   }
 `;
 
-const ProfilePicture = styled.img`
+const ProfilePictureImg = styled.img`
   object-fit: cover;
   border-radius: 100%;
   width: 8rem;
@@ -35,6 +36,9 @@ const ProfilePicture = styled.img`
   margin-bottom: 0.5rem;
   user-select: none;
   pointer-events: none;
+  opacity: ${(props) => (props.loaded ? 1 : 0)};
+  transition: ${(props) =>
+    props.shouldAnimate ? "opacity 0.5s ease-in-out" : "none"};
 
   @media (max-width: 768px) {
     width: 6rem;
@@ -42,6 +46,66 @@ const ProfilePicture = styled.img`
     margin-bottom: 0;
   }
 `;
+
+const HiddenImage = styled.img`
+  display: none;
+`;
+
+function ProfilePicture({ src, alt }) {
+  const { markImageAsLoaded, isImageLoaded } = useTheme();
+
+  // Check if image was already loaded in this session immediately
+  const wasLoadedBefore = src ? isImageLoaded(src) : false;
+
+  const [loaded, setLoaded] = useState(wasLoadedBefore || !src);
+  const [shouldAnimate, setShouldAnimate] = useState(!wasLoadedBefore && src);
+  const imageRef = useRef(null);
+
+  useEffect(() => {
+    if (src) {
+      // If we've seen this image before in this session, don't animate
+      if (isImageLoaded(src)) {
+        setLoaded(true);
+        setShouldAnimate(false);
+        return;
+      }
+
+      // Check if it's already loaded in the DOM
+      if (
+        imageRef.current &&
+        imageRef.current.complete &&
+        imageRef.current.naturalWidth > 0
+      ) {
+        setLoaded(true);
+        setShouldAnimate(false);
+        markImageAsLoaded(src);
+      }
+    }
+  }, [src, isImageLoaded, markImageAsLoaded]);
+
+  const handleImageLoad = () => {
+    setLoaded(true);
+
+    // Mark this image as loaded in the global state
+    if (src) {
+      markImageAsLoaded(src);
+    }
+  };
+
+  return (
+    <>
+      {src && (
+        <HiddenImage ref={imageRef} src={src} onLoad={handleImageLoad} alt="" />
+      )}
+      <ProfilePictureImg
+        src={src}
+        alt={alt}
+        loaded={loaded}
+        shouldAnimate={shouldAnimate}
+      />
+    </>
+  );
+}
 
 function AboutPage() {
   return (
