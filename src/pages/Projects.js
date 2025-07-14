@@ -216,16 +216,14 @@ function ProjectsPage() {
     fetchProjects();
   }, [cachedProjects, setCachedProjectsData]);
 
-  // Trigger fade-in animation when content is ready (both cached and fetched)
+  // Trigger fade-in animation immediately when component mounts
   useEffect(() => {
-    if (!loading) {
-      // Small delay to ensure smooth fade-in
-      const timer = setTimeout(() => {
-        setContentVisible(true);
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [loading]);
+    // Small delay to ensure smooth fade-in
+    const timer = setTimeout(() => {
+      setContentVisible(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Handle project click with fade-out animation
   const handleProjectClick = (projectId) => {
@@ -250,11 +248,19 @@ function ProjectsPage() {
 
   const renderContent = () => {
     if (loading) {
-      return <ProjectsSkeleton />;
+      return (
+        <FadeInWrapper visible={contentVisible}>
+          <ProjectsSkeleton />
+        </FadeInWrapper>
+      );
     }
 
     if (error) {
-      return <Error>Error: {error}</Error>;
+      return (
+        <FadeInWrapper visible={contentVisible}>
+          <Error>Error: {error}</Error>
+        </FadeInWrapper>
+      );
     }
 
     return (
