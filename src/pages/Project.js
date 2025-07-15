@@ -118,11 +118,7 @@ const HiddenImage = styled.img`
 const LinksContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
-
-  @media (max-width: 768px) {
-    gap: 1rem;
-  }
+  gap: 1rem;
 `;
 
 const LinkButton = styled.a`
