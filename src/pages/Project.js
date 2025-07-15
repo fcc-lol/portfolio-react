@@ -7,7 +7,8 @@ import { ProjectSkeleton, Error } from "../components/States";
 import {
   Header,
   MediumText,
-  HeaderTextContent
+  HeaderTextContent,
+  SmallText
 } from "../components/Typography";
 import { useTheme } from "../contexts/ThemeContext";
 import { FADE_TRANSITION } from "../constants";
@@ -74,6 +75,37 @@ const FadeInVideo = styled.video`
   transition: ${(props) => (props.shouldAnimate ? FADE_TRANSITION : "none")};
 `;
 
+const Credits = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+`;
+
+const Credit = styled.div`
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+`;
+
+const ProfilePictureImg = styled.img`
+  object-fit: cover;
+  border-radius: 100%;
+  width: 2.5rem;
+  height: 2.5rem;
+  user-select: none;
+  pointer-events: none;
+  opacity: ${(props) => (props.loaded ? 1 : 0)};
+  transition: ${(props) => (props.shouldAnimate ? FADE_TRANSITION : "none")};
+
+  @media (max-width: 768px) {
+    width: 5rem;
+    height: 5rem;
+    margin-bottom: 0;
+  }
+`;
+
 const HiddenImage = styled.img`
   display: none;
 `;
@@ -112,6 +144,72 @@ const isVideoFile = (url) => {
   const videoExtensions = [".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv"];
   return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
 };
+
+function ProfilePicture({ src, alt, name }) {
+  const { markImageAsLoaded, isImageLoaded } = useTheme();
+
+  // If no src provided, try to construct from name
+  const imageSrc = src || (name ? `/images/${name.toLowerCase()}.jpg` : null);
+
+  // Check if image was already loaded in this session immediately
+  const wasLoadedBefore = imageSrc ? isImageLoaded(imageSrc) : false;
+
+  const [loaded, setLoaded] = useState(wasLoadedBefore || !imageSrc);
+  const [shouldAnimate, setShouldAnimate] = useState(
+    !wasLoadedBefore && imageSrc
+  );
+  const imageRef = useRef(null);
+
+  useEffect(() => {
+    if (imageSrc) {
+      // If we've seen this image before in this session, don't animate
+      if (isImageLoaded(imageSrc)) {
+        setLoaded(true);
+        setShouldAnimate(false);
+        return;
+      }
+
+      // Check if it's already loaded in the DOM
+      if (
+        imageRef.current &&
+        imageRef.current.complete &&
+        imageRef.current.naturalWidth > 0
+      ) {
+        setLoaded(true);
+        setShouldAnimate(false);
+        markImageAsLoaded(imageSrc);
+      }
+    }
+  }, [imageSrc, isImageLoaded, markImageAsLoaded]);
+
+  const handleImageLoad = () => {
+    setLoaded(true);
+
+    // Mark this image as loaded in the global state
+    if (imageSrc) {
+      markImageAsLoaded(imageSrc);
+    }
+  };
+
+  return (
+    <>
+      {imageSrc && (
+        <HiddenImage
+          ref={imageRef}
+          src={imageSrc}
+          onLoad={handleImageLoad}
+          alt=""
+        />
+      )}
+      <ProfilePictureImg
+        src={imageSrc}
+        alt={alt}
+        loaded={loaded}
+        shouldAnimate={shouldAnimate}
+      />
+    </>
+  );
+}
 
 function MediaItem({ mediaItem, projectName, index }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
@@ -275,6 +373,21 @@ function ProjectPage() {
                   </LinkButton>
                 ))}
               </LinksContainer>
+            )}
+            {project.credits && project.credits.length > 0 && (
+              <Credits>
+                {project.credits.map((credit, index) => (
+                  <Credit key={index} $isDarkMode={isDarkMode}>
+                    <ProfilePicture
+                      src={credit.profilePictureUrl}
+                      alt={credit.name}
+                      name={credit.name}
+                    />
+                    <SmallText>{credit.name}</SmallText>
+                    {credit.bio && <SmallText>{credit.bio}</SmallText>}
+                  </Credit>
+                ))}
+              </Credits>
             )}
           </HeaderTextContent>
         </HeaderCard>
