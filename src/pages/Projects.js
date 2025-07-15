@@ -106,14 +106,15 @@ const Content = styled.div`
 const Title = styled.h2`
   margin: 0 0 0.2rem 0;
   color: rgba(255, 255, 255, 1);
-  text-shadow: 0 0.25rem 0.2rem rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.375), 0 2px 12px rgba(0, 0, 0, 0.5);
   font-size: 1.5rem;
   font-weight: bold;
 `;
 
 const Description = styled.p`
-  color: rgba(255, 255, 255, 0.75);
-  text-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.2);
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.625);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 12px rgba(0, 0, 0, 1);
   margin: 0;
 `;
 
