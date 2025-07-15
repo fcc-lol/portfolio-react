@@ -44,6 +44,10 @@ const HeaderCard = styled(Card)`
   min-height: 10rem;
 `;
 
+const Title = styled(Header)`
+  line-height: 1;
+`;
+
 const MediaContainer = styled.div`
   width: 100%;
   position: relative;
@@ -79,6 +83,7 @@ const Credits = styled.div`
   display: flex;
   flex-direction: row;
   gap: 2rem;
+  margin-top: 0.5rem;
 `;
 
 const Credit = styled.div`
@@ -358,7 +363,7 @@ function ProjectPage() {
       <VStack>
         <HeaderCard $isDarkMode={isDarkMode}>
           <HeaderTextContent>
-            <Header>{project.name}</Header>
+            <Title>{project.name}</Title>
             <MediumText>{project.description}</MediumText>
             {project.links && project.links.length > 0 && (
               <LinksContainer>

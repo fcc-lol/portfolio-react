@@ -4,6 +4,7 @@ export const Header = styled.h1`
   font-size: 3rem;
   font-weight: bold;
   margin: 0;
+  line-height: 1.125;
   color: ${(props) => props.theme.textPrimary};
 
   @media (max-width: 1024px) {
@@ -23,7 +24,7 @@ export const LargeText = styled.p`
   font-size: 1.75rem;
   font-weight: normal;
   margin: 0;
-  line-height: 1.25;
+  line-height: 1.375;
   color: ${(props) => props.theme.textPrimary};
 `;
 
