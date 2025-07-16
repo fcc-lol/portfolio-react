@@ -46,6 +46,7 @@ const HeaderCard = styled(Card)`
 
 const Title = styled(Header)`
   line-height: 1;
+  hyphens: auto;
 `;
 
 const MediaContainer = styled.div`
@@ -143,6 +144,45 @@ const LinkButton = styled.a`
     transform: scale(0.9);
   }
 `;
+
+const formatTitle = (title) => {
+  if (title.length < 12) {
+    return title;
+  }
+
+  const name = title;
+  const words = name.split(" ");
+
+  // Find the longest word that's suitable for hyphenation
+  let longestWordIndex = -1;
+  let longestWordLength = 0;
+
+  words.forEach((word, index) => {
+    if (word.length > longestWordLength && word.length >= 8) {
+      longestWordLength = word.length;
+      longestWordIndex = index;
+    }
+  });
+
+  // If no word is long enough for hyphenation, return original name
+  if (longestWordIndex === -1) {
+    return name;
+  }
+
+  // Calculate position within the longest word to insert soft hyphen
+  const word = words[longestWordIndex];
+  const wordMidPoint = Math.floor(word.length / 2);
+
+  // Insert soft hyphen in the middle of the longest word
+  const modifiedWord =
+    word.slice(0, wordMidPoint) + "\u00AD" + word.slice(wordMidPoint);
+
+  // Reconstruct the name with the modified word
+  const modifiedWords = [...words];
+  modifiedWords[longestWordIndex] = modifiedWord;
+
+  return modifiedWords.join(" ");
+};
 
 // Helper function to determine if a URL is a video
 const isVideoFile = (url) => {
@@ -363,7 +403,7 @@ function ProjectPage() {
       <VStack>
         <HeaderCard $isDarkMode={isDarkMode}>
           <HeaderTextContent>
-            <Title>{project.name}</Title>
+            <Title>{formatTitle(project.name)}</Title>
             <MediumText>{project.description}</MediumText>
             {project.links && project.links.length > 0 && (
               <LinksContainer>
