@@ -87,7 +87,7 @@ const Credits = styled.div`
 
   @media (max-width: 768px) {
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 `;
 
@@ -108,6 +108,11 @@ const ProfilePictureImg = styled.img`
   pointer-events: none;
   opacity: ${(props) => (props.loaded ? 1 : 0)};
   transition: ${(props) => (props.shouldAnimate ? FADE_TRANSITION : "none")};
+
+  @media (max-width: 768px) {
+    width: 2rem;
+    height: 2rem;
+  }
 `;
 
 const HiddenImage = styled.img`
