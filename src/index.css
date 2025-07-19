@@ -6,6 +6,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.2s ease-in-out;
+
+  /* Tell the browser we support both light and dark themes */
+  color-scheme: light dark;
+
+  /* Default light theme */
+  background: rgb(255, 255, 255);
+  color: rgba(0, 0, 0, 1);
+}
+
+/* Dark theme based on system preference */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: rgb(18, 18, 18);
+    color: rgba(255, 255, 255, 1);
+  }
 }
 
 code {

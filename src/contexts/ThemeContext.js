@@ -36,31 +36,32 @@ const darkTheme = {
 // Create context
 const ThemeContext = createContext();
 
-// Function to get initial theme state
-const getInitialTheme = () => {
-  const savedTheme = localStorage.getItem("darkMode");
-  if (savedTheme) {
-    return JSON.parse(savedTheme);
-  }
-  // Check system preference
+// Function to get system theme preference
+const getSystemTheme = () => {
   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
   return mediaQuery.matches;
 };
 
 // Theme provider component
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
+  const [isDarkMode, setIsDarkMode] = useState(getSystemTheme);
   const [loadedImages, setLoadedImages] = useState(new Set());
   const [cachedProjects, setCachedProjects] = useState(null);
 
-  // Save theme preference to localStorage
+  // Listen for changes to system theme preference
   useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(isDarkMode));
-  }, [isDarkMode]);
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+    const handleChange = (e) => {
+      setIsDarkMode(e.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
 
   const markImageAsLoaded = (imageUrl) => {
     setLoadedImages((prev) => new Set(prev).add(imageUrl));
@@ -83,7 +84,6 @@ export const ThemeProvider = ({ children }) => {
   const value = {
     theme,
     isDarkMode,
-    toggleTheme,
     markImageAsLoaded,
     isImageLoaded,
     setCachedProjectsData,
