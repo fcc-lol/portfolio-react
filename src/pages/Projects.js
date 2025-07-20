@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import styled from "styled-components";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import Card from "../components/Card";
@@ -77,12 +77,7 @@ const Image = styled.div.attrs((props) => ({
     props.$imageurl ? `url(${props.$imageurl})` : props.theme.cardBackground};
   background-size: cover;
   background-position: center;
-  opacity: ${(props) => {
-    // If image was loaded before, start with opacity 1 immediately
-    if (props.wasLoadedBefore) return 1;
-    // Otherwise use the loaded state
-    return props.loaded ? 1 : 0;
-  }};
+  opacity: ${(props) => (props.loaded ? 1 : 0)};
   transition: ${(props) => (props.shouldAnimate ? FADE_TRANSITION : "none")};
 `;
 
@@ -121,8 +116,10 @@ const Description = styled.p`
 function ProjectImage({ imageUrl, ...props }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
 
-  // Check if image was already loaded in this session immediately
-  const wasLoadedBefore = imageUrl ? isImageLoaded(imageUrl) : false;
+  // Check if image was already loaded in this session immediately (memoized to prevent re-calculations)
+  const wasLoadedBefore = useMemo(() => {
+    return imageUrl ? isImageLoaded(imageUrl) : false;
+  }, [imageUrl, isImageLoaded]);
 
   // Always start as false to trigger fade-in animation on page load
   const [loaded, setLoaded] = useState(!imageUrl);
@@ -130,24 +127,14 @@ function ProjectImage({ imageUrl, ...props }) {
 
   useEffect(() => {
     if (imageUrl) {
-      // If image was already loaded before, trigger fade-in immediately
-      if (wasLoadedBefore) {
-        // Small delay to ensure fade-in effect is visible
-        setTimeout(() => setLoaded(true), 50);
-        return;
-      }
+      // Wait for skeleton fade-out to complete before starting image fade-in
+      const skeletonFadeOutDelay = FADE_TRANSITION_MS;
+      const additionalDelay = wasLoadedBefore ? 50 : 100; // Slightly faster for cached images
+      const totalDelay = skeletonFadeOutDelay + additionalDelay;
 
-      // Check if it's already loaded in the DOM
-      if (
-        imageRef.current &&
-        imageRef.current.complete &&
-        imageRef.current.naturalWidth > 0
-      ) {
-        setLoaded(true);
-        markImageAsLoaded(imageUrl);
-      }
+      setTimeout(() => setLoaded(true), totalDelay);
     }
-  }, [imageUrl, wasLoadedBefore, markImageAsLoaded]);
+  }, [imageUrl, wasLoadedBefore]);
 
   const handleImageLoad = () => {
     setLoaded(true);
