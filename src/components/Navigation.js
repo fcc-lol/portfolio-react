@@ -12,13 +12,15 @@ const TabNavigation = styled.nav`
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   user-select: none;
   height: 3.5rem;
 
   @media (max-width: 768px) {
     margin-bottom: 1rem;
     display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 `;
 
@@ -32,7 +34,7 @@ const Tabs = styled.div`
     gap: 0;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    width: 100%;
+    width: calc(100% - 2.25rem);
     opacity: ${(props) => (props.$hideOnMobile ? 0 : 1)};
     transition-delay: ${(props) =>
       props.$hideOnMobile
@@ -60,30 +62,29 @@ const TabButton = styled.button`
   @media (hover: hover) {
     &:hover {
       color: ${(props) => props.theme.textPrimary};
-      transform: scale(1.1);
+      transform: ${(props) => (props.$isActive ? "scale(1)" : "scale(1.1)")};
+      cursor: ${(props) => (props.$isActive ? "default" : "pointer")};
     }
   }
 
   &:active {
     color: ${(props) => props.theme.textPrimary};
-    transform: scale(0.9);
+    transform: ${(props) => (props.$isActive ? "scale(1)" : "scale(0.9)")};
   }
 `;
 
 const BackButton = styled(TabButton)`
   position: absolute;
-  left: 0;
+  left: -0.125rem;
   top: 50%;
   margin-top: -1.75rem;
   opacity: ${(props) => (props.$visible ? 1 : 0)};
-  transition: ${FADE_TRANSITION}, ${TRANSFORM_TRANSITION};
   pointer-events: ${(props) => (props.$visible ? "auto" : "none")};
 `;
 
 function Navigation({
   showBackButton = false,
   onBackClick,
-  onFadeOut,
   isNavigating: globalIsNavigating = false
 }) {
   const location = useLocation();
