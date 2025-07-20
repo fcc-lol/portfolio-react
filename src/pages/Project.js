@@ -11,7 +11,7 @@ import {
   SmallText
 } from "../components/Typography";
 import { useTheme } from "../contexts/ThemeContext";
-import { FADE_TRANSITION } from "../constants";
+import { FADE_TRANSITION, TRANSFORM_TRANSITION } from "../constants";
 
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
@@ -131,7 +131,7 @@ const LinkButton = styled.a`
   color: ${(props) => props.theme.textSecondary};
   text-decoration: underline;
   font-weight: normal;
-  transition: all 0.2s ease-in-out;
+  transition: ${FADE_TRANSITION}, ${TRANSFORM_TRANSITION};
   font-size: 1.125rem;
 
   @media (hover: hover) {

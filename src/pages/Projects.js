@@ -4,7 +4,11 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import Card from "../components/Card";
 import { Error, ProjectsSkeleton } from "../components/States";
 import { useTheme } from "../contexts/ThemeContext";
-import { FADE_TRANSITION, FADE_TRANSITION_MS } from "../constants";
+import {
+  ANIMATION_DURATION,
+  FADE_TRANSITION,
+  TRANSFORM_TRANSITION
+} from "../constants";
 
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
@@ -27,7 +31,7 @@ const Project = styled(Card)`
   will-change: transform;
   padding: 0;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: ${TRANSFORM_TRANSITION};
   font-size: unset;
   position: relative;
   height: 20rem;
@@ -128,7 +132,7 @@ function ProjectImage({ imageUrl, ...props }) {
   useEffect(() => {
     if (imageUrl) {
       // Wait for skeleton fade-out to complete before starting image fade-in
-      const skeletonFadeOutDelay = FADE_TRANSITION_MS;
+      const skeletonFadeOutDelay = ANIMATION_DURATION;
       const additionalDelay = wasLoadedBefore ? 50 : 100; // Slightly faster for cached images
       const totalDelay = skeletonFadeOutDelay + additionalDelay;
 
@@ -220,7 +224,7 @@ function ProjectsPage() {
     // Wait for fade-out animation to complete before navigating
     setTimeout(() => {
       navigate(`/project/${projectId}`);
-    }, FADE_TRANSITION_MS);
+    }, ANIMATION_DURATION);
   };
 
   const getPrimaryImage = (project) => {

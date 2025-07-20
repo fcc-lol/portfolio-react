@@ -12,11 +12,11 @@ import isPropValid from "@emotion/is-prop-valid";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Navigation from "./components/Navigation";
 import { Page, Container } from "./components/Layout";
-import { FADE_TRANSITION_MS } from "./constants";
 import ProjectsPage from "./pages/Projects";
 import ProjectPage from "./pages/Project";
 import SpacePage from "./pages/Space";
 import AboutPage from "./pages/About";
+import { ANIMATION_DURATION } from "./constants";
 
 // Root layout component that includes ScrollRestoration and Navigation
 function RootLayout() {
@@ -42,7 +42,7 @@ function RootLayout() {
     // Wait for fade-out animation to complete before navigating
     setTimeout(() => {
       navigate("/");
-    }, FADE_TRANSITION_MS);
+    }, ANIMATION_DURATION);
   };
 
   // Determine if we should show the back button
@@ -55,6 +55,7 @@ function RootLayout() {
           showBackButton={showBackButton}
           onBackClick={handleBackClick}
           onFadeOut={handleFadeOut}
+          isNavigating={isNavigating}
         />
         <Outlet
           context={{

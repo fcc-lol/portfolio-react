@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTheme } from "../contexts/ThemeContext";
+import { FADE_TRANSITION, TRANSFORM_TRANSITION } from "../constants";
 
 const ToggleButton = styled.button`
   background: none;
@@ -9,7 +10,7 @@ const ToggleButton = styled.button`
   padding: 0.75rem;
   font-size: 1.25rem;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: ${FADE_TRANSITION}, ${TRANSFORM_TRANSITION};
   backface-visibility: hidden;
   will-change: transform;
   -webkit-tap-highlight-color: transparent;
@@ -37,7 +38,7 @@ const Circle = styled.div`
   height: 0.75rem;
   border-radius: 50%;
   background: ${(props) => props.theme.textPrimary};
-  transition: all 0.2s ease-in-out;
+  transition: ${FADE_TRANSITION}, ${TRANSFORM_TRANSITION};
   opacity: 0.25;
 `;
 

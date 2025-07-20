@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { FADE_TRANSITION, TRANSFORM_TRANSITION } from "../constants";
 
 const StyledButton = styled.button`
   background: ${(props) => props.theme.textPrimary};
@@ -8,7 +9,7 @@ const StyledButton = styled.button`
   font-size: 1.25rem;
   font-weight: bold;
   text-decoration: none;
-  transition: all 0.2s ease-in-out;
+  transition: ${FADE_TRANSITION}, ${TRANSFORM_TRANSITION};
   cursor: pointer;
   border: none;
   outline: none;

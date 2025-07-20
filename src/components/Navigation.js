@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FADE_TRANSITION_MS } from "../constants";
+import {
+  ANIMATION_DURATION,
+  FADE_TRANSITION,
+  TRANSFORM_TRANSITION
+} from "../constants";
 
 const TabNavigation = styled.nav`
+  position: relative;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  margin-top: 0.25rem;
   margin-bottom: 2.5rem;
   user-select: none;
   height: 3.5rem;
@@ -22,13 +26,21 @@ const Tabs = styled.div`
   display: flex;
   gap: 1.5rem;
   justify-content: center;
+  transition: ${FADE_TRANSITION};
 
   @media (max-width: 768px) {
     gap: 0;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     width: 100%;
-    ${(props) => props.$hideOnMobile && "display: none;"}
+    opacity: ${(props) => (props.$hideOnMobile ? 0 : 1)};
+    transition-delay: ${(props) =>
+      props.$hideOnMobile
+        ? "0ms"
+        : props.$shouldDelay
+        ? `${ANIMATION_DURATION - 75}ms`
+        : "0ms"};
+    pointer-events: ${(props) => (props.$hideOnMobile ? "none" : "auto")};
   }
 `;
 
@@ -40,10 +52,10 @@ const TabButton = styled.button`
   padding: 1rem;
   font-size: 1.25rem;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
   backface-visibility: hidden;
   will-change: transform;
   -webkit-tap-highlight-color: transparent;
+  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION};
 
   @media (hover: hover) {
     &:hover {
@@ -56,21 +68,42 @@ const TabButton = styled.button`
     color: ${(props) => props.theme.textPrimary};
     transform: scale(0.9);
   }
-
-  @media (max-width: 768px) {
-    padding: 0 1rem;
-  }
 `;
 
 const BackButton = styled(TabButton)`
-  padding: 1rem 0;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -1.75rem;
+  opacity: ${(props) => (props.$visible ? 1 : 0)};
+  transition: ${FADE_TRANSITION}, ${TRANSFORM_TRANSITION};
+  pointer-events: ${(props) => (props.$visible ? "auto" : "none")};
 `;
 
-function Navigation({ showBackButton = false, onBackClick, onFadeOut }) {
+function Navigation({
+  showBackButton = false,
+  onBackClick,
+  onFadeOut,
+  isNavigating: globalIsNavigating = false
+}) {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isNavigating, setIsNavigating] = useState(false);
   const [pendingTab, setPendingTab] = useState(null);
+  const [comingBackFromProject, setComingBackFromProject] = useState(false);
+
+  // Detect when we're coming back from a project page
+  useEffect(() => {
+    // If showBackButton just changed from true to false, we're coming back from project
+    if (!showBackButton) {
+      // Set a brief flag for the transition delay
+      setComingBackFromProject(true);
+      const timer = setTimeout(() => {
+        setComingBackFromProject(false);
+      }, 300); // Clear after animation
+
+      return () => clearTimeout(timer);
+    }
+  }, [showBackButton]);
 
   // Get current tab from pathname
   const getCurrentTab = () => {
@@ -92,26 +125,21 @@ function Navigation({ showBackButton = false, onBackClick, onFadeOut }) {
 
   // Handle tab click
   const handleTabClick = (tab) => {
-    // Don't navigate if already navigating or if already on the same tab
-    if (isNavigating || activeTab === tab) return;
+    // Special case: if we're on a project detail page and clicking Projects tab, allow navigation to projects list
+    const isOnProjectDetail = location.pathname.startsWith("/project/");
+    const clickingProjects = tab === "projects";
 
-    setIsNavigating(true);
+    // Don't navigate if already on the same tab, unless we're on project detail clicking projects
+    if (activeTab === tab && !(isOnProjectDetail && clickingProjects)) return;
+
     setPendingTab(tab); // Set immediately for visual feedback
 
-    // Trigger fade-out if callback is provided
-    if (onFadeOut) {
-      onFadeOut();
+    // Navigate immediately for tab switching - no fade-out needed
+    if (tab === "projects") {
+      navigate("/");
+    } else {
+      navigate(`/${tab}`);
     }
-
-    // Wait for fade-out animation to complete before navigating
-    setTimeout(() => {
-      if (tab === "projects") {
-        navigate("/");
-      } else {
-        navigate(`/${tab}`);
-      }
-      setIsNavigating(false);
-    }, FADE_TRANSITION_MS);
   };
 
   // Handle back button click
@@ -123,14 +151,19 @@ function Navigation({ showBackButton = false, onBackClick, onFadeOut }) {
     }
   };
 
+  // Hide tabs on mobile when showing back button OR during global navigation (to project pages)
+  const hideTabsOnMobile = showBackButton || globalIsNavigating;
+
   return (
     <TabNavigation>
-      <div>
-        {showBackButton && (
-          <BackButton onClick={handleBackClick}>← back</BackButton>
-        )}
-      </div>
-      <Tabs $hideOnMobile={showBackButton}>
+      <BackButton $visible={showBackButton} onClick={handleBackClick}>
+        ← back
+      </BackButton>
+      <div></div>
+      <Tabs
+        $hideOnMobile={hideTabsOnMobile}
+        $shouldDelay={comingBackFromProject}
+      >
         <TabButton
           $isActive={displayActiveTab === "projects"}
           onClick={() => handleTabClick("projects")}
