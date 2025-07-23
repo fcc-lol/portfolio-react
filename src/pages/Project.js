@@ -11,7 +11,11 @@ import {
   SmallText
 } from "../components/Typography";
 import { useTheme } from "../contexts/ThemeContext";
-import { FADE_TRANSITION, TRANSFORM_TRANSITION } from "../constants";
+import {
+  FADE_TRANSITION,
+  ANIMATION_DURATION,
+  TRANSFORM_TRANSITION
+} from "../constants";
 
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
