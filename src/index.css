@@ -5,7 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.25s ease-in-out;
 
   /* Tell the browser we support both light and dark themes */
   color-scheme: light dark;

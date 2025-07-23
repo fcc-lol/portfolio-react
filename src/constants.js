@@ -1,5 +1,5 @@
 // Animation constants
-export const ANIMATION_DURATION = 200; // milliseconds
+export const ANIMATION_DURATION = 250; // milliseconds
 
 // Animation timing strings for CSS
 export const FADE_TRANSITION = `opacity ${ANIMATION_DURATION}ms ease-in-out`;
