@@ -131,7 +131,7 @@ const LinkButton = styled.a`
   color: ${(props) => props.theme.textSecondary};
   text-decoration: underline;
   font-weight: normal;
-  transition: ${FADE_TRANSITION}, ${TRANSFORM_TRANSITION};
+  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION};
   font-size: 1.125rem;
 
   @media (hover: hover) {
