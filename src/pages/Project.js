@@ -198,7 +198,8 @@ function ProfilePicture({ src, alt, name }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
 
   // If no src provided, try to construct from name
-  const imageSrc = src || (name ? `/images/${name.toLowerCase()}.jpg` : null);
+  const imageSrc =
+    src || (name ? `/images/people/${name.toLowerCase()}.jpg` : null);
 
   // Check if image was already loaded in this session immediately
   const wasLoadedBefore = imageSrc ? isImageLoaded(imageSrc) : false;

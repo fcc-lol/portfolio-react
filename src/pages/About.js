@@ -144,7 +144,7 @@ function AboutPage() {
         </Card>
         <HStack>
           <ProfileCard>
-            <ProfilePicture src="/images/zach.jpg" alt="Zach" />
+            <ProfilePicture src="/images/people/zach.jpg" alt="Zach" />
             <Subheader>Zach</Subheader>
             <SmallText>
               I'm a curious tinkerer, who learns by doing. I like to work on
@@ -153,14 +153,14 @@ function AboutPage() {
             </SmallText>
           </ProfileCard>
           <ProfileCard>
-            <ProfilePicture src="/images/dan.jpg" alt="Dan" />
+            <ProfilePicture src="/images/people/dan.jpg" alt="Dan" />
             <Subheader>Dan</Subheader>
             <SmallText>
               I'm a guy that likes design and code. More to come.
             </SmallText>
           </ProfileCard>
           <ProfileCard>
-            <ProfilePicture src="/images/leo.jpg" alt="Leo" />
+            <ProfilePicture src="/images/people/leo.jpg" alt="Leo" />
             <Subheader>Leo</Subheader>
             <SmallText>
               I'm a designer, engineer, and artist. I believe design and
