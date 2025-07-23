@@ -80,6 +80,8 @@ const BackButton = styled(TabButton)`
   margin-top: -1.75rem;
   opacity: ${(props) => (props.$visible ? 1 : 0)};
   pointer-events: ${(props) => (props.$visible ? "auto" : "none")};
+  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION},
+    ${FADE_TRANSITION};
 `;
 
 function Navigation({
