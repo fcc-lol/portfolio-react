@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { useParams, useOutletContext } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 import { VStack } from "../components/Layout";
 import { ProjectSkeleton, Error } from "../components/States";
@@ -350,11 +350,12 @@ function MediaItem({ mediaItem, projectName, index }) {
 function ProjectPage() {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
   const [dataLoaded, setDataLoaded] = useState(false);
   const { projectId } = useParams();
   const { isDarkMode } = useTheme();
   const { pageVisible } = useOutletContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Reset data loaded state when projectId changes
@@ -370,8 +371,9 @@ function ProjectPage() {
         }
         const data = await response.json();
         setProject(data);
-      } catch (err) {
-        setError(err.message);
+      } catch (error) {
+        console.error(error);
+        return;
       } finally {
         setLoading(false);
         // Start fade-in after data is loaded
@@ -395,12 +397,9 @@ function ProjectPage() {
     );
   }
 
-  if (error || !project) {
-    return (
-      <FadeInWrapper visible={visible}>
-        <Error>Error: {error || "Project not found"}</Error>
-      </FadeInWrapper>
-    );
+  if (!project) {
+    navigate("/", { replace: true });
+    return null;
   }
 
   return (
