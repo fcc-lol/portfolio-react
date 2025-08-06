@@ -1,13 +1,33 @@
-Options -MultiViews
-RewriteEngine On
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # Prerendering for social media crawlers using our API server
+  # Check if the request is from a known crawler
+  RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|redditbot|applebot) [NC]
+  # Only for project routes (not root, files, or other routes)  
+  RewriteCond %{REQUEST_URI} ^/project/[a-zA-Z0-9-]+/?$
+  # Redirect to API server for prerendering (using the existing portfolio API URL)
+  RewriteRule ^project/([a-zA-Z0-9-]+)/?$ https://portfolio-api.fcc.lol/projects/prerender/$1? [R=302,L]
+  
+  # Serve existing files directly
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
 
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^ - [L]
+  # Serve static files directly  
+  RewriteCond %{REQUEST_URI} ^/static/
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+  
+  # Normal SPA routing for regular users
+  # Redirect all requests to index.html except for existing files or directories
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [QSA,L]
+</IfModule>
 
-RewriteCond %{REQUEST_URI} ^/static/
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^ - [L]
+# Disable directory browsing
+Options -Indexes
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.html [QSA,L]
+# Specify default character set
+AddDefaultCharset UTF-8
