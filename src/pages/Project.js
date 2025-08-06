@@ -50,8 +50,8 @@ const HeaderCard = styled(Card)`
 
 const Title = styled(Header)`
   line-height: 1;
-  hyphens: none;
-  word-break: break-word;
+  hyphens: auto;
+  hyphenate-limit-chars: 12 6 6;
 `;
 
 const MediaContainer = styled.div`
