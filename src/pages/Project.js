@@ -49,7 +49,6 @@ const HeaderCard = styled(Card)`
 `;
 
 const Title = styled(Header)`
-  line-height: 1;
   hyphens: manual;
 `;
 
