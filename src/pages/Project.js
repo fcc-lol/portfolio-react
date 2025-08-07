@@ -51,6 +51,7 @@ const HeaderCard = styled(Card)`
 const Title = styled(Header)`
   line-height: 1;
   hyphens: auto;
+  hyphenate-limit-chars: 12 6 6;
 `;
 
 const MediaContainer = styled.div`
@@ -158,11 +159,12 @@ const formatTitle = (title) => {
   const words = name.split(" ");
 
   // Find the longest word that's suitable for hyphenation
+  // Only hyphenate words that are 12+ characters (like "commemorative")
   let longestWordIndex = -1;
   let longestWordLength = 0;
 
   words.forEach((word, index) => {
-    if (word.length > longestWordLength && word.length >= 8) {
+    if (word.length > longestWordLength && word.length >= 12) {
       longestWordLength = word.length;
       longestWordIndex = index;
     }
