@@ -8,13 +8,13 @@ import {
   Header,
   MediumText,
   HeaderTextContent,
-  SmallText
+  SmallText,
 } from "../components/Typography";
 import { useTheme } from "../contexts/ThemeContext";
 import {
   FADE_TRANSITION,
   ANIMATION_DURATION,
-  TRANSFORM_TRANSITION
+  TRANSFORM_TRANSITION,
 } from "../constants";
 
 const FadeInWrapper = styled.div`
@@ -49,6 +49,8 @@ const HeaderCard = styled(Card)`
 
 const Title = styled(Header)`
   hyphens: manual;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid ${(props) => props.theme.border};
 `;
 
 const MediaContainer = styled.div`
@@ -247,7 +249,7 @@ function ProfilePicture({ src, alt, name }) {
           ref={imageRef}
           src={imageSrc}
           onLoad={handleImageLoad}
-          alt=""
+          alt=''
         />
       )}
       <ProfilePictureImg
@@ -333,7 +335,7 @@ function MediaItem({ mediaItem, projectName, index }) {
         ref={imageRef}
         src={mediaUrl}
         onLoad={handleMediaLoad}
-        alt=""
+        alt=''
       />
       <FadeInImage
         src={mediaUrl}
@@ -414,9 +416,8 @@ function ProjectPage() {
                   <LinkButton
                     key={index}
                     href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                    target='_blank'
+                    rel='noopener noreferrer'>
                     {link.label}
                   </LinkButton>
                 ))}
@@ -453,8 +454,7 @@ function ProjectPage() {
                 <MediaCard
                   key={index}
                   $isDarkMode={isDarkMode}
-                  $aspectRatio={aspectRatio}
-                >
+                  $aspectRatio={aspectRatio}>
                   <MediaItem
                     mediaItem={mediaItem}
                     projectName={project.name}

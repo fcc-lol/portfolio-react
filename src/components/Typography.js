@@ -4,6 +4,8 @@ export const Header = styled.h1`
   font-size: 3rem;
   font-weight: bold;
   margin: 0;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid ${(props) => props.theme.border};
   line-height: 1.125;
   color: ${(props) => props.theme.textPrimary};
 
@@ -48,7 +50,7 @@ export const HeaderTextContent = styled.div`
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 `;
 
 export const TextContent = styled.div`

@@ -10,12 +10,13 @@ const lightTheme = {
   textSecondary: "rgba(0, 0, 0, 0.45)",
   textTertiary: "rgba(0, 0, 0, 0.7)",
   shadow: "rgba(0, 0, 0, 0.1)",
+  border: "rgba(0, 0, 0, 0.1)",
   selection: {
     background: "rgba(0, 0, 0, 1)",
-    color: "rgba(255, 255, 255, 1)"
+    color: "rgba(255, 255, 255, 1)",
   },
   error: "#ff6b6b",
-  errorBackground: "white"
+  errorBackground: "white",
 };
 
 const darkTheme = {
@@ -25,12 +26,13 @@ const darkTheme = {
   textSecondary: "rgba(255, 255, 255, 0.6)",
   textTertiary: "rgba(255, 255, 255, 0.8)",
   shadow: "rgba(0, 0, 0, 0.3)",
+  border: "rgba(255, 255, 255, 0.2)",
   selection: {
     background: "rgba(255, 255, 255, 1)",
-    color: "rgba(0, 0, 0, 1)"
+    color: "rgba(0, 0, 0, 1)",
   },
   error: "#ff6b6b",
-  errorBackground: "rgb(40, 40, 40)"
+  errorBackground: "rgb(40, 40, 40)",
 };
 
 // Create context
@@ -87,7 +89,7 @@ export const ThemeProvider = ({ children }) => {
     markImageAsLoaded,
     isImageLoaded,
     setCachedProjectsData,
-    getCachedProjectsData
+    getCachedProjectsData,
   };
 
   return (
