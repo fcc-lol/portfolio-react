@@ -27,7 +27,6 @@ const MediaCard = styled(Card)`
   overflow: hidden;
   position: relative;
   ${(props) => props.$aspectRatio && `aspect-ratio: ${props.$aspectRatio};`}
-  min-height: 200px;
 
   &::before {
     content: "";
