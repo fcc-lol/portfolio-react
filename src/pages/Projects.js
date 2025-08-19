@@ -219,7 +219,17 @@ function ProjectsPage() {
   }, [cachedProjects, setCachedProjectsData]);
 
   // Handle project click with fade-out animation
-  const handleProjectClick = (projectId) => {
+  const handleProjectClick = (projectId, event) => {
+    // Check if command/ctrl key was pressed (for opening in new tab)
+    if (event.metaKey || event.ctrlKey) {
+      // Open in new tab for command/ctrl+click
+      event.preventDefault();
+      const projectUrl = `${window.location.origin}/project/${projectId}`;
+      window.open(projectUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // Regular click behavior - navigate with fade-out animation
     handleFadeOut(); // This triggers pageVisible = false and setIsNavigating = true
     // Wait for fade-out animation to complete before navigating
     setTimeout(() => {
@@ -260,7 +270,7 @@ function ProjectsPage() {
           {projects.map((project) => (
             <Project
               key={project.id}
-              onClick={() => handleProjectClick(project.id)}
+              onClick={(event) => handleProjectClick(project.id, event)}
               $isDarkMode={isDarkMode}
             >
               <ProjectImage imageUrl={getPrimaryImage(project)} />
