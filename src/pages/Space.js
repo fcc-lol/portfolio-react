@@ -61,6 +61,9 @@ function SpacePage() {
   const image3Ref = useRef(null);
 
   useEffect(() => {
+    // Update browser title
+    document.title = "FCC Studio – Space";
+
     // Start fade-in after a short delay to ensure proper animation
     setTimeout(() => {
       setDataLoaded(true);

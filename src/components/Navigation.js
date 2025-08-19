@@ -62,14 +62,19 @@ const TabButton = styled.button`
   @media (hover: hover) {
     &:hover {
       color: ${(props) => props.theme.textPrimary};
-      transform: ${(props) => (props.$isActive ? "scale(1)" : "scale(1.1)")};
-      cursor: ${(props) => (props.$isActive ? "default" : "pointer")};
+      transform: ${(props) =>
+        props.$isActive && !props.$alwaysInteractive
+          ? "scale(1)"
+          : "scale(1.1)"};
+      cursor: ${(props) =>
+        props.$isActive && !props.$alwaysInteractive ? "default" : "pointer"};
     }
   }
 
   &:active {
     color: ${(props) => props.theme.textPrimary};
-    transform: ${(props) => (props.$isActive ? "scale(1)" : "scale(0.9)")};
+    transform: ${(props) =>
+      props.$isActive && !props.$alwaysInteractive ? "scale(1)" : "scale(0.9)"};
   }
 `;
 
@@ -116,6 +121,9 @@ function Navigation({
     if (path.startsWith("/project/")) return "projects";
     return "projects"; // default and /projects
   };
+
+  // Check if we're on a project detail page
+  const isOnProjectDetail = location.pathname.startsWith("/project/");
 
   const activeTab = getCurrentTab();
   // Use pendingTab for immediate visual feedback, fallback to activeTab
@@ -169,6 +177,9 @@ function Navigation({
       >
         <TabButton
           $isActive={displayActiveTab === "projects"}
+          $alwaysInteractive={
+            isOnProjectDetail && displayActiveTab === "projects"
+          }
           onClick={() => handleTabClick("projects")}
         >
           Projects

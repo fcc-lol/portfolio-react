@@ -185,6 +185,11 @@ function ProjectsPage() {
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
+    // Update browser title
+    document.title = "FCC Studio – Projects";
+  }, []);
+
+  useEffect(() => {
     // If we already have cached data, don't fetch again
     if (cachedProjects) {
       // Start fade-in after a short delay to ensure proper animation

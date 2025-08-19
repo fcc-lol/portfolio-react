@@ -117,6 +117,9 @@ function AboutPage() {
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
+    // Update browser title
+    document.title = "FCC Studio – About";
+
     // Start fade-in after a short delay to ensure proper animation
     setTimeout(() => {
       setDataLoaded(true);
