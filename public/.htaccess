@@ -5,9 +5,24 @@
   # Prerendering for social media crawlers using our API server
   # Check if the request is from a known crawler
   RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|redditbot|applebot) [NC]
-  # Only for project routes (not root, files, or other routes)  
+  
+  # Homepage prerendering
+  RewriteCond %{REQUEST_URI} ^/?$
+  RewriteRule ^/?$ https://portfolio-api.fcc.lol/projects/prerender? [R=302,L]
+  
+  # Tag routes prerendering
+  RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|redditbot|applebot) [NC]
+  RewriteCond %{REQUEST_URI} ^/tag/[a-zA-Z0-9-]+/?$
+  RewriteRule ^tag/([a-zA-Z0-9-]+)/?$ https://portfolio-api.fcc.lol/projects/prerender/tag/$1? [R=302,L]
+  
+  # Person routes prerendering
+  RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|redditbot|applebot) [NC]
+  RewriteCond %{REQUEST_URI} ^/person/[a-zA-Z0-9-]+/?$
+  RewriteRule ^person/([a-zA-Z0-9-]+)/?$ https://portfolio-api.fcc.lol/projects/prerender/person/$1? [R=302,L]
+  
+  # Project routes prerendering
+  RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|redditbot|applebot) [NC]
   RewriteCond %{REQUEST_URI} ^/project/[a-zA-Z0-9-]+/?$
-  # Redirect to API server for prerendering (using the existing portfolio API URL)
   RewriteRule ^project/([a-zA-Z0-9-]+)/?$ https://portfolio-api.fcc.lol/projects/prerender/$1? [R=302,L]
   
   # Serve existing files directly
