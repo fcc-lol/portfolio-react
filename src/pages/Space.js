@@ -15,6 +15,22 @@ const ImageContainer = styled.div`
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 1.5rem;
+    opacity: ${(props) => (props.$isDarkMode || !props.loaded ? 0 : 1)};
+    transition: ${FADE_TRANSITION};
+  }
 `;
 
 const FadeInImage = styled.img`
@@ -32,7 +48,7 @@ const imageUrls = [
 ];
 
 function SpaceImageComponent({ imageUrl, imageKey, imageRef }) {
-  const { markImageAsLoaded } = useTheme();
+  const { markImageAsLoaded, isDarkMode } = useTheme();
   const [loaded, setLoaded] = useState(false);
 
   const handleImageLoad = () => {
@@ -41,7 +57,7 @@ function SpaceImageComponent({ imageUrl, imageKey, imageRef }) {
   };
 
   return (
-    <ImageContainer>
+    <ImageContainer $isDarkMode={isDarkMode} loaded={loaded}>
       <FadeInImage
         ref={imageRef}
         src={imageUrl}

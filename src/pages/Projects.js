@@ -44,11 +44,12 @@ const Project = styled(Card)`
     left: 0;
     right: 0;
     bottom: 0;
-    border: ${(props) =>
-      props.$isDarkMode ? "none" : "2px solid rgba(0, 0, 0, 0.1)"};
+    border: 2px solid rgba(0, 0, 0, 0.1);
     pointer-events: none;
     z-index: 1;
     border-radius: 1.5rem;
+    opacity: ${(props) => (props.$isDarkMode || !props.$imageLoaded ? 0 : 1)};
+    transition: ${FADE_TRANSITION};
   }
 
   @media (hover: hover) {
@@ -117,7 +118,7 @@ const Description = styled.p`
   margin: 0;
 `;
 
-function ProjectImage({ imageUrl, ...props }) {
+function ProjectImage({ imageUrl, onLoad, ...props }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
 
   // Check if image was already loaded in this session immediately (memoized to prevent re-calculations)
@@ -127,6 +128,13 @@ function ProjectImage({ imageUrl, ...props }) {
 
   // Always start as false to trigger fade-in animation on page load
   const [loaded, setLoaded] = useState(!imageUrl);
+
+  // Notify parent immediately if there's no image
+  useEffect(() => {
+    if (!imageUrl && onLoad) {
+      onLoad(true);
+    }
+  }, [imageUrl, onLoad]);
   const imageRef = useRef(null);
 
   useEffect(() => {
@@ -136,9 +144,14 @@ function ProjectImage({ imageUrl, ...props }) {
       const additionalDelay = wasLoadedBefore ? 50 : 100; // Slightly faster for cached images
       const totalDelay = skeletonFadeOutDelay + additionalDelay;
 
-      setTimeout(() => setLoaded(true), totalDelay);
+      setTimeout(() => {
+        setLoaded(true);
+        if (onLoad) {
+          onLoad(true);
+        }
+      }, totalDelay);
     }
-  }, [imageUrl, wasLoadedBefore]);
+  }, [imageUrl, wasLoadedBefore, onLoad]);
 
   const handleImageLoad = () => {
     setLoaded(true);
@@ -146,6 +159,11 @@ function ProjectImage({ imageUrl, ...props }) {
     // Mark this image as loaded in the global state
     if (imageUrl) {
       markImageAsLoaded(imageUrl);
+    }
+
+    // Notify parent component
+    if (onLoad) {
+      onLoad(true);
     }
   };
 
@@ -174,7 +192,8 @@ function ProjectsPage() {
   const { isDarkMode, setCachedProjectsData, getCachedProjectsData } =
     useTheme();
   const navigate = useNavigate();
-  const { pageVisible, contentVisible, handleFadeOut, handleContentFadeOut } = useOutletContext();
+  const { pageVisible, contentVisible, handleFadeOut, handleContentFadeOut } =
+    useOutletContext();
 
   // Try to get cached projects first
   const cachedProjects = getCachedProjectsData();
@@ -183,6 +202,7 @@ function ProjectsPage() {
   const [loading, setLoading] = useState(!cachedProjects);
   const [error, setError] = useState(null);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [loadedImages, setLoadedImages] = useState({});
 
   useEffect(() => {
     // Update browser title
@@ -249,6 +269,13 @@ function ProjectsPage() {
     );
   };
 
+  const handleImageLoad = (projectId) => {
+    setLoadedImages((prev) => ({
+      ...prev,
+      [projectId]: true
+    }));
+  };
+
   // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
   const visible = pageVisible && contentVisible && dataLoaded;
 
@@ -277,8 +304,12 @@ function ProjectsPage() {
               key={project.id}
               onClick={(event) => handleProjectClick(project.id, event)}
               $isDarkMode={isDarkMode}
+              $imageLoaded={loadedImages[project.id] || false}
             >
-              <ProjectImage imageUrl={getPrimaryImage(project)} />
+              <ProjectImage
+                imageUrl={getPrimaryImage(project)}
+                onLoad={() => handleImageLoad(project.id)}
+              />
               <Content visible={visible}>
                 <Title>{project.name}</Title>
                 <Description>{project.description}</Description>
