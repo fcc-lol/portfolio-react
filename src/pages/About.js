@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { VStack, HStack } from "../components/Layout";
@@ -12,7 +12,11 @@ import {
   HeaderTextContent
 } from "../components/Typography";
 import ProfilePicture from "../components/ProfilePicture";
-import { FADE_TRANSITION } from "../constants";
+import {
+  FADE_TRANSITION,
+  ANIMATION_DURATION,
+  TRANSFORM_TRANSITION
+} from "../constants";
 
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
@@ -28,6 +32,22 @@ const ProfileCard = styled(Card)`
   text-align: center;
   padding: 2rem 2rem 3rem 2rem;
   gap: 0.5rem;
+  cursor: pointer;
+  transition: ${TRANSFORM_TRANSITION}, ${FADE_TRANSITION};
+
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.05);
+
+      @media (max-width: 1024px) {
+        transform: scale(1.025);
+      }
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
 
   @media (max-width: 768px) {
     padding: 2rem;
@@ -35,7 +55,8 @@ const ProfileCard = styled(Card)`
 `;
 
 function AboutPage() {
-  const { pageVisible, contentVisible } = useOutletContext();
+  const { pageVisible, contentVisible, handleFadeOut } = useOutletContext();
+  const navigate = useNavigate();
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
@@ -47,6 +68,20 @@ function AboutPage() {
       setDataLoaded(true);
     }, 50);
   }, []);
+
+  // Handle person card click with fade-out navigation
+  const handlePersonClick = (personName) => {
+    if (handleFadeOut) {
+      handleFadeOut(); // Trigger fade-out animation
+      // Wait for fade-out animation to complete before navigating
+      setTimeout(() => {
+        navigate(`/person/${personName.toLowerCase()}`);
+      }, ANIMATION_DURATION);
+    } else {
+      // Fallback for direct navigation
+      navigate(`/person/${personName.toLowerCase()}`);
+    }
+  };
 
   // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
   const visible = pageVisible && contentVisible && dataLoaded;
@@ -68,7 +103,7 @@ function AboutPage() {
           </HeaderTextContent>
         </Card>
         <HStack>
-          <ProfileCard>
+          <ProfileCard onClick={() => handlePersonClick("Zach")}>
             <ProfilePicture
               src="/images/people/zach.jpg"
               alt="Zach"
@@ -81,7 +116,7 @@ function AboutPage() {
               execute nimbly.
             </SmallText>
           </ProfileCard>
-          <ProfileCard>
+          <ProfileCard onClick={() => handlePersonClick("Dan")}>
             <ProfilePicture
               src="/images/people/dan.jpg"
               alt="Dan"
@@ -92,7 +127,7 @@ function AboutPage() {
               I'm a guy that likes design and code. More to come.
             </SmallText>
           </ProfileCard>
-          <ProfileCard>
+          <ProfileCard onClick={() => handlePersonClick("Leo")}>
             <ProfilePicture
               src="/images/people/leo.jpg"
               alt="Leo"
