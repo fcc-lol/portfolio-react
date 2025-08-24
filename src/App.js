@@ -15,6 +15,7 @@ import { Page, Container } from "./components/Layout";
 import ProjectsPage from "./pages/Projects";
 import ProjectPage from "./pages/Project";
 import PersonProjectsPage from "./pages/PersonProjects";
+import TagProjectsPage from "./pages/TagProjects";
 import SpacePage from "./pages/Space";
 import AboutPage from "./pages/About";
 import { ANIMATION_DURATION } from "./constants";
@@ -66,7 +67,8 @@ function RootLayout() {
   // Determine if we should show the back button
   const showBackButton =
     location.pathname.startsWith("/project/") ||
-    location.pathname.startsWith("/person/");
+    location.pathname.startsWith("/person/") ||
+    location.pathname.startsWith("/tag/");
 
   return (
     <Page>
@@ -129,6 +131,10 @@ const router = createBrowserRouter([
       {
         path: "/person/:personName",
         element: <PersonProjectsPage />
+      },
+      {
+        path: "/tag/:tagName",
+        element: <TagProjectsPage />
       }
     ]
   }

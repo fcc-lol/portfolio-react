@@ -93,7 +93,7 @@ const Credits = styled.div`
 
   @media (max-width: 768px) {
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 1.125rem;
   }
 `;
 
@@ -144,20 +144,65 @@ const LinksAndTagsContainer = styled.div`
   flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
 `;
 
-const Tag = styled.span`
+const LinksContainer = styled.div`
+  display: contents;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+`;
+
+const TagsContainer = styled.div`
+  display: contents;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+`;
+
+const Tag = styled.button`
   display: inline-block;
   color: ${(props) => props.theme.textSecondary};
   text-decoration: underline;
   font-weight: normal;
   font-size: 1.125rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION};
+
+  @media (hover: hover) {
+    &:hover {
+      color: ${(props) => props.theme.textPrimary};
+    }
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
 `;
 
 const Separator = styled.span`
   color: ${(props) => props.theme.textSecondary};
   font-size: 1.125rem;
   font-weight: normal;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const LinkButton = styled.a`
@@ -330,6 +375,15 @@ function ProjectPage() {
     }, ANIMATION_DURATION);
   };
 
+  // Handle tag click with fade-out animation
+  const handleTagClick = (tag) => {
+    handleFadeOut(); // This triggers pageVisible = false and setIsNavigating = true
+    // Wait for fade-out animation to complete before navigating
+    setTimeout(() => {
+      navigate(`/tag/${tag}`);
+    }, ANIMATION_DURATION);
+  };
+
   useEffect(() => {
     // Reset data loaded state when projectId changes
     setDataLoaded(false);
@@ -393,7 +447,7 @@ function ProjectPage() {
               (project.links && project.links.length > 0)) && (
               <LinksAndTagsContainer>
                 {project.links && project.links.length > 0 && (
-                  <>
+                  <LinksContainer>
                     {project.links.map((link, index) => (
                       <LinkButton
                         key={index}
@@ -404,18 +458,20 @@ function ProjectPage() {
                         {link.label}
                       </LinkButton>
                     ))}
-                  </>
+                  </LinksContainer>
                 )}
                 {project.links &&
                   project.links.length > 0 &&
                   project.tags &&
                   project.tags.length > 0 && <Separator>·</Separator>}
                 {project.tags && project.tags.length > 0 && (
-                  <>
+                  <TagsContainer>
                     {project.tags.map((tag, index) => (
-                      <Tag key={index}>#{tag}</Tag>
+                      <Tag key={index} onClick={() => handleTagClick(tag)}>
+                        #{tag}
+                      </Tag>
                     ))}
-                  </>
+                  </TagsContainer>
                 )}
               </LinksAndTagsContainer>
             )}
