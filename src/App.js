@@ -14,6 +14,7 @@ import Navigation from "./components/Navigation";
 import { Page, Container } from "./components/Layout";
 import ProjectsPage from "./pages/Projects";
 import ProjectPage from "./pages/Project";
+import PersonProjectsPage from "./pages/PersonProjects";
 import SpacePage from "./pages/Space";
 import AboutPage from "./pages/About";
 import { ANIMATION_DURATION } from "./constants";
@@ -41,12 +42,14 @@ function RootLayout() {
     setIsNavigating(true);
     // Wait for fade-out animation to complete before navigating
     setTimeout(() => {
-      navigate("/");
+      navigate(-1); // Go back to previous page
     }, ANIMATION_DURATION);
   };
 
   // Determine if we should show the back button
-  const showBackButton = location.pathname.startsWith("/project/");
+  const showBackButton =
+    location.pathname.startsWith("/project/") ||
+    location.pathname.startsWith("/person/");
 
   return (
     <Page>
@@ -102,6 +105,10 @@ const router = createBrowserRouter([
       {
         path: "/project/:projectId",
         element: <ProjectPage />
+      },
+      {
+        path: "/person/:personName",
+        element: <PersonProjectsPage />
       }
     ]
   }

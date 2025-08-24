@@ -92,6 +92,7 @@ const BackButton = styled(TabButton)`
 function Navigation({
   showBackButton = false,
   onBackClick,
+  onFadeOut,
   isNavigating: globalIsNavigating = false
 }) {
   const location = useLocation();
@@ -118,12 +119,14 @@ function Navigation({
     const path = location.pathname;
     if (path === "/space") return "space";
     if (path === "/about") return "about";
-    if (path.startsWith("/project/")) return "projects";
+    if (path.startsWith("/project/") || path.startsWith("/person/"))
+      return "projects";
     return "projects"; // default and /projects
   };
 
-  // Check if we're on a project detail page
+  // Check if we're on a project detail page or person page
   const isOnProjectDetail = location.pathname.startsWith("/project/");
+  const isOnPersonPage = location.pathname.startsWith("/person/");
 
   const activeTab = getCurrentTab();
   // Use pendingTab for immediate visual feedback, fallback to activeTab
@@ -136,20 +139,31 @@ function Navigation({
 
   // Handle tab click
   const handleTabClick = (tab) => {
-    // Special case: if we're on a project detail page and clicking Projects tab, allow navigation to projects list
-    const isOnProjectDetail = location.pathname.startsWith("/project/");
+    // Special case: if we're on a project detail page or person page and clicking Projects tab, allow navigation to projects list
+    const isOnDetailPage =
+      location.pathname.startsWith("/project/") ||
+      location.pathname.startsWith("/person/");
     const clickingProjects = tab === "projects";
 
-    // Don't navigate if already on the same tab, unless we're on project detail clicking projects
-    if (activeTab === tab && !(isOnProjectDetail && clickingProjects)) return;
+    // Don't navigate if already on the same tab, unless we're on detail page clicking projects
+    if (activeTab === tab && !(isOnDetailPage && clickingProjects)) return;
 
     setPendingTab(tab); // Set immediately for visual feedback
 
-    // Navigate immediately for tab switching - no fade-out needed
-    if (tab === "projects") {
-      navigate("/");
+    // Special handling for Projects tab when on detail pages - use fade-out animation
+    if (clickingProjects && isOnDetailPage && onFadeOut) {
+      onFadeOut(); // Trigger fade-out animation
+      // Wait for fade-out animation to complete before navigating
+      setTimeout(() => {
+        navigate("/");
+      }, ANIMATION_DURATION);
     } else {
-      navigate(`/${tab}`);
+      // Navigate immediately for regular tab switching - no fade-out needed
+      if (tab === "projects") {
+        navigate("/");
+      } else {
+        navigate(`/${tab}`);
+      }
     }
   };
 
@@ -178,7 +192,8 @@ function Navigation({
         <TabButton
           $isActive={displayActiveTab === "projects"}
           $alwaysInteractive={
-            isOnProjectDetail && displayActiveTab === "projects"
+            (isOnProjectDetail || isOnPersonPage) &&
+            displayActiveTab === "projects"
           }
           onClick={() => handleTabClick("projects")}
         >

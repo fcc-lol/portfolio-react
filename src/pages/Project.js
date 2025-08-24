@@ -10,6 +10,7 @@ import {
   HeaderTextContent,
   SmallText
 } from "../components/Typography";
+import ProfilePicture from "../components/ProfilePicture";
 import { useTheme } from "../contexts/ThemeContext";
 import {
   FADE_TRANSITION,
@@ -98,30 +99,45 @@ const Credits = styled.div`
 
 const Credit = styled.div`
   padding: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const ProfilePictureImg = styled.img`
-  object-fit: cover;
-  border-radius: 100%;
-  width: 2.5rem;
-  height: 2.5rem;
-  user-select: none;
-  pointer-events: none;
-  opacity: ${(props) => (props.loaded ? 1 : 0)};
-  transition: ${(props) => (props.shouldAnimate ? FADE_TRANSITION : "none")};
-
-  @media (max-width: 768px) {
-    width: 2rem;
-    height: 2rem;
-  }
 `;
 
 const HiddenImage = styled.img`
   display: none;
+`;
+const PersonContainer = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  transition: ${TRANSFORM_TRANSITION};
+
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+const PersonName = styled.span`
+  font-size: 1.125rem;
+  font-weight: normal;
+  margin: 0;
+  line-height: 1.375;
+  color: ${(props) => props.theme.textSecondary};
+  text-decoration: underline;
+  transition: color ${ANIMATION_DURATION}ms ease-in-out;
+
+  ${PersonContainer}:hover & {
+    color: ${(props) => props.theme.textPrimary};
+  }
 `;
 
 const LinksContainer = styled.div`
@@ -194,73 +210,6 @@ const isVideoFile = (url) => {
   const videoExtensions = [".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv"];
   return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
 };
-
-function ProfilePicture({ src, alt, name }) {
-  const { markImageAsLoaded, isImageLoaded } = useTheme();
-
-  // If no src provided, try to construct from name
-  const imageSrc =
-    src || (name ? `/images/people/${name.toLowerCase()}.jpg` : null);
-
-  // Check if image was already loaded in this session immediately
-  const wasLoadedBefore = imageSrc ? isImageLoaded(imageSrc) : false;
-
-  const [loaded, setLoaded] = useState(wasLoadedBefore || !imageSrc);
-  const [shouldAnimate, setShouldAnimate] = useState(
-    !wasLoadedBefore && imageSrc
-  );
-  const imageRef = useRef(null);
-
-  useEffect(() => {
-    if (imageSrc) {
-      // If we've seen this image before in this session, don't animate
-      if (isImageLoaded(imageSrc)) {
-        setLoaded(true);
-        setShouldAnimate(false);
-        return;
-      }
-
-      // Check if it's already loaded in the DOM
-      if (
-        imageRef.current &&
-        imageRef.current.complete &&
-        imageRef.current.naturalWidth > 0
-      ) {
-        setLoaded(true);
-        setShouldAnimate(false);
-        markImageAsLoaded(imageSrc);
-      }
-    }
-  }, [imageSrc, isImageLoaded, markImageAsLoaded]);
-
-  const handleImageLoad = () => {
-    setLoaded(true);
-
-    // Mark this image as loaded in the global state
-    if (imageSrc) {
-      markImageAsLoaded(imageSrc);
-    }
-  };
-
-  return (
-    <>
-      {imageSrc && (
-        <HiddenImage
-          ref={imageRef}
-          src={imageSrc}
-          onLoad={handleImageLoad}
-          alt=""
-        />
-      )}
-      <ProfilePictureImg
-        src={imageSrc}
-        alt={alt}
-        loaded={loaded}
-        shouldAnimate={shouldAnimate}
-      />
-    </>
-  );
-}
 
 function MediaItem({ mediaItem, projectName, index }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
@@ -355,8 +304,17 @@ function ProjectPage() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const { projectId } = useParams();
   const { isDarkMode } = useTheme();
-  const { pageVisible } = useOutletContext();
+  const { pageVisible, handleFadeOut } = useOutletContext();
   const navigate = useNavigate();
+
+  // Handle name click with fade-out animation
+  const handleNameClick = (personName) => {
+    handleFadeOut(); // This triggers pageVisible = false and setIsNavigating = true
+    // Wait for fade-out animation to complete before navigating
+    setTimeout(() => {
+      navigate(`/person/${personName.toLowerCase()}`);
+    }, ANIMATION_DURATION);
+  };
 
   useEffect(() => {
     // Reset data loaded state when projectId changes
@@ -435,12 +393,16 @@ function ProjectPage() {
               <Credits>
                 {project.credits.map((credit, index) => (
                   <Credit key={index} $isDarkMode={isDarkMode}>
-                    <ProfilePicture
-                      src={credit.profilePictureUrl}
-                      alt={credit.name}
-                      name={credit.name}
-                    />
-                    <SmallText>{credit.name}</SmallText>
+                    <PersonContainer
+                      onClick={() => handleNameClick(credit.name)}
+                    >
+                      <ProfilePicture
+                        alt={credit.name}
+                        name={credit.name}
+                        size="small"
+                      />
+                      <PersonName>{credit.name}</PersonName>
+                    </PersonContainer>
                     {credit.bio && <SmallText>{credit.bio}</SmallText>}
                   </Credit>
                 ))}
