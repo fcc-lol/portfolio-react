@@ -14,8 +14,10 @@ const FadeInWrapper = styled.div`
 const ImageContainer = styled.div`
   width: 100%;
   aspect-ratio: 4 / 3;
+  min-height: 200px; /* Fallback for older browsers */
   overflow: hidden;
   position: relative;
+  background: ${(props) => props.theme.cardBackground};
 
   &::before {
     content: "";
@@ -80,14 +82,12 @@ function SpacePage() {
     // Update browser title
     document.title = "FCC Studio – Space";
 
-    // Start fade-in after a short delay to ensure proper animation
-    setTimeout(() => {
-      setDataLoaded(true);
-    }, 50);
+    // Show content immediately - we know the layout
+    setDataLoaded(true);
   }, []);
 
-  // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
-  const visible = pageVisible && contentVisible && dataLoaded;
+  // Show immediately - no need to wait for complex state dependencies
+  const visible = true;
 
   return (
     <FadeInWrapper visible={visible}>

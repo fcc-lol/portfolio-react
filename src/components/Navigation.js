@@ -104,11 +104,28 @@ function Navigation({
     if (!showBackButton) {
       // Set a brief flag for the transition delay
       setComingBackFromProject(true);
-      const timer = setTimeout(() => {
-        setComingBackFromProject(false);
-      }, 300); // Clear after animation
 
-      return () => clearTimeout(timer);
+      // Use requestAnimationFrame for 300ms delay
+      const targetFrames = Math.ceil(300 / 16.67); // ~18 frames at 60fps for 300ms
+      let frameCount = 0;
+      let animationId;
+
+      const waitForAnimation = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
+          setComingBackFromProject(false);
+        } else {
+          animationId = requestAnimationFrame(waitForAnimation);
+        }
+      };
+
+      animationId = requestAnimationFrame(waitForAnimation);
+
+      return () => {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
+      };
     }
   }, [showBackButton]);
 
@@ -151,14 +168,25 @@ function Navigation({
     // Use content-specific fade-out for tab navigation (content only, navigation stays visible)
     if (onContentFadeOut) {
       onContentFadeOut(); // Trigger fade-out animation for page content only
-      // Wait for fade-out animation to complete before navigating
-      setTimeout(() => {
-        if (tab === "projects") {
-          navigate("/");
+
+      // Wait for fade-out animation to complete using requestAnimationFrame
+      const targetFrames = Math.ceil(ANIMATION_DURATION / 16.67); // ~15 frames at 60fps for 250ms
+      let frameCount = 0;
+
+      const waitForAnimation = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
+          if (tab === "projects") {
+            navigate("/");
+          } else {
+            navigate(`/${tab}`);
+          }
         } else {
-          navigate(`/${tab}`);
+          requestAnimationFrame(waitForAnimation);
         }
-      }, ANIMATION_DURATION);
+      };
+
+      requestAnimationFrame(waitForAnimation);
     } else {
       // Fallback for direct navigation
       if (tab === "projects") {

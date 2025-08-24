@@ -1,6 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useParams, useOutletContext, useNavigate } from "react-router-dom";
+import {
+  useParams,
+  useOutletContext,
+  useNavigate,
+  useLocation
+} from "react-router-dom";
 import Card from "../components/Card";
 import { VStack } from "../components/Layout";
 import { ProjectSkeleton, Error } from "../components/States";
@@ -36,11 +41,12 @@ const MediaCard = styled(Card)`
     left: 0;
     right: 0;
     bottom: 0;
-    border: ${(props) =>
-      props.$isDarkMode ? "none" : "2px solid rgba(0, 0, 0, 0.1)"};
+    border: 2px solid rgba(0, 0, 0, 0.1);
     pointer-events: none;
     z-index: 1;
     border-radius: 1.5rem;
+    opacity: ${(props) => (props.$isDarkMode || !props.$mediaLoaded ? 0 : 1)};
+    transition: ${FADE_TRANSITION};
   }
 `;
 
@@ -101,9 +107,6 @@ const Credit = styled.div`
   padding: 0;
 `;
 
-const HiddenImage = styled.img`
-  display: none;
-`;
 const PersonContainer = styled.button`
   background: none;
   border: none;
@@ -270,7 +273,7 @@ const isVideoFile = (url) => {
   return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
 };
 
-function MediaItem({ mediaItem, projectName, index }) {
+function MediaItem({ mediaItem, projectName, index, onLoad }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
 
   // Handle both old format (string) and new format (object)
@@ -282,41 +285,60 @@ function MediaItem({ mediaItem, projectName, index }) {
 
   // Always start as false to trigger fade-in animation on page load
   const [loaded, setLoaded] = useState(!mediaUrl);
-  const imageRef = useRef(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     if (mediaUrl && !isVideo) {
-      // If media was already loaded before, trigger fade-in immediately
+      // If media was already loaded before, show it using requestAnimationFrame
       if (wasLoadedBefore) {
-        // Small delay to ensure fade-in effect is visible
-        setTimeout(() => setLoaded(true), 50);
+        requestAnimationFrame(() => {
+          setLoaded(true);
+          // Only call onLoad if this was actually previously loaded successfully
+          if (onLoad && !hasError) onLoad(index);
+        });
         return;
       }
-
-      // Check if it's already loaded in the DOM
-      if (
-        imageRef.current &&
-        imageRef.current.complete &&
-        imageRef.current.naturalWidth > 0
-      ) {
-        setLoaded(true);
-        markImageAsLoaded(mediaUrl);
-      }
+      // For new images, rely on the onLoad/onError handlers
     } else if (mediaUrl && isVideo) {
-      // For videos, handle fade-in similarly
+      // For videos, handle fade-in similarly (videos are less prone to dimension issues)
       if (wasLoadedBefore) {
-        setTimeout(() => setLoaded(true), 50);
+        requestAnimationFrame(() => {
+          setLoaded(true);
+          if (onLoad && !hasError) onLoad(index);
+        });
+      }
+      // For new videos, rely on the onLoadedData/onError handlers
+    }
+  }, [mediaUrl, wasLoadedBefore, isVideo, onLoad, index, hasError]);
+
+  const handleMediaLoadInternal = (event) => {
+    // For images, verify it actually loaded successfully
+    if (!isVideo && event?.target) {
+      const img = event.target;
+      if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+        // Image didn't actually load successfully
+        handleMediaError();
+        return;
       }
     }
-  }, [mediaUrl, wasLoadedBefore, markImageAsLoaded, isVideo]);
 
-  const handleMediaLoad = () => {
     setLoaded(true);
 
     // Mark this media as loaded in the global state
     if (mediaUrl) {
       markImageAsLoaded(mediaUrl);
     }
+
+    // Only notify parent for border animation if there's no error
+    if (onLoad && !hasError) {
+      onLoad(index);
+    }
+  };
+
+  const handleMediaError = () => {
+    setHasError(true);
+    setLoaded(false); // Don't show broken image
+    // Don't notify parent - no border for broken images
   };
 
   if (isVideo) {
@@ -331,7 +353,8 @@ function MediaItem({ mediaItem, projectName, index }) {
           loaded={loaded}
           shouldAnimate={!!mediaUrl}
           wasLoadedBefore={wasLoadedBefore}
-          onLoadedData={handleMediaLoad}
+          onLoadedData={handleMediaLoadInternal}
+          onError={handleMediaError}
         />
       </MediaContainer>
     );
@@ -339,28 +362,29 @@ function MediaItem({ mediaItem, projectName, index }) {
 
   return (
     <MediaContainer>
-      <HiddenImage
-        ref={imageRef}
-        src={mediaUrl}
-        onLoad={handleMediaLoad}
-        alt=""
-      />
       <FadeInImage
         src={mediaUrl}
         alt={`${projectName} - ${index + 1}`}
         loaded={loaded}
         shouldAnimate={!!mediaUrl}
         wasLoadedBefore={wasLoadedBefore}
+        onLoad={handleMediaLoadInternal}
+        onError={handleMediaError}
       />
     </MediaContainer>
   );
 }
 
 function ProjectPage() {
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const prefillData = location.state?.prefillData;
 
-  const [dataLoaded, setDataLoaded] = useState(false);
+  // Initialize with prefilled data if available, otherwise null
+  const [project, setProject] = useState(prefillData || null);
+  const [loading, setLoading] = useState(!prefillData); // Not loading if we have prefill data
+
+  const [dataLoaded, setDataLoaded] = useState(false); // Always start false to trigger fade-in animation
+  const [loadedMedia, setLoadedMedia] = useState({}); // Track which media items have loaded
   const { projectId } = useParams();
   const { isDarkMode } = useTheme();
   const { pageVisible, contentVisible, handleFadeOut } = useOutletContext();
@@ -369,24 +393,62 @@ function ProjectPage() {
   // Handle name click with fade-out animation
   const handleNameClick = (personName) => {
     handleFadeOut(); // This triggers pageVisible = false and setIsNavigating = true
-    // Wait for fade-out animation to complete before navigating
-    setTimeout(() => {
-      navigate(`/person/${personName.toLowerCase()}`);
-    }, ANIMATION_DURATION);
+
+    // Wait for fade-out animation to complete using requestAnimationFrame
+    const targetFrames = Math.ceil(ANIMATION_DURATION / 16.67); // ~15 frames at 60fps for 250ms
+    let frameCount = 0;
+
+    const waitForAnimation = () => {
+      frameCount++;
+      if (frameCount >= targetFrames) {
+        navigate(`/person/${personName.toLowerCase()}`);
+      } else {
+        requestAnimationFrame(waitForAnimation);
+      }
+    };
+
+    requestAnimationFrame(waitForAnimation);
   };
 
   // Handle tag click with fade-out animation
   const handleTagClick = (tag) => {
     handleFadeOut(); // This triggers pageVisible = false and setIsNavigating = true
-    // Wait for fade-out animation to complete before navigating
-    setTimeout(() => {
-      navigate(`/tag/${tag}`);
-    }, ANIMATION_DURATION);
+
+    // Wait for fade-out animation to complete using requestAnimationFrame
+    const targetFrames = Math.ceil(ANIMATION_DURATION / 16.67); // ~15 frames at 60fps for 250ms
+    let frameCount = 0;
+
+    const waitForAnimation = () => {
+      frameCount++;
+      if (frameCount >= targetFrames) {
+        navigate(`/tag/${tag}`);
+      } else {
+        requestAnimationFrame(waitForAnimation);
+      }
+    };
+
+    requestAnimationFrame(waitForAnimation);
+  };
+
+  // Handle media load for border animation
+  const handleMediaLoad = (mediaIndex) => {
+    setLoadedMedia((prev) => ({
+      ...prev,
+      [mediaIndex]: true
+    }));
   };
 
   useEffect(() => {
-    // Reset data loaded state when projectId changes
-    setDataLoaded(false);
+    // If we have prefill data, start fade-in immediately using requestAnimationFrame
+    if (prefillData) {
+      // Use requestAnimationFrame for more reliable timing
+      const triggerFadeIn = () => {
+        requestAnimationFrame(() => {
+          setDataLoaded(true);
+        });
+      };
+      triggerFadeIn();
+    }
 
     const fetchProject = async () => {
       try {
@@ -397,21 +459,26 @@ function ProjectPage() {
           throw new Error("Project not found");
         }
         const data = await response.json();
-        setProject(data);
+        setProject(data); // This will update/replace the prefilled data with complete data
       } catch (error) {
         console.error(error);
-        return;
+        // If we have prefill data and API fails, keep showing prefill data
+        if (!prefillData) {
+          return;
+        }
       } finally {
         setLoading(false);
-        // Start fade-in after data is loaded
-        setTimeout(() => {
-          setDataLoaded(true);
-        }, 50);
+        // If we didn't have prefill data, start fade-in after data is loaded
+        if (!prefillData) {
+          requestAnimationFrame(() => {
+            setDataLoaded(true);
+          });
+        }
       }
     };
 
     fetchProject();
-  }, [projectId]);
+  }, [projectId, prefillData]);
 
   // Update browser title when project is loaded
   useEffect(() => {
@@ -497,7 +564,7 @@ function ProjectPage() {
           </HeaderTextContent>
         </HeaderCard>
 
-        {project.media && (
+        {project.media && project.media.length > 0 && (
           <VStack>
             {project.media.map((mediaItem, index) => {
               // Calculate aspect ratio for the card
@@ -511,11 +578,13 @@ function ProjectPage() {
                   key={index}
                   $isDarkMode={isDarkMode}
                   $aspectRatio={aspectRatio}
+                  $mediaLoaded={loadedMedia[index] || false}
                 >
                   <MediaItem
                     mediaItem={mediaItem}
                     projectName={project.name}
                     index={index}
+                    onLoad={handleMediaLoad}
                   />
                 </MediaCard>
               );

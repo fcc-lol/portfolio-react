@@ -255,6 +255,9 @@ function ProjectsPage() {
       return;
     }
 
+    // Find the project data to pass along for prefilling
+    const projectData = projects.find((p) => p.id === projectId);
+
     // Regular click behavior - use same fade-out system as tab navigation
     console.log("Starting content fade-out for project:", projectId);
     const startTime = performance.now();
@@ -281,7 +284,12 @@ function ProjectsPage() {
             deviation >= 0 ? "+" : ""
           }${deviation.toFixed(1)}ms)`
         );
-        navigate(`/project/${projectId}`);
+        // Pass project data via router state for immediate display
+        navigate(`/project/${projectId}`, {
+          state: {
+            prefillData: projectData || null // Pass all available project data
+          }
+        });
       } else {
         requestAnimationFrame(waitForAnimation);
       }
