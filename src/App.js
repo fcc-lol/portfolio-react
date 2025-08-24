@@ -25,6 +25,7 @@ function RootLayout() {
   const navigate = useNavigate();
   const [isNavigating, setIsNavigating] = useState(false);
   const [pageVisible, setPageVisible] = useState(false);
+  const [hasInternalNavigation, setHasInternalNavigation] = useState(false);
 
   // Reset navigation state and show page when route changes
   useEffect(() => {
@@ -35,14 +36,23 @@ function RootLayout() {
   const handleFadeOut = () => {
     setPageVisible(false);
     setIsNavigating(true);
+    setHasInternalNavigation(true); // Mark that we've navigated internally
   };
 
   const handleBackClick = () => {
-    setPageVisible(false);
-    setIsNavigating(true);
+    // Use the same fade-out pattern as all other navigation
+    handleFadeOut();
     // Wait for fade-out animation to complete before navigating
     setTimeout(() => {
-      navigate(-1); // Go back to previous page
+      // Check if we've had any internal navigation in this session
+      // If not, it means the user came directly to this page (new tab, direct link, etc.)
+      if (!hasInternalNavigation) {
+        // No internal navigation history, go to Projects page
+        navigate("/");
+      } else {
+        // We have internal navigation history, go back to previous page
+        navigate(-1);
+      }
     }, ANIMATION_DURATION);
   };
 
