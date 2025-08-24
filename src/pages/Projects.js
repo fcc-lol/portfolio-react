@@ -192,7 +192,7 @@ function ProjectsPage() {
   const { isDarkMode, setCachedProjectsData, getCachedProjectsData } =
     useTheme();
   const navigate = useNavigate();
-  const { pageVisible, contentVisible, handleFadeOut, handleContentFadeOut } =
+  const { pageVisible, contentVisible, handleContentFadeOut } =
     useOutletContext();
 
   // Try to get cached projects first
@@ -245,6 +245,7 @@ function ProjectsPage() {
 
   // Handle project click with fade-out animation
   const handleProjectClick = (projectId, event) => {
+    console.log("handleProjectClick called with projectId:", projectId);
     // Check if command/ctrl key was pressed (for opening in new tab)
     if (event.metaKey || event.ctrlKey) {
       // Open in new tab for command/ctrl+click
@@ -254,12 +255,39 @@ function ProjectsPage() {
       return;
     }
 
-    // Regular click behavior - navigate with fade-out animation
-    handleFadeOut(); // This triggers pageVisible = false and setIsNavigating = true
-    // Wait for fade-out animation to complete before navigating
-    setTimeout(() => {
-      navigate(`/project/${projectId}`);
-    }, ANIMATION_DURATION);
+    // Regular click behavior - use same fade-out system as tab navigation
+    console.log("Starting content fade-out for project:", projectId);
+    const startTime = performance.now();
+
+    handleContentFadeOut(); // Same as tab navigation - triggers contentVisible = false
+    const fadeCallTime = performance.now() - startTime;
+    console.log(`handleContentFadeOut took ${fadeCallTime.toFixed(1)}ms`);
+
+    // Use requestAnimationFrame for more reliable timing that works around main thread blocking
+    const targetFrames = Math.ceil(ANIMATION_DURATION / 16.67); // ~15 frames at 60fps for 250ms
+    let frameCount = 0;
+
+    const waitForAnimation = () => {
+      frameCount++;
+      const elapsed = performance.now() - startTime;
+
+      if (frameCount >= targetFrames || elapsed >= ANIMATION_DURATION) {
+        const expectedTime = ANIMATION_DURATION;
+        const deviation = elapsed - expectedTime;
+        console.log(
+          `Navigating after ${elapsed.toFixed(
+            1
+          )}ms fade-out (expected: ${expectedTime}ms, deviation: ${
+            deviation >= 0 ? "+" : ""
+          }${deviation.toFixed(1)}ms)`
+        );
+        navigate(`/project/${projectId}`);
+      } else {
+        requestAnimationFrame(waitForAnimation);
+      }
+    };
+
+    requestAnimationFrame(waitForAnimation);
   };
 
   const getPrimaryImage = (project) => {
@@ -310,7 +338,7 @@ function ProjectsPage() {
                 imageUrl={getPrimaryImage(project)}
                 onLoad={() => handleImageLoad(project.id)}
               />
-              <Content visible={visible}>
+              <Content visible={dataLoaded}>
                 <Title>{project.name}</Title>
                 <Description>{project.description}</Description>
               </Content>
