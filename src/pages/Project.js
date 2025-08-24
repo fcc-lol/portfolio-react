@@ -139,10 +139,25 @@ const PersonName = styled.span`
   }
 `;
 
-const LinksContainer = styled.div`
+const LinksAndTagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 1rem;
+`;
+
+const Tag = styled.span`
+  display: inline-block;
+  color: ${(props) => props.theme.textSecondary};
+  text-decoration: underline;
+  font-weight: normal;
+  font-size: 1.125rem;
+`;
+
+const Separator = styled.span`
+  color: ${(props) => props.theme.textSecondary};
+  font-size: 1.125rem;
+  font-weight: normal;
 `;
 
 const LinkButton = styled.a`
@@ -374,19 +389,35 @@ function ProjectPage() {
           <HeaderTextContent>
             <Title>{formatTitle(project.name)}</Title>
             <MediumText>{project.description}</MediumText>
-            {project.links && project.links.length > 0 && (
-              <LinksContainer>
-                {project.links.map((link, index) => (
-                  <LinkButton
-                    key={index}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {link.label}
-                  </LinkButton>
-                ))}
-              </LinksContainer>
+            {((project.tags && project.tags.length > 0) ||
+              (project.links && project.links.length > 0)) && (
+              <LinksAndTagsContainer>
+                {project.links && project.links.length > 0 && (
+                  <>
+                    {project.links.map((link, index) => (
+                      <LinkButton
+                        key={index}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {link.label}
+                      </LinkButton>
+                    ))}
+                  </>
+                )}
+                {project.links &&
+                  project.links.length > 0 &&
+                  project.tags &&
+                  project.tags.length > 0 && <Separator>·</Separator>}
+                {project.tags && project.tags.length > 0 && (
+                  <>
+                    {project.tags.map((tag, index) => (
+                      <Tag key={index}>#{tag}</Tag>
+                    ))}
+                  </>
+                )}
+              </LinksAndTagsContainer>
             )}
             {project.credits && project.credits.length > 0 && (
               <Credits>
