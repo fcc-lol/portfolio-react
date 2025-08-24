@@ -150,15 +150,19 @@ function Navigation({
 
     setPendingTab(tab); // Set immediately for visual feedback
 
-    // Special handling for Projects tab when on detail pages - use fade-out animation
-    if (clickingProjects && isOnDetailPage && onFadeOut) {
+    // Use fade-out animation for all navigation
+    if (onFadeOut) {
       onFadeOut(); // Trigger fade-out animation
       // Wait for fade-out animation to complete before navigating
       setTimeout(() => {
-        navigate("/");
+        if (tab === "projects") {
+          navigate("/");
+        } else {
+          navigate(`/${tab}`);
+        }
       }, ANIMATION_DURATION);
     } else {
-      // Navigate immediately for regular tab switching - no fade-out needed
+      // Fallback for when onFadeOut is not available
       if (tab === "projects") {
         navigate("/");
       } else {
