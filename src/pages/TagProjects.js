@@ -22,7 +22,7 @@ function TagProjectsPage() {
   const apiEndpoint = `https://portfolio-api.fcc.lol/projects/tag/${tagName}`;
 
   // Document title
-  const documentTitle = `FCC Studio – #${tagName} Projects`;
+  const documentTitle = `FCC Studio – Projects with #${tagName}`;
 
   // Header component with tag display
   const headerComponent = (
