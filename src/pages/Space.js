@@ -82,12 +82,14 @@ function SpacePage() {
     // Update browser title
     document.title = "FCC Studio – Space";
 
-    // Show content immediately - we know the layout
-    setDataLoaded(true);
+    // Start fade-in after a short delay to ensure proper animation
+    setTimeout(() => {
+      setDataLoaded(true);
+    }, 50);
   }, []);
 
-  // Show immediately - no need to wait for complex state dependencies
-  const visible = true;
+  // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && contentVisible && dataLoaded;
 
   return (
     <FadeInWrapper visible={visible}>
