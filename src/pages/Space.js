@@ -54,7 +54,7 @@ function SpaceImageComponent({ imageUrl, imageKey, imageRef }) {
 }
 
 function SpacePage() {
-  const { pageVisible } = useOutletContext();
+  const { pageVisible, contentVisible } = useOutletContext();
   const [dataLoaded, setDataLoaded] = useState(false);
   const image1Ref = useRef(null);
   const image2Ref = useRef(null);
@@ -70,8 +70,8 @@ function SpacePage() {
     }, 50);
   }, []);
 
-  // Combine pageVisible (for fade-out) with dataLoaded (for fade-in timing)
-  const visible = pageVisible && dataLoaded;
+  // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && contentVisible && dataLoaded;
 
   return (
     <FadeInWrapper visible={visible}>

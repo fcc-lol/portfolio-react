@@ -25,17 +25,24 @@ function RootLayout() {
   const navigate = useNavigate();
   const [isNavigating, setIsNavigating] = useState(false);
   const [pageVisible, setPageVisible] = useState(false);
+  const [contentVisible, setContentVisible] = useState(false); // Separate state for content-only fades
   const [hasInternalNavigation, setHasInternalNavigation] = useState(false);
 
   // Reset navigation state and show page when route changes
   useEffect(() => {
     setIsNavigating(false);
     setPageVisible(true); // Start as true, let pages control their own fade-in
+    setContentVisible(true); // Content visible by default
   }, [location.pathname]);
 
   const handleFadeOut = () => {
     setPageVisible(false);
     setIsNavigating(true);
+    setHasInternalNavigation(true); // Mark that we've navigated internally
+  };
+
+  const handleContentFadeOut = () => {
+    setContentVisible(false);
     setHasInternalNavigation(true); // Mark that we've navigated internally
   };
 
@@ -68,6 +75,7 @@ function RootLayout() {
           showBackButton={showBackButton}
           onBackClick={handleBackClick}
           onFadeOut={handleFadeOut}
+          onContentFadeOut={handleContentFadeOut}
           isNavigating={isNavigating}
         />
         <Outlet
@@ -76,7 +84,9 @@ function RootLayout() {
             setIsNavigating,
             handleBackClick,
             pageVisible,
-            handleFadeOut
+            contentVisible,
+            handleFadeOut,
+            handleContentFadeOut
           }}
         />
         <ScrollRestoration

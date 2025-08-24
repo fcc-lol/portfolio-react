@@ -303,7 +303,7 @@ function ProjectPage() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const { projectId } = useParams();
   const { isDarkMode } = useTheme();
-  const { pageVisible, handleFadeOut } = useOutletContext();
+  const { pageVisible, contentVisible, handleFadeOut } = useOutletContext();
   const navigate = useNavigate();
 
   // Handle name click with fade-out animation
@@ -351,8 +351,8 @@ function ProjectPage() {
     }
   }, [project]);
 
-  // Combine pageVisible (for fade-out) with dataLoaded (for fade-in timing)
-  const visible = pageVisible && dataLoaded;
+  // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && contentVisible && dataLoaded;
 
   if (loading) {
     return (

@@ -174,7 +174,7 @@ function ProjectsPage() {
   const { isDarkMode, setCachedProjectsData, getCachedProjectsData } =
     useTheme();
   const navigate = useNavigate();
-  const { pageVisible, handleFadeOut } = useOutletContext();
+  const { pageVisible, contentVisible, handleFadeOut, handleContentFadeOut } = useOutletContext();
 
   // Try to get cached projects first
   const cachedProjects = getCachedProjectsData();
@@ -249,13 +249,13 @@ function ProjectsPage() {
     );
   };
 
-  // Combine pageVisible (for fade-out) with dataLoaded (for fade-in timing)
-  const visible = pageVisible && dataLoaded;
+  // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && contentVisible && dataLoaded;
 
   const renderContent = () => {
     if (loading) {
       return (
-        <FadeInWrapper visible={pageVisible}>
+        <FadeInWrapper visible={pageVisible && contentVisible}>
           <ProjectsSkeleton />
         </FadeInWrapper>
       );

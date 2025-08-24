@@ -35,7 +35,7 @@ const ProfileCard = styled(Card)`
 `;
 
 function AboutPage() {
-  const { pageVisible } = useOutletContext();
+  const { pageVisible, contentVisible } = useOutletContext();
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
@@ -48,8 +48,8 @@ function AboutPage() {
     }, 50);
   }, []);
 
-  // Combine pageVisible (for fade-out) with dataLoaded (for fade-in timing)
-  const visible = pageVisible && dataLoaded;
+  // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && contentVisible && dataLoaded;
 
   return (
     <FadeInWrapper visible={visible}>

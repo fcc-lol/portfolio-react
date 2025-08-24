@@ -196,7 +196,7 @@ function ProjectImage({ imageUrl, ...props }) {
 function PersonProjectsPage() {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
-  const { pageVisible, handleFadeOut } = useOutletContext();
+  const { pageVisible, contentVisible, handleFadeOut } = useOutletContext();
   const { personName } = useParams();
 
   const [projects, setProjects] = useState([]);
@@ -273,8 +273,8 @@ function PersonProjectsPage() {
     );
   };
 
-  // Combine pageVisible (for fade-out) with dataLoaded (for fade-in timing)
-  const visible = pageVisible && dataLoaded;
+  // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
+  const visible = pageVisible && contentVisible && dataLoaded;
 
   // Reusable header component to eliminate duplication
   const renderHeader = () => (

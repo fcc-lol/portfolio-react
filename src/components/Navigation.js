@@ -90,6 +90,7 @@ function Navigation({
   showBackButton = false,
   onBackClick,
   onFadeOut,
+  onContentFadeOut,
   isNavigating: globalIsNavigating = false
 }) {
   const location = useLocation();
@@ -147,9 +148,9 @@ function Navigation({
 
     setPendingTab(tab); // Set immediately for visual feedback
 
-    // Use fade-out animation for all navigation
-    if (onFadeOut) {
-      onFadeOut(); // Trigger fade-out animation
+    // Use content-specific fade-out for tab navigation (content only, navigation stays visible)
+    if (onContentFadeOut) {
+      onContentFadeOut(); // Trigger fade-out animation for page content only
       // Wait for fade-out animation to complete before navigating
       setTimeout(() => {
         if (tab === "projects") {
@@ -159,7 +160,7 @@ function Navigation({
         }
       }, ANIMATION_DURATION);
     } else {
-      // Fallback for when onFadeOut is not available
+      // Fallback for direct navigation
       if (tab === "projects") {
         navigate("/");
       } else {
