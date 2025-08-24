@@ -3,9 +3,11 @@ import styled from "styled-components";
 import { useTheme } from "../contexts/ThemeContext";
 import { FADE_TRANSITION } from "../constants";
 
-const ProfilePictureImg = styled.img`
-  object-fit: cover;
+const ProfilePictureContainer = styled.div`
+  position: relative;
+  display: inline-block;
   border-radius: 100%;
+  background-color: ${(props) => props.theme.border};
   width: ${(props) => {
     if (props.size === "large") return "8rem";
     if (props.size === "medium") return "4rem";
@@ -19,10 +21,6 @@ const ProfilePictureImg = styled.img`
     return "2.5rem"; // default to small
   }};
   margin-bottom: ${(props) => (props.size === "large" ? "0.5rem" : "0")};
-  user-select: none;
-  pointer-events: none;
-  opacity: ${(props) => (props.loaded ? 1 : 0)};
-  transition: ${(props) => (props.shouldAnimate ? FADE_TRANSITION : "none")};
 
   @media (max-width: 768px) {
     width: ${(props) => {
@@ -39,6 +37,37 @@ const ProfilePictureImg = styled.img`
     }};
     margin-bottom: ${(props) => (props.size === "large" ? "0" : "0")};
   }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 100%;
+    opacity: ${(props) => (props.$isDarkMode || !props.$loaded ? 0 : 1)};
+    transition: ${FADE_TRANSITION};
+  }
+`;
+
+const ProfilePictureImg = styled.img`
+  object-fit: cover;
+  border-radius: 100%;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  pointer-events: none;
+  opacity: ${(props) => {
+    // If image was loaded before, start with opacity 1 immediately
+    if (props.wasLoadedBefore) return 1;
+    // Otherwise use the loaded state
+    return props.loaded ? 1 : 0;
+  }};
+  transition: ${(props) => (props.shouldAnimate ? FADE_TRANSITION : "none")};
 `;
 
 const HiddenImage = styled.img`
@@ -46,7 +75,7 @@ const HiddenImage = styled.img`
 `;
 
 function ProfilePicture({ src, alt, name, size = "small" }) {
-  const { markImageAsLoaded, isImageLoaded } = useTheme();
+  const { markImageAsLoaded, isImageLoaded, isDarkMode } = useTheme();
 
   // If no src provided, try to construct from name
   const imageSrc =
@@ -55,18 +84,18 @@ function ProfilePicture({ src, alt, name, size = "small" }) {
   // Check if image was already loaded in this session immediately
   const wasLoadedBefore = imageSrc ? isImageLoaded(imageSrc) : false;
 
-  const [loaded, setLoaded] = useState(wasLoadedBefore || !imageSrc);
-  const [shouldAnimate, setShouldAnimate] = useState(
-    !wasLoadedBefore && imageSrc
-  );
+  // Always start as false to trigger fade-in animation on page load
+  const [loaded, setLoaded] = useState(!imageSrc);
+  const shouldAnimate = !!imageSrc;
   const imageRef = useRef(null);
 
   useEffect(() => {
     if (imageSrc) {
-      // If we've seen this image before in this session, don't animate
-      if (isImageLoaded(imageSrc)) {
-        setLoaded(true);
-        setShouldAnimate(false);
+      // If image was already loaded before, show it using requestAnimationFrame
+      if (wasLoadedBefore) {
+        requestAnimationFrame(() => {
+          setLoaded(true);
+        });
         return;
       }
 
@@ -77,11 +106,10 @@ function ProfilePicture({ src, alt, name, size = "small" }) {
         imageRef.current.naturalWidth > 0
       ) {
         setLoaded(true);
-        setShouldAnimate(false);
         markImageAsLoaded(imageSrc);
       }
     }
-  }, [imageSrc, isImageLoaded, markImageAsLoaded]);
+  }, [imageSrc, wasLoadedBefore, markImageAsLoaded]);
 
   const handleImageLoad = () => {
     setLoaded(true);
@@ -102,13 +130,19 @@ function ProfilePicture({ src, alt, name, size = "small" }) {
           alt=""
         />
       )}
-      <ProfilePictureImg
-        src={imageSrc}
-        alt={alt}
-        loaded={loaded}
-        shouldAnimate={shouldAnimate}
+      <ProfilePictureContainer
         size={size}
-      />
+        $isDarkMode={isDarkMode}
+        $loaded={loaded}
+      >
+        <ProfilePictureImg
+          src={imageSrc}
+          alt={alt}
+          loaded={loaded}
+          shouldAnimate={shouldAnimate}
+          wasLoadedBefore={wasLoadedBefore}
+        />
+      </ProfilePictureContainer>
     </>
   );
 }
