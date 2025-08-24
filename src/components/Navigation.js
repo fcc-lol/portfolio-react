@@ -62,10 +62,7 @@ const TabButton = styled.button`
   @media (hover: hover) {
     &:hover {
       color: ${(props) => props.theme.textPrimary};
-      transform: ${(props) =>
-        props.$isActive && !props.$alwaysInteractive
-          ? "scale(1)"
-          : "scale(1.1)"};
+      transform: scale(1.1);
       cursor: ${(props) =>
         props.$isActive && !props.$alwaysInteractive ? "default" : "pointer"};
     }
