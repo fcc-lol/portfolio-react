@@ -4,7 +4,7 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Card from "../components/Card";
 import { VStack } from "../components/Layout";
 import { Error, ProjectsSkeleton } from "../components/States";
-import { Header, HeaderTextContent } from "../components/Typography";
+import { Header, HeaderTextContent, Subheader } from "../components/Typography";
 import ProfilePicture from "../components/ProfilePicture";
 import { useTheme } from "../contexts/ThemeContext";
 import {
@@ -26,18 +26,16 @@ const HeaderTextContentWithProfilePicture = styled(HeaderTextContent)`
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
-    gap: 2rem;
   }
 `;
 
-const Title = styled(Header)`
-  border-bottom: none;
-  padding-bottom: 0;
+const Title = styled(Subheader)`
+  margin: 0 0 0.125rem 0;
 `;
 
 const Grid = styled.div`
@@ -283,7 +281,7 @@ function PersonProjectsPage() {
     <HeaderCard $isDarkMode={isDarkMode}>
       <HeaderTextContentWithProfilePicture>
         <ProfilePicture alt={displayName} name={displayName} size="medium" />
-        <Title $showBorder={false}>Projects with {displayName}</Title>
+        <Title>Projects with {displayName}</Title>
       </HeaderTextContentWithProfilePicture>
     </HeaderCard>
   );

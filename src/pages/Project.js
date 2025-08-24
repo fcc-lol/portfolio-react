@@ -132,7 +132,6 @@ const PersonName = styled.span`
   margin: 0;
   line-height: 1.375;
   color: ${(props) => props.theme.textSecondary};
-  text-decoration: underline;
   transition: color ${ANIMATION_DURATION}ms ease-in-out;
 
   ${PersonContainer}:hover & {
