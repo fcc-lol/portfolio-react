@@ -4,7 +4,7 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Card from "../components/Card";
 import { VStack } from "../components/Layout";
 import { Error, ProjectsSkeleton } from "../components/States";
-import { Header, HeaderTextContent, Subheader } from "../components/Typography";
+import { HeaderTextContent, Subheader } from "../components/Typography";
 import ProfilePicture from "../components/ProfilePicture";
 import { useTheme } from "../contexts/ThemeContext";
 import {
