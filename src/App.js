@@ -44,6 +44,7 @@ function RootLayout() {
 
   const handleContentFadeOut = () => {
     setContentVisible(false);
+    setIsNavigating(true); // Hide navigation tabs during transition
     setHasInternalNavigation(true); // Mark that we've navigated internally
   };
 

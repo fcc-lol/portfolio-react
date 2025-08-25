@@ -98,6 +98,12 @@ function Navigation({
   const [pendingTab, setPendingTab] = useState(null);
   const [comingBackFromProject, setComingBackFromProject] = useState(false);
 
+  // Check if current path should show back button (more reliable than waiting for prop)
+  const isOnBackButtonPath =
+    location.pathname.startsWith("/project/") ||
+    location.pathname.startsWith("/person/") ||
+    location.pathname.startsWith("/tag/");
+
   // Detect when we're coming back from a project page
   useEffect(() => {
     // If showBackButton just changed from true to false, we're coming back from project
@@ -134,7 +140,11 @@ function Navigation({
     const path = location.pathname;
     if (path === "/space") return "space";
     if (path === "/about") return "about";
-    if (path.startsWith("/project/") || path.startsWith("/person/") || path.startsWith("/tag/"))
+    if (
+      path.startsWith("/project/") ||
+      path.startsWith("/person/") ||
+      path.startsWith("/tag/")
+    )
       return "projects";
     return "projects"; // default and /projects
   };
@@ -208,8 +218,8 @@ function Navigation({
     }
   };
 
-  // Hide tabs on mobile when showing back button OR during global navigation (to project pages)
-  const hideTabsOnMobile = showBackButton || globalIsNavigating;
+  // Hide tabs on mobile when on back button paths OR during global navigation
+  const hideTabsOnMobile = isOnBackButtonPath || globalIsNavigating;
 
   return (
     <TabNavigation>
