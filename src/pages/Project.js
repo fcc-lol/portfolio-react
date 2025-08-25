@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import {
   useParams,
@@ -40,6 +40,7 @@ const MediaCard = styled(Card)`
   overflow: hidden;
   position: relative;
   ${(props) => props.$aspectRatio && `aspect-ratio: ${props.$aspectRatio};`}
+  ${(props) => props.$isNotes && `min-height: 8rem;`}
 
   &::before {
     content: "";
@@ -92,7 +93,7 @@ const NotesContainer = styled.div`
   h6 {
     color: ${(props) => props.theme.textPrimary};
     margin: 1.5rem 0 1rem 0;
-    line-height: 1.2;
+    line-height: 1.25;
     font-weight: bold;
   }
 
@@ -420,23 +421,16 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
   const [loaded, setLoaded] = useState(!mediaUrl);
   const [hasError, setHasError] = useState(false);
-  const hasCalledOnLoad = useRef(false);
 
   // Only calculate video/loading state for non-notes media
   const isVideo = !isNotes && isVideoFile(mediaUrl);
   const wasLoadedBefore =
     !isNotes && mediaUrl ? isImageLoaded(mediaUrl) : false;
 
-  // Handle notes type - call onLoad immediately since no loading is needed (only once)
+  // All other useEffect hooks for image/video loading (skip for notes)
   useEffect(() => {
-    if (isNotes && onLoad && !hasCalledOnLoad.current) {
-      hasCalledOnLoad.current = true;
-      onLoad(index);
-    }
-  }, [isNotes, onLoad, index]);
-
-  // All other useEffect hooks for image/video loading
-  useEffect(() => {
+    // Skip all loading logic for notes
+    if (isNotes) return;
     if (mediaUrl && !isVideo) {
       // If media was already loaded before, show it using requestAnimationFrame
       if (wasLoadedBefore) {
@@ -458,7 +452,7 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
       }
       // For new videos, rely on the onLoadedData/onError handlers
     }
-  }, [mediaUrl, wasLoadedBefore, isVideo, onLoad, index, hasError]);
+  }, [mediaUrl, wasLoadedBefore, isVideo, onLoad, index, hasError, isNotes]);
 
   // Early return for notes after all hooks are called
   if (isNotes) {
@@ -645,7 +639,10 @@ function ProjectPage() {
   }, [project]);
 
   // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
-  const visible = pageVisible && contentVisible && dataLoaded;
+  // If we have project data, show it immediately (notes can render right away)
+  const hasProjectData = project !== null;
+  const visible =
+    pageVisible && contentVisible && (hasProjectData || dataLoaded);
 
   if (loading) {
     return (
@@ -721,10 +718,10 @@ function ProjectPage() {
           </HeaderTextContent>
         </HeaderCard>
 
+        {/* Render all media in original order, with different timing for notes vs images/videos */}
         {project.media && project.media.length > 0 && (
           <VStack>
             {project.media.map((mediaItem, index) => {
-              // Calculate aspect ratio for the card (skip for notes)
               const isNotes =
                 typeof mediaItem === "object" && mediaItem.type === "notes";
               const aspectRatio =
@@ -734,20 +731,44 @@ function ProjectPage() {
                   ? mediaItem.dimensions.width / mediaItem.dimensions.height
                   : null;
 
+              // Notes render immediately without animation
+              if (isNotes) {
+                return (
+                  <MediaCard
+                    key={index}
+                    $isDarkMode={isDarkMode}
+                    $isNotes={true}
+                    $mediaLoaded={true}
+                  >
+                    <MediaItem
+                      mediaItem={mediaItem}
+                      projectName={project.name}
+                      index={index}
+                      onLoad={undefined}
+                    />
+                  </MediaCard>
+                );
+              }
+
+              // Images/videos use fade-in animation
+              const itemVisible = visible && dataLoaded;
+
               return (
-                <MediaCard
-                  key={index}
-                  $isDarkMode={isDarkMode}
-                  $aspectRatio={aspectRatio}
-                  $mediaLoaded={loadedMedia[index] || false}
-                >
-                  <MediaItem
-                    mediaItem={mediaItem}
-                    projectName={project.name}
-                    index={index}
-                    onLoad={handleMediaLoad}
-                  />
-                </MediaCard>
+                <FadeInWrapper key={index} visible={itemVisible}>
+                  <MediaCard
+                    $isDarkMode={isDarkMode}
+                    $aspectRatio={aspectRatio}
+                    $isNotes={false}
+                    $mediaLoaded={loadedMedia[index] || false}
+                  >
+                    <MediaItem
+                      mediaItem={mediaItem}
+                      projectName={project.name}
+                      index={index}
+                      onLoad={handleMediaLoad}
+                    />
+                  </MediaCard>
+                </FadeInWrapper>
               );
             })}
           </VStack>
