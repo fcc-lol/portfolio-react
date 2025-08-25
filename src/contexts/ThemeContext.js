@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback
+} from "react";
 import { ThemeProvider as StyledThemeProvider } from "styled-components";
 import GlobalStyles from "../components/GlobalStyles";
 
@@ -65,21 +71,24 @@ export const ThemeProvider = ({ children }) => {
     };
   }, []);
 
-  const markImageAsLoaded = (imageUrl) => {
+  const markImageAsLoaded = useCallback((imageUrl) => {
     setLoadedImages((prev) => new Set(prev).add(imageUrl));
-  };
+  }, []);
 
-  const isImageLoaded = (imageUrl) => {
-    return loadedImages.has(imageUrl);
-  };
+  const isImageLoaded = useCallback(
+    (imageUrl) => {
+      return loadedImages.has(imageUrl);
+    },
+    [loadedImages]
+  );
 
-  const setCachedProjectsData = (projects) => {
+  const setCachedProjectsData = useCallback((projects) => {
     setCachedProjects(projects);
-  };
+  }, []);
 
-  const getCachedProjectsData = () => {
+  const getCachedProjectsData = useCallback(() => {
     return cachedProjects;
-  };
+  }, [cachedProjects]);
 
   const theme = isDarkMode ? darkTheme : lightTheme;
 

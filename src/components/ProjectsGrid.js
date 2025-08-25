@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import Card from "./Card";
@@ -121,21 +121,12 @@ const Description = styled.p`
 function ProjectImage({ imageUrl, ...props }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
 
-  // Check if image was already loaded in this session immediately (memoized to prevent re-calculations)
-  const wasLoadedBefore = useMemo(() => {
-    return imageUrl ? isImageLoaded(imageUrl) : false;
-  }, [imageUrl, isImageLoaded]);
+  // Calculate wasLoadedBefore once on mount to avoid infinite loops
+  const wasLoadedBefore = useRef(imageUrl ? isImageLoaded(imageUrl) : false);
 
-  // Start loaded=true only if no image URL, otherwise wait for load event
-  const [loaded, setLoaded] = useState(!imageUrl);
+  // Start loaded=true if no image URL OR if it was loaded before, otherwise wait for load event
+  const [loaded, setLoaded] = useState(!imageUrl || wasLoadedBefore.current);
   const imageRef = useRef(null);
-
-  useEffect(() => {
-    if (imageUrl && wasLoadedBefore) {
-      // If image was loaded before, show it immediately
-      setLoaded(true);
-    }
-  }, [imageUrl, wasLoadedBefore]);
 
   const handleImageLoad = () => {
     setLoaded(true);
@@ -166,7 +157,7 @@ function ProjectImage({ imageUrl, ...props }) {
         $imageurl={imageUrl}
         loaded={loaded}
         shouldAnimate={!!imageUrl}
-        wasLoadedBefore={wasLoadedBefore}
+        wasLoadedBefore={wasLoadedBefore.current}
         {...props}
       />
     </ImageContainer>

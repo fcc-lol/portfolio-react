@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback
+} from "react";
 import styled from "styled-components";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import Card from "../components/Card";
@@ -121,31 +127,19 @@ const Description = styled.p`
 function ProjectImage({ imageUrl, onLoad, ...props }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
 
-  // Check if image was already loaded in this session immediately (memoized to prevent re-calculations)
-  const wasLoadedBefore = useMemo(() => {
-    return imageUrl ? isImageLoaded(imageUrl) : false;
-  }, [imageUrl, isImageLoaded]);
+  // Calculate wasLoadedBefore once on mount to avoid infinite loops
+  const wasLoadedBefore = useRef(imageUrl ? isImageLoaded(imageUrl) : false);
 
-  // Start loaded=true only if no image URL, otherwise wait for load event
-  const [loaded, setLoaded] = useState(!imageUrl);
+  // Start loaded=true if no image URL OR if it was loaded before, otherwise wait for load event
+  const [loaded, setLoaded] = useState(!imageUrl || wasLoadedBefore.current);
   const imageRef = useRef(null);
 
-  // Notify parent immediately if there's no image
+  // Notify parent immediately if there's no image or image was loaded before
   useEffect(() => {
-    if (!imageUrl && onLoad) {
+    if ((!imageUrl || wasLoadedBefore.current) && onLoad) {
       onLoad(true);
     }
-  }, [imageUrl, onLoad]);
-
-  useEffect(() => {
-    if (imageUrl && wasLoadedBefore) {
-      // If image was loaded before, show it immediately and notify parent
-      setLoaded(true);
-      if (onLoad) {
-        onLoad(true);
-      }
-    }
-  }, [imageUrl, wasLoadedBefore, onLoad]);
+  }, [imageUrl, onLoad]); // Now safe because onLoad is stable
 
   const handleImageLoad = () => {
     setLoaded(true);
@@ -181,7 +175,7 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
         $imageurl={imageUrl}
         loaded={loaded}
         shouldAnimate={!!imageUrl}
-        wasLoadedBefore={wasLoadedBefore}
+        wasLoadedBefore={wasLoadedBefore.current}
         {...props}
       />
     </ImageContainer>
@@ -332,12 +326,21 @@ function ProjectsPage() {
     );
   };
 
-  const handleImageLoad = (projectId) => {
+  const handleImageLoad = useCallback((projectId) => {
     setLoadedImages((prev) => ({
       ...prev,
       [projectId]: true
     }));
-  };
+  }, []);
+
+  // Create stable onLoad functions for each project to prevent infinite loops
+  const onLoadFunctions = useMemo(() => {
+    const functions = {};
+    projects.forEach((project) => {
+      functions[project.id] = () => handleImageLoad(project.id);
+    });
+    return functions;
+  }, [projects, handleImageLoad]);
 
   // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
   const visible = pageVisible && contentVisible && dataLoaded;
@@ -373,7 +376,7 @@ function ProjectsPage() {
             >
               <ProjectImage
                 imageUrl={getPrimaryImage(project)}
-                onLoad={() => handleImageLoad(project.id)}
+                onLoad={onLoadFunctions[project.id]}
               />
               <Content visible={dataLoaded}>
                 <Title>{project.name}</Title>
