@@ -30,6 +30,22 @@ marked.setOptions({
   gfm: true // Enable GitHub Flavored Markdown
 });
 
+// Helper function to make all links open in new tabs
+const processMarkdownLinks = (htmlContent) => {
+  // Replace all <a> tags to add target="_blank" and rel="noopener noreferrer"
+  return htmlContent.replace(
+    /<a\s+([^>]*?)href="([^"]*)"([^>]*?)>/gi,
+    (match, beforeHref, href, afterHref) => {
+      // Check if target is already specified
+      if (match.includes('target=')) {
+        return match;
+      }
+      // Add target and rel attributes
+      return `<a ${beforeHref}href="${href}"${afterHref} target="_blank" rel="noopener noreferrer">`;
+    }
+  );
+};
+
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
   transition: ${FADE_TRANSITION};
@@ -159,12 +175,18 @@ const NotesContainer = styled.div`
   }
 
   a {
-    color: ${(props) => props.theme.textSecondary};
+    color: ${(props) => props.theme.textPrimary};
     text-decoration: underline;
     transition: color ${ANIMATION_DURATION}ms ease-in-out;
 
-    &:hover {
-      color: ${(props) => props.theme.textPrimary};
+    @media (hover: hover) {
+      &:hover {
+        color: ${(props) => props.theme.textSecondary};
+      }
+    }
+
+    &:active {
+      color: ${(props) => props.theme.textTertiary};
     }
   }
 
@@ -458,8 +480,9 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
   if (isNotes) {
     const markdownContent = mediaItem.content || "";
     const htmlContent = marked.parse(markdownContent);
+    const processedHtmlContent = processMarkdownLinks(htmlContent);
 
-    return <NotesContainer dangerouslySetInnerHTML={{ __html: htmlContent }} />;
+    return <NotesContainer dangerouslySetInnerHTML={{ __html: processedHtmlContent }} />;
   }
 
   const handleMediaLoadInternal = (event) => {
