@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import {
   useParams,
@@ -6,6 +6,7 @@ import {
   useNavigate,
   useLocation
 } from "react-router-dom";
+import { marked } from "marked";
 import Card from "../components/Card";
 import { VStack } from "../components/Layout";
 import { ProjectSkeleton, Error } from "../components/States";
@@ -22,6 +23,12 @@ import {
   ANIMATION_DURATION,
   TRANSFORM_TRANSITION
 } from "../constants";
+
+// Configure marked for safer rendering
+marked.setOptions({
+  breaks: true, // Convert line breaks to <br>
+  gfm: true // Enable GitHub Flavored Markdown
+});
 
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
@@ -63,6 +70,136 @@ const Title = styled(Header)`
 const MediaContainer = styled.div`
   width: 100%;
   position: relative;
+`;
+
+const NotesContainer = styled.div`
+  width: calc(100% - 4.5rem);
+  padding: 2.25rem;
+  color: ${(props) => props.theme.textPrimary};
+  font-size: 1.125rem;
+  line-height: 1.5;
+  word-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  /* Markdown element styling */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: ${(props) => props.theme.textPrimary};
+    margin: 1.5rem 0 1rem 0;
+    line-height: 1.2;
+    font-weight: bold;
+  }
+
+  h1 {
+    font-size: 1.875rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
+  h4,
+  h5,
+  h6 {
+    font-size: 1.125rem;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  ul,
+  ol {
+    margin: 0;
+    padding-left: 2rem;
+  }
+
+  li {
+    margin: 0;
+  }
+
+  blockquote {
+    border-left: 4px solid ${(props) => props.theme.border};
+    margin: 1rem 0;
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    color: ${(props) => props.theme.textSecondary};
+    font-style: italic;
+  }
+
+  code {
+    background: ${(props) => props.theme.cardBackground};
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
+      "Courier New", monospace;
+    font-size: 0.875rem;
+    color: ${(props) => props.theme.textPrimary};
+  }
+
+  pre {
+    background: ${(props) => props.theme.cardBackground};
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+
+  a {
+    color: ${(props) => props.theme.textSecondary};
+    text-decoration: underline;
+    transition: color ${ANIMATION_DURATION}ms ease-in-out;
+
+    &:hover {
+      color: ${(props) => props.theme.textPrimary};
+    }
+  }
+
+  strong,
+  b {
+    font-weight: bold;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid ${(props) => props.theme.border};
+    margin: 2rem 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+
+  th,
+  td {
+    border: 1px solid ${(props) => props.theme.border};
+    padding: 0.75rem;
+    text-align: left;
+  }
+
+  th {
+    background: ${(props) => props.theme.cardBackground};
+    font-weight: bold;
+  }
 `;
 
 const FadeInImage = styled.img`
@@ -274,19 +411,31 @@ const isVideoFile = (url) => {
 };
 
 function MediaItem({ mediaItem, projectName, index, onLoad }) {
-  const { markImageAsLoaded, isImageLoaded } = useTheme();
-
   // Handle both old format (string) and new format (object)
   const mediaUrl = typeof mediaItem === "string" ? mediaItem : mediaItem.url;
-  const isVideo = isVideoFile(mediaUrl);
+  const mediaType = typeof mediaItem === "object" ? mediaItem.type : null;
+  const isNotes = mediaType === "notes";
 
-  // Check if media was already loaded in this session immediately
-  const wasLoadedBefore = mediaUrl ? isImageLoaded(mediaUrl) : false;
-
-  // Always start as false to trigger fade-in animation on page load
+  // Always call hooks first to maintain consistent hook order
+  const { markImageAsLoaded, isImageLoaded } = useTheme();
   const [loaded, setLoaded] = useState(!mediaUrl);
   const [hasError, setHasError] = useState(false);
+  const hasCalledOnLoad = useRef(false);
 
+  // Only calculate video/loading state for non-notes media
+  const isVideo = !isNotes && isVideoFile(mediaUrl);
+  const wasLoadedBefore =
+    !isNotes && mediaUrl ? isImageLoaded(mediaUrl) : false;
+
+  // Handle notes type - call onLoad immediately since no loading is needed (only once)
+  useEffect(() => {
+    if (isNotes && onLoad && !hasCalledOnLoad.current) {
+      hasCalledOnLoad.current = true;
+      onLoad(index);
+    }
+  }, [isNotes, onLoad, index]);
+
+  // All other useEffect hooks for image/video loading
   useEffect(() => {
     if (mediaUrl && !isVideo) {
       // If media was already loaded before, show it using requestAnimationFrame
@@ -310,6 +459,14 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
       // For new videos, rely on the onLoadedData/onError handlers
     }
   }, [mediaUrl, wasLoadedBefore, isVideo, onLoad, index, hasError]);
+
+  // Early return for notes after all hooks are called
+  if (isNotes) {
+    const markdownContent = mediaItem.content || "";
+    const htmlContent = marked.parse(markdownContent);
+
+    return <NotesContainer dangerouslySetInnerHTML={{ __html: htmlContent }} />;
+  }
 
   const handleMediaLoadInternal = (event) => {
     // For images, verify it actually loaded successfully
@@ -567,9 +724,13 @@ function ProjectPage() {
         {project.media && project.media.length > 0 && (
           <VStack>
             {project.media.map((mediaItem, index) => {
-              // Calculate aspect ratio for the card
+              // Calculate aspect ratio for the card (skip for notes)
+              const isNotes =
+                typeof mediaItem === "object" && mediaItem.type === "notes";
               const aspectRatio =
-                typeof mediaItem === "object" && mediaItem.dimensions
+                !isNotes &&
+                typeof mediaItem === "object" &&
+                mediaItem.dimensions
                   ? mediaItem.dimensions.width / mediaItem.dimensions.height
                   : null;
 
