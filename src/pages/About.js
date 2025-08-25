@@ -64,9 +64,19 @@ function AboutPage() {
     document.title = "FCC Studio – About";
 
     // Start fade-in after a short delay to ensure proper animation
-    setTimeout(() => {
-      setDataLoaded(true);
-    }, 50);
+    const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+    let frameCount = 0;
+
+    const waitForDelay = () => {
+      frameCount++;
+      if (frameCount >= targetFrames) {
+        setDataLoaded(true);
+      } else {
+        requestAnimationFrame(waitForDelay);
+      }
+    };
+
+    requestAnimationFrame(waitForDelay);
   }, []);
 
   // Handle person card click with fade-out navigation

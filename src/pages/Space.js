@@ -83,9 +83,19 @@ function SpacePage() {
     document.title = "FCC Studio – Space";
 
     // Start fade-in after a short delay to ensure proper animation
-    setTimeout(() => {
-      setDataLoaded(true);
-    }, 50);
+    const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+    let frameCount = 0;
+
+    const waitForDelay = () => {
+      frameCount++;
+      if (frameCount >= targetFrames) {
+        setDataLoaded(true);
+      } else {
+        requestAnimationFrame(waitForDelay);
+      }
+    };
+
+    requestAnimationFrame(waitForDelay);
   }, []);
 
   // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)

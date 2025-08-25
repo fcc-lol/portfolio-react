@@ -51,17 +51,27 @@ function RootLayout() {
     // Use the same fade-out pattern as all other navigation
     handleFadeOut();
     // Wait for fade-out animation to complete before navigating
-    setTimeout(() => {
-      // Check if we've had any internal navigation in this session
-      // If not, it means the user came directly to this page (new tab, direct link, etc.)
-      if (!hasInternalNavigation) {
-        // No internal navigation history, go to Projects page
-        navigate("/");
+    const targetFrames = Math.ceil(ANIMATION_DURATION / 16.67); // Calculate frames needed for ANIMATION_DURATION
+    let frameCount = 0;
+
+    const waitForAnimation = () => {
+      frameCount++;
+      if (frameCount >= targetFrames) {
+        // Check if we've had any internal navigation in this session
+        // If not, it means the user came directly to this page (new tab, direct link, etc.)
+        if (!hasInternalNavigation) {
+          // No internal navigation history, go to Projects page
+          navigate("/");
+        } else {
+          // We have internal navigation history, go back to previous page
+          navigate(-1);
+        }
       } else {
-        // We have internal navigation history, go back to previous page
-        navigate(-1);
+        requestAnimationFrame(waitForAnimation);
       }
-    }, ANIMATION_DURATION);
+    };
+
+    requestAnimationFrame(waitForAnimation);
   };
 
   // Determine if we should show the back button

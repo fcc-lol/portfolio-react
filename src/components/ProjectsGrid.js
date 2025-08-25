@@ -137,7 +137,20 @@ function ProjectImage({ imageUrl, ...props }) {
       const additionalDelay = wasLoadedBefore ? 50 : 100; // Slightly faster for cached images
       const totalDelay = skeletonFadeOutDelay + additionalDelay;
 
-      setTimeout(() => setLoaded(true), totalDelay);
+      // Use requestAnimationFrame instead of setTimeout
+      const targetFrames = Math.ceil(totalDelay / 16.67); // Calculate frames needed for delay
+      let frameCount = 0;
+
+      const waitForDelay = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
+          setLoaded(true);
+        } else {
+          requestAnimationFrame(waitForDelay);
+        }
+      };
+
+      requestAnimationFrame(waitForDelay);
     }
   }, [imageUrl, wasLoadedBefore]);
 
@@ -211,9 +224,19 @@ function ProjectsGrid({
       } finally {
         setLoading(false);
         // Start fade-in after data is loaded
-        setTimeout(() => {
-          setDataLoaded(true);
-        }, 50);
+        const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+        let frameCount = 0;
+
+        const waitForDelay = () => {
+          frameCount++;
+          if (frameCount >= targetFrames) {
+            setDataLoaded(true);
+          } else {
+            requestAnimationFrame(waitForDelay);
+          }
+        };
+
+        requestAnimationFrame(waitForDelay);
       }
     };
 
@@ -236,9 +259,19 @@ function ProjectsGrid({
     // Regular click behavior - navigate with fade-out animation
     handleFadeOut(); // This triggers pageVisible = false and setIsNavigating = true
     // Wait for fade-out animation to complete before navigating
-    setTimeout(() => {
-      navigate(`/project/${projectId}`);
-    }, ANIMATION_DURATION);
+    const targetFrames = Math.ceil(ANIMATION_DURATION / 16.67); // Calculate frames needed for ANIMATION_DURATION
+    let frameCount = 0;
+
+    const waitForAnimation = () => {
+      frameCount++;
+      if (frameCount >= targetFrames) {
+        navigate(`/project/${projectId}`);
+      } else {
+        requestAnimationFrame(waitForAnimation);
+      }
+    };
+
+    requestAnimationFrame(waitForAnimation);
   };
 
   const getPrimaryImage = (project) => {

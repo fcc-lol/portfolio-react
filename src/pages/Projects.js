@@ -144,12 +144,23 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
       const additionalDelay = wasLoadedBefore ? 50 : 100; // Slightly faster for cached images
       const totalDelay = skeletonFadeOutDelay + additionalDelay;
 
-      setTimeout(() => {
-        setLoaded(true);
-        if (onLoad) {
-          onLoad(true);
+      // Use requestAnimationFrame instead of setTimeout
+      const targetFrames = Math.ceil(totalDelay / 16.67); // Calculate frames needed for delay
+      let frameCount = 0;
+
+      const waitForDelay = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
+          setLoaded(true);
+          if (onLoad) {
+            onLoad(true);
+          }
+        } else {
+          requestAnimationFrame(waitForDelay);
         }
-      }, totalDelay);
+      };
+
+      requestAnimationFrame(waitForDelay);
     }
   }, [imageUrl, wasLoadedBefore, onLoad]);
 
@@ -213,9 +224,19 @@ function ProjectsPage() {
     // If we already have cached data, don't fetch again
     if (cachedProjects) {
       // Start fade-in after a short delay to ensure proper animation
-      setTimeout(() => {
-        setDataLoaded(true);
-      }, 50);
+      const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+      let frameCount = 0;
+
+      const waitForDelay = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
+          setDataLoaded(true);
+        } else {
+          requestAnimationFrame(waitForDelay);
+        }
+      };
+
+      requestAnimationFrame(waitForDelay);
       return;
     }
 
@@ -234,9 +255,19 @@ function ProjectsPage() {
       } finally {
         setLoading(false);
         // Start fade-in after data is loaded
-        setTimeout(() => {
-          setDataLoaded(true);
-        }, 50);
+        const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+        let frameCount = 0;
+
+        const waitForDelay = () => {
+          frameCount++;
+          if (frameCount >= targetFrames) {
+            setDataLoaded(true);
+          } else {
+            requestAnimationFrame(waitForDelay);
+          }
+        };
+
+        requestAnimationFrame(waitForDelay);
       }
     };
 
@@ -261,7 +292,6 @@ function ProjectsPage() {
     const startTime = performance.now();
 
     handleContentFadeOut(); // Same as tab navigation - triggers contentVisible = false
-    const fadeCallTime = performance.now() - startTime;
 
     // Use requestAnimationFrame for more reliable timing that works around main thread blocking
     const targetFrames = Math.ceil(ANIMATION_DURATION / 16.67); // ~15 frames at 60fps for 250ms
