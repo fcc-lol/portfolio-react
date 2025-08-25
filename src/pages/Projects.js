@@ -186,7 +186,7 @@ function ProjectsPage() {
   const { isDarkMode, setCachedProjectsData, getCachedProjectsData } =
     useTheme();
   const navigate = useNavigate();
-  const { pageVisible, contentVisible, handleContentFadeOut } =
+  const { pageVisible, contentVisible, handleProjectNavigation } =
     useOutletContext();
 
   // Try to get cached projects first
@@ -291,10 +291,10 @@ function ProjectsPage() {
     // Find the project data to pass along for prefilling
     const projectData = projects.find((p) => p.id === projectId);
 
-    // Regular click behavior - use same fade-out system as tab navigation
+    // Regular click behavior - use project-specific navigation (hides tabs on mobile)
     const startTime = performance.now();
 
-    handleContentFadeOut(); // Same as tab navigation - triggers contentVisible = false
+    handleProjectNavigation(); // Triggers contentVisible = false + isNavigating = true for mobile tab hiding
 
     // Use requestAnimationFrame for more reliable timing that works around main thread blocking
     const targetFrames = Math.ceil(ANIMATION_DURATION / 16.67); // ~15 frames at 60fps for 250ms

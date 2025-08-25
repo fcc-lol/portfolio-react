@@ -44,7 +44,12 @@ function RootLayout() {
 
   const handleContentFadeOut = () => {
     setContentVisible(false);
-    setIsNavigating(true); // Hide navigation tabs during transition
+    setHasInternalNavigation(true); // Mark that we've navigated internally
+  };
+
+  const handleProjectNavigation = () => {
+    setContentVisible(false);
+    setIsNavigating(true); // Hide navigation tabs during transition for project navigation
     setHasInternalNavigation(true); // Mark that we've navigated internally
   };
 
@@ -99,7 +104,8 @@ function RootLayout() {
             pageVisible,
             contentVisible,
             handleFadeOut,
-            handleContentFadeOut
+            handleContentFadeOut,
+            handleProjectNavigation
           }}
         />
         <ScrollRestoration
