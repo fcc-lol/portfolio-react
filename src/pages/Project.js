@@ -37,7 +37,7 @@ const processMarkdownLinks = (htmlContent) => {
     /<a\s+([^>]*?)href="([^"]*)"([^>]*?)>/gi,
     (match, beforeHref, href, afterHref) => {
       // Check if target is already specified
-      if (match.includes('target=')) {
+      if (match.includes("target=")) {
         return match;
       }
       // Add target and rel attributes
@@ -482,7 +482,11 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
     const htmlContent = marked.parse(markdownContent);
     const processedHtmlContent = processMarkdownLinks(htmlContent);
 
-    return <NotesContainer dangerouslySetInnerHTML={{ __html: processedHtmlContent }} />;
+    return (
+      <NotesContainer
+        dangerouslySetInnerHTML={{ __html: processedHtmlContent }}
+      />
+    );
   }
 
   const handleMediaLoadInternal = (event) => {
@@ -613,15 +617,22 @@ function ProjectPage() {
   };
 
   useEffect(() => {
-    // If we have prefill data, start fade-in immediately using requestAnimationFrame
+    // If we have prefill data, start fade-in after consistent delay for smooth animation
     if (prefillData) {
-      // Use requestAnimationFrame for more reliable timing
-      const triggerFadeIn = () => {
-        requestAnimationFrame(() => {
+      // Use the same delay pattern as other pages for consistency
+      const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+      let frameCount = 0;
+
+      const waitForDelay = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
           setDataLoaded(true);
-        });
+        } else {
+          requestAnimationFrame(waitForDelay);
+        }
       };
-      triggerFadeIn();
+
+      requestAnimationFrame(waitForDelay);
     }
 
     const fetchProject = async () => {
@@ -642,11 +653,21 @@ function ProjectPage() {
         }
       } finally {
         setLoading(false);
-        // If we didn't have prefill data, start fade-in after data is loaded
+        // If we didn't have prefill data, start fade-in after data is loaded with consistent delay
         if (!prefillData) {
-          requestAnimationFrame(() => {
-            setDataLoaded(true);
-          });
+          const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+          let frameCount = 0;
+
+          const waitForDelay = () => {
+            frameCount++;
+            if (frameCount >= targetFrames) {
+              setDataLoaded(true);
+            } else {
+              requestAnimationFrame(waitForDelay);
+            }
+          };
+
+          requestAnimationFrame(waitForDelay);
         }
       }
     };
@@ -662,10 +683,8 @@ function ProjectPage() {
   }, [project]);
 
   // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
-  // If we have project data, show it immediately (notes can render right away)
-  const hasProjectData = project !== null;
-  const visible =
-    pageVisible && contentVisible && (hasProjectData || dataLoaded);
+  // Wait for dataLoaded like all other pages for consistent fade-in timing
+  const visible = pageVisible && contentVisible && dataLoaded;
 
   if (loading) {
     return (
@@ -774,7 +793,7 @@ function ProjectPage() {
               }
 
               // Images/videos use fade-in animation
-              const itemVisible = visible && dataLoaded;
+              const itemVisible = visible;
 
               return (
                 <FadeInWrapper key={index} visible={itemVisible}>

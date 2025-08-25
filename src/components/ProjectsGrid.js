@@ -256,6 +256,9 @@ function ProjectsGrid({
       return;
     }
 
+    // Find the project data to pass as prefill
+    const projectData = projects.find((p) => p.id === projectId) || null;
+
     // Regular click behavior - navigate with fade-out animation
     handleFadeOut(); // This triggers pageVisible = false and setIsNavigating = true
     // Wait for fade-out animation to complete before navigating
@@ -265,7 +268,12 @@ function ProjectsGrid({
     const waitForAnimation = () => {
       frameCount++;
       if (frameCount >= targetFrames) {
-        navigate(`/project/${projectId}`);
+        // Pass project data via router state for immediate display
+        navigate(`/project/${projectId}`, {
+          state: {
+            prefillData: projectData
+          }
+        });
       } else {
         requestAnimationFrame(waitForAnimation);
       }
