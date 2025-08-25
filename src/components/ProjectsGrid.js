@@ -126,31 +126,14 @@ function ProjectImage({ imageUrl, ...props }) {
     return imageUrl ? isImageLoaded(imageUrl) : false;
   }, [imageUrl, isImageLoaded]);
 
-  // Always start as false to trigger fade-in animation on page load
+  // Start loaded=true only if no image URL, otherwise wait for load event
   const [loaded, setLoaded] = useState(!imageUrl);
   const imageRef = useRef(null);
 
   useEffect(() => {
-    if (imageUrl) {
-      // Wait for skeleton fade-out to complete before starting image fade-in
-      const skeletonFadeOutDelay = ANIMATION_DURATION;
-      const additionalDelay = wasLoadedBefore ? 50 : 100; // Slightly faster for cached images
-      const totalDelay = skeletonFadeOutDelay + additionalDelay;
-
-      // Use requestAnimationFrame instead of setTimeout
-      const targetFrames = Math.ceil(totalDelay / 16.67); // Calculate frames needed for delay
-      let frameCount = 0;
-
-      const waitForDelay = () => {
-        frameCount++;
-        if (frameCount >= targetFrames) {
-          setLoaded(true);
-        } else {
-          requestAnimationFrame(waitForDelay);
-        }
-      };
-
-      requestAnimationFrame(waitForDelay);
+    if (imageUrl && wasLoadedBefore) {
+      // If image was loaded before, show it immediately
+      setLoaded(true);
     }
   }, [imageUrl, wasLoadedBefore]);
 
@@ -163,6 +146,11 @@ function ProjectImage({ imageUrl, ...props }) {
     }
   };
 
+  const handleImageError = () => {
+    // Don't show broken images
+    setLoaded(false);
+  };
+
   return (
     <ImageContainer>
       {imageUrl && (
@@ -170,6 +158,7 @@ function ProjectImage({ imageUrl, ...props }) {
           ref={imageRef}
           src={imageUrl}
           onLoad={handleImageLoad}
+          onError={handleImageError}
           alt=""
         />
       )}
@@ -198,6 +187,7 @@ function ProjectsGrid({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [skeletonVisible, setSkeletonVisible] = useState(false);
 
   useEffect(() => {
     // Update browser title
@@ -205,11 +195,44 @@ function ProjectsGrid({
   }, [documentTitle]);
 
   useEffect(() => {
+    // Start skeleton fade-in with consistent 50ms delay
+    const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+    let frameCount = 0;
+
+    const waitForDelay = () => {
+      frameCount++;
+      if (frameCount >= targetFrames) {
+        setSkeletonVisible(true);
+      } else {
+        requestAnimationFrame(waitForDelay);
+      }
+    };
+
+    requestAnimationFrame(waitForDelay);
+  }, []);
+
+  useEffect(() => {
     // Reset state when apiEndpoint changes
     setProjects([]);
     setLoading(true);
     setError(null);
     setDataLoaded(false);
+    setSkeletonVisible(false);
+
+    // Start skeleton fade-in with consistent 50ms delay for new API calls
+    const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+    let frameCount = 0;
+
+    const waitForSkeletonDelay = () => {
+      frameCount++;
+      if (frameCount >= targetFrames) {
+        setSkeletonVisible(true);
+      } else {
+        requestAnimationFrame(waitForSkeletonDelay);
+      }
+    };
+
+    requestAnimationFrame(waitForSkeletonDelay);
 
     const fetchProjects = async () => {
       try {
@@ -295,7 +318,9 @@ function ProjectsGrid({
   const renderContent = () => {
     if (loading) {
       return (
-        <FadeInWrapper visible={false}>
+        <FadeInWrapper
+          visible={pageVisible && contentVisible && skeletonVisible}
+        >
           <VStack>
             {headerComponent}
             <ProjectsSkeleton />

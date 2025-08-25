@@ -126,8 +126,9 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
     return imageUrl ? isImageLoaded(imageUrl) : false;
   }, [imageUrl, isImageLoaded]);
 
-  // Always start as false to trigger fade-in animation on page load
+  // Start loaded=true only if no image URL, otherwise wait for load event
   const [loaded, setLoaded] = useState(!imageUrl);
+  const imageRef = useRef(null);
 
   // Notify parent immediately if there's no image
   useEffect(() => {
@@ -135,32 +136,14 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
       onLoad(true);
     }
   }, [imageUrl, onLoad]);
-  const imageRef = useRef(null);
 
   useEffect(() => {
-    if (imageUrl) {
-      // Wait for skeleton fade-out to complete before starting image fade-in
-      const skeletonFadeOutDelay = ANIMATION_DURATION;
-      const additionalDelay = wasLoadedBefore ? 50 : 100; // Slightly faster for cached images
-      const totalDelay = skeletonFadeOutDelay + additionalDelay;
-
-      // Use requestAnimationFrame instead of setTimeout
-      const targetFrames = Math.ceil(totalDelay / 16.67); // Calculate frames needed for delay
-      let frameCount = 0;
-
-      const waitForDelay = () => {
-        frameCount++;
-        if (frameCount >= targetFrames) {
-          setLoaded(true);
-          if (onLoad) {
-            onLoad(true);
-          }
-        } else {
-          requestAnimationFrame(waitForDelay);
-        }
-      };
-
-      requestAnimationFrame(waitForDelay);
+    if (imageUrl && wasLoadedBefore) {
+      // If image was loaded before, show it immediately and notify parent
+      setLoaded(true);
+      if (onLoad) {
+        onLoad(true);
+      }
     }
   }, [imageUrl, wasLoadedBefore, onLoad]);
 
@@ -178,6 +161,11 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
     }
   };
 
+  const handleImageError = () => {
+    // Don't show broken images
+    setLoaded(false);
+  };
+
   return (
     <ImageContainer>
       {imageUrl && (
@@ -185,6 +173,7 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
           ref={imageRef}
           src={imageUrl}
           onLoad={handleImageLoad}
+          onError={handleImageError}
           alt=""
         />
       )}
@@ -214,11 +203,31 @@ function ProjectsPage() {
   const [error, setError] = useState(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [loadedImages, setLoadedImages] = useState({});
+  const [skeletonVisible, setSkeletonVisible] = useState(false);
 
   useEffect(() => {
     // Update browser title
     document.title = "FCC Studio – Projects";
   }, []);
+
+  useEffect(() => {
+    // Start skeleton fade-in with consistent 50ms delay if we need to show loading state
+    if (loading) {
+      const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+      let frameCount = 0;
+
+      const waitForDelay = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
+          setSkeletonVisible(true);
+        } else {
+          requestAnimationFrame(waitForDelay);
+        }
+      };
+
+      requestAnimationFrame(waitForDelay);
+    }
+  }, [loading]);
 
   useEffect(() => {
     // If we already have cached data, don't fetch again
@@ -336,7 +345,9 @@ function ProjectsPage() {
   const renderContent = () => {
     if (loading) {
       return (
-        <FadeInWrapper visible={pageVisible && contentVisible}>
+        <FadeInWrapper
+          visible={pageVisible && contentVisible && skeletonVisible}
+        >
           <ProjectsSkeleton />
         </FadeInWrapper>
       );
