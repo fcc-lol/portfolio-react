@@ -134,14 +134,15 @@ function Navigation({
     const path = location.pathname;
     if (path === "/space") return "space";
     if (path === "/about") return "about";
-    if (path.startsWith("/project/") || path.startsWith("/person/"))
+    if (path.startsWith("/project/") || path.startsWith("/person/") || path.startsWith("/tag/"))
       return "projects";
     return "projects"; // default and /projects
   };
 
-  // Check if we're on a project detail page or person page
+  // Check if we're on a project detail page, person page, or tag page
   const isOnProjectDetail = location.pathname.startsWith("/project/");
   const isOnPersonPage = location.pathname.startsWith("/person/");
+  const isOnTagPage = location.pathname.startsWith("/tag/");
 
   const activeTab = getCurrentTab();
   // Use pendingTab for immediate visual feedback, fallback to activeTab
@@ -154,10 +155,11 @@ function Navigation({
 
   // Handle tab click
   const handleTabClick = (tab) => {
-    // Special case: if we're on a project detail page or person page and clicking Projects tab, allow navigation to projects list
+    // Special case: if we're on a project detail page, person page, or tag page and clicking Projects tab, allow navigation to projects list
     const isOnDetailPage =
       location.pathname.startsWith("/project/") ||
-      location.pathname.startsWith("/person/");
+      location.pathname.startsWith("/person/") ||
+      location.pathname.startsWith("/tag/");
     const clickingProjects = tab === "projects";
 
     // Don't navigate if already on the same tab, unless we're on detail page clicking projects
@@ -222,7 +224,7 @@ function Navigation({
         <TabButton
           $isActive={displayActiveTab === "projects"}
           $alwaysInteractive={
-            (isOnProjectDetail || isOnPersonPage) &&
+            (isOnProjectDetail || isOnPersonPage || isOnTagPage) &&
             displayActiveTab === "projects"
           }
           onClick={() => handleTabClick("projects")}

@@ -6,6 +6,8 @@ import { HeaderTextContent, Subheader } from "../components/Typography";
 import ProfilePicture from "../components/ProfilePicture";
 import ProjectsGrid from "../components/ProjectsGrid";
 import { useTheme } from "../contexts/ThemeContext";
+// import { useOutletContext, useNavigate } from "react-router-dom";
+// import { ANIMATION_DURATION } from "../constants";
 
 const HeaderCard = styled(Card)`
   min-height: 6rem;
@@ -30,6 +32,9 @@ const Title = styled(Subheader)`
 function PersonProjectsPage() {
   const { isDarkMode } = useTheme();
   const { personName } = useParams();
+  // Navigation hooks available if needed for future navigation functionality
+  // const navigate = useNavigate();
+  // const { handleFadeOut } = useOutletContext();
 
   // Capitalize person name for display
   const displayName = personName

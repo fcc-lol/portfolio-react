@@ -73,10 +73,21 @@ function AboutPage() {
   const handlePersonClick = (personName) => {
     if (handleFadeOut) {
       handleFadeOut(); // Trigger fade-out animation
-      // Wait for fade-out animation to complete before navigating
-      setTimeout(() => {
-        navigate(`/person/${personName.toLowerCase()}`);
-      }, ANIMATION_DURATION);
+
+      // Use requestAnimationFrame for animation timing
+      const targetFrames = Math.ceil(ANIMATION_DURATION / 16.67); // ~15 frames at 60fps for 250ms
+      let frameCount = 0;
+
+      const waitForAnimation = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
+          navigate(`/person/${personName.toLowerCase()}`);
+        } else {
+          requestAnimationFrame(waitForAnimation);
+        }
+      };
+
+      requestAnimationFrame(waitForAnimation);
     } else {
       // Fallback for direct navigation
       navigate(`/person/${personName.toLowerCase()}`);
