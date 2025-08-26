@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faYoutube } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import Card from "../components/Card";
-import { VStack, HStack } from "../components/Layout";
+import { VStack } from "../components/Layout";
 import {
   Header,
   Subheader,
