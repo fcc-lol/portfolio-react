@@ -10,7 +10,7 @@ import { useTheme } from "../contexts/ThemeContext";
 // import { ANIMATION_DURATION } from "../constants";
 
 const HeaderCard = styled(Card)`
-  min-height: 6rem;
+  min-height: ${props => props.$type === 'person' ? '6rem' : '4rem'};
 `;
 
 const HeaderTextContentWithProfilePicture = styled(HeaderTextContent)`
@@ -29,36 +29,49 @@ const Title = styled(Subheader)`
   margin: 0 0 0.125rem 0;
 `;
 
-function PersonProjectsPage() {
+function FilteredProjectsPage({ type }) {
   const { isDarkMode } = useTheme();
-  const { personName } = useParams();
+  const params = useParams();
   // Navigation hooks available if needed for future navigation functionality
   // const navigate = useNavigate();
   // const { handleFadeOut } = useOutletContext();
 
-  // Capitalize person name for display
-  const displayName = personName
-    ? personName.charAt(0).toUpperCase() + personName.slice(1)
-    : "";
+  // Get the parameter based on type
+  const paramName = type === 'person' ? params.personName : params.tagName;
+  
+  // For person projects, capitalize the name for display
+  const displayName = type === 'person' && paramName
+    ? paramName.charAt(0).toUpperCase() + paramName.slice(1)
+    : paramName;
 
-  // API endpoint for person projects
-  const apiEndpoint = `https://portfolio-api.fcc.lol/projects/person/${personName}`;
+  // API endpoint based on type
+  const apiEndpoint = `https://portfolio-api.fcc.lol/projects/${type}/${paramName}`;
 
-  // Document title
-  const documentTitle = `FCC Studio – Projects with ${displayName}`;
+  // Document title based on type
+  const documentTitle = type === 'person' 
+    ? `FCC Studio – Projects with ${displayName}`
+    : `FCC Studio – Projects with #${paramName}`;
 
-  // Header component with ProfilePicture
-  const headerComponent = (
-    <HeaderCard $isDarkMode={isDarkMode}>
+  // Header component - different for person vs tag
+  const headerComponent = type === 'person' ? (
+    <HeaderCard $isDarkMode={isDarkMode} $type={type}>
       <HeaderTextContentWithProfilePicture>
         <ProfilePicture alt={displayName} name={displayName} size="medium" />
         <Title>Projects with {displayName}</Title>
       </HeaderTextContentWithProfilePicture>
     </HeaderCard>
+  ) : (
+    <HeaderCard $isDarkMode={isDarkMode} $type={type}>
+      <HeaderTextContent>
+        <Title>Projects with #{paramName}</Title>
+      </HeaderTextContent>
+    </HeaderCard>
   );
 
-  // No results message
-  const noResultsMessage = `No projects found for ${displayName}.`;
+  // No results message based on type
+  const noResultsMessage = type === 'person'
+    ? `No projects found for ${displayName}.`
+    : `No projects found with the tag #${paramName}.`;
 
   return (
     <ProjectsGrid
@@ -70,4 +83,4 @@ function PersonProjectsPage() {
   );
 }
 
-export default PersonProjectsPage;
+export default FilteredProjectsPage;

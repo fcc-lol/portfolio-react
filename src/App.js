@@ -14,8 +14,7 @@ import Navigation from "./components/Navigation";
 import { Page, Container } from "./components/Layout";
 import ProjectsPage from "./pages/Projects";
 import ProjectPage from "./pages/Project";
-import PersonProjectsPage from "./pages/PersonProjects";
-import TagProjectsPage from "./pages/TagProjects";
+import FilteredProjectsPage from "./pages/FilteredProjects";
 import SpacePage from "./pages/Space";
 import AboutPage from "./pages/About";
 import { ANIMATION_DURATION } from "./constants";
@@ -147,11 +146,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/person/:personName",
-        element: <PersonProjectsPage />
+        element: <FilteredProjectsPage type="person" />
       },
       {
         path: "/tag/:tagName",
-        element: <TagProjectsPage />
+        element: <FilteredProjectsPage type="tag" />
       }
     ]
   }
