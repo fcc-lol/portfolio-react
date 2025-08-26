@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faYoutube } from "@fortawesome/free-brands-svg-icons";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faLink, faUser } from "@fortawesome/free-solid-svg-icons";
 import Card from "../components/Card";
 import { VStack } from "../components/Layout";
 import {
@@ -16,11 +16,7 @@ import {
 import { Link } from "../components/Link";
 import ProfilePicture from "../components/ProfilePicture";
 import { FadeInWrapper } from "../components/AnimationHelpers";
-import {
-  FADE_TRANSITION,
-  ANIMATION_DURATION,
-  TRANSFORM_TRANSITION
-} from "../constants";
+import { ANIMATION_DURATION } from "../constants";
 
 const LinksContainer = styled.div`
   display: flex;
@@ -50,29 +46,31 @@ const ProfileCard = styled(Card)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   text-align: center;
-  padding: 2rem 2rem 3rem 2rem;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: ${TRANSFORM_TRANSITION}, ${FADE_TRANSITION};
-
-  @media (hover: hover) {
-    &:hover {
-      transform: scale(1.05);
-
-      @media (max-width: 1024px) {
-        transform: scale(1.025);
-      }
-    }
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
+  padding: 2rem 2rem 2.5rem 2rem;
+  gap: 2rem;
 
   @media (max-width: 768px) {
     padding: 2rem;
+  }
+`;
+
+const ProfileInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+`;
+
+const ProfileLinksContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+
+  @media (max-width: 1160px) {
+    gap: 1.5rem;
   }
 `;
 
@@ -169,42 +167,93 @@ function AboutPage() {
           </HeaderTextContent>
         </Card>
         <ProfileCardsContainer>
-          <ProfileCard onClick={() => handlePersonClick("Zach")}>
-            <ProfilePicture
-              src="/images/people/zach.jpg"
-              alt="Zach"
-              size="large"
-            />
-            <Subheader>Zach</Subheader>
-            <SmallText>
-              I'm a curious tinkerer, who learns by doing. I like to work on
-              projects that present opportunities to think strategically and
-              execute nimbly.
-            </SmallText>
+          <ProfileCard>
+            <ProfileInfo>
+              <ProfilePicture
+                src="/images/people/zach.jpg"
+                alt="Zach"
+                size="large"
+              />
+              <Subheader>Zach</Subheader>
+              <SmallText>
+                I'm a curious tinkerer, who learns by doing. I like to work on
+                projects that present opportunities to think strategically and
+                execute nimbly.
+              </SmallText>
+            </ProfileInfo>
+            <ProfileLinksContainer>
+              <Link onClick={() => handlePersonClick("Zach")} noUnderline>
+                <FontAwesomeIcon icon={faUser} />
+                Projects
+              </Link>
+              <Link
+                href="https://zach.coffee"
+                target="_blank"
+                rel="noopener noreferrer"
+                noUnderline
+              >
+                <FontAwesomeIcon icon={faLink} />
+                Portfolio
+              </Link>
+            </ProfileLinksContainer>
           </ProfileCard>
-          <ProfileCard onClick={() => handlePersonClick("Dan")}>
-            <ProfilePicture
-              src="/images/people/dan.jpg"
-              alt="Dan"
-              size="large"
-            />
-            <Subheader>Dan</Subheader>
-            <SmallText>
-              I'm a guy that likes design and code. More to come.
-            </SmallText>
+          <ProfileCard>
+            <ProfileInfo>
+              <ProfilePicture
+                src="/images/people/dan.jpg"
+                alt="Dan"
+                size="large"
+              />
+              <Subheader>Dan</Subheader>
+              <SmallText>
+                I'm a guy that likes design and code. More to come.
+              </SmallText>
+            </ProfileInfo>
+            <ProfileLinksContainer>
+              <Link onClick={() => handlePersonClick("Dan")} noUnderline>
+                <FontAwesomeIcon icon={faUser} />
+                Projects
+              </Link>
+              <Link
+                href="https://danzaharia.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                noUnderline
+              >
+                <FontAwesomeIcon icon={faLink} />
+                Portfolio
+              </Link>
+            </ProfileLinksContainer>
           </ProfileCard>
-          <ProfileCard onClick={() => handlePersonClick("Leo")}>
-            <ProfilePicture
-              src="/images/people/leo.jpg"
-              alt="Leo"
-              size="large"
-            />
-            <Subheader>Leo</Subheader>
-            <SmallText>
-              I'm a designer, engineer, and artist. I believe design and
-              technology should encourage community, equal opportunity, and
-              social progress.
-            </SmallText>
+          <ProfileCard>
+            <ProfileInfo>
+              <ProfilePicture
+                src="/images/people/leo.jpg"
+                alt="Leo"
+                size="large"
+              />
+              <Subheader>Leo</Subheader>
+              <SmallText>
+                I'm a designer, engineer, and artist. I believe design and
+                technology should encourage community, equal opportunity, and
+                social progress.
+              </SmallText>
+            </ProfileInfo>
+            <ProfileLinksContainer>
+              <Link onClick={() => handlePersonClick("Leo")} noUnderline>
+                <FontAwesomeIcon icon={faUser} />
+                Projects
+              </Link>
+              <Link
+                href="https://leo.gd"
+                target="_blank"
+                rel="noopener noreferrer"
+                noUnderline
+              >
+                <FontAwesomeIcon icon={faLink} />
+                Portfolio
+              </Link>
+            </ProfileLinksContainer>
           </ProfileCard>
         </ProfileCardsContainer>
       </VStack>
