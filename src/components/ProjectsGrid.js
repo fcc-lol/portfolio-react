@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback
+} from "react";
 import styled from "styled-components";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import Card from "./Card";
@@ -45,11 +51,12 @@ const Project = styled(Card)`
     left: 0;
     right: 0;
     bottom: 0;
-    border: ${(props) =>
-      props.$isDarkMode ? "none" : "2px solid rgba(0, 0, 0, 0.1)"};
+    border: 2px solid rgba(0, 0, 0, 0.1);
     pointer-events: none;
     z-index: 1;
     border-radius: 1.5rem;
+    opacity: ${(props) => (props.$isDarkMode || !props.$imageLoaded ? 0 : 1)};
+    transition: ${FADE_TRANSITION};
   }
 
   @media (hover: hover) {
@@ -118,7 +125,7 @@ const Description = styled.p`
   margin: 0;
 `;
 
-function ProjectImage({ imageUrl, ...props }) {
+function ProjectImage({ imageUrl, onLoad, ...props }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
 
   // Calculate wasLoadedBefore once on mount to avoid infinite loops
@@ -128,12 +135,24 @@ function ProjectImage({ imageUrl, ...props }) {
   const [loaded, setLoaded] = useState(!imageUrl || wasLoadedBefore.current);
   const imageRef = useRef(null);
 
+  // Notify parent immediately if there's no image or image was loaded before
+  useEffect(() => {
+    if ((!imageUrl || wasLoadedBefore.current) && onLoad) {
+      onLoad(true);
+    }
+  }, [imageUrl, onLoad]); // Now safe because onLoad is stable
+
   const handleImageLoad = () => {
     setLoaded(true);
 
     // Mark this image as loaded in the global state
     if (imageUrl) {
       markImageAsLoaded(imageUrl);
+    }
+
+    // Notify parent component
+    if (onLoad) {
+      onLoad(true);
     }
   };
 
@@ -178,6 +197,7 @@ function ProjectsGrid({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [loadedImages, setLoadedImages] = useState({});
   const [skeletonVisible, setSkeletonVisible] = useState(false);
 
   useEffect(() => {
@@ -186,31 +206,15 @@ function ProjectsGrid({
   }, [documentTitle]);
 
   useEffect(() => {
-    // Start skeleton fade-in with consistent 50ms delay
-    const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
-    let frameCount = 0;
-
-    const waitForDelay = () => {
-      frameCount++;
-      if (frameCount >= targetFrames) {
-        setSkeletonVisible(true);
-      } else {
-        requestAnimationFrame(waitForDelay);
-      }
-    };
-
-    requestAnimationFrame(waitForDelay);
-  }, []);
-
-  useEffect(() => {
     // Reset state when apiEndpoint changes
     setProjects([]);
     setLoading(true);
     setError(null);
     setDataLoaded(false);
+    setLoadedImages({});
     setSkeletonVisible(false);
 
-    // Start skeleton fade-in with consistent 50ms delay for new API calls
+    // Start skeleton fade-in with consistent 50ms delay
     const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
     let frameCount = 0;
 
@@ -257,7 +261,7 @@ function ProjectsGrid({
     if (apiEndpoint) {
       fetchProjects();
     }
-  }, [apiEndpoint]);
+  }, [apiEndpoint]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle project click with fade-out animation
   const handleProjectClick = (projectId, event) => {
@@ -303,6 +307,22 @@ function ProjectsGrid({
     );
   };
 
+  const handleImageLoad = useCallback((projectId) => {
+    setLoadedImages((prev) => ({
+      ...prev,
+      [projectId]: true
+    }));
+  }, []);
+
+  // Create stable onLoad functions for each project to prevent infinite loops
+  const onLoadFunctions = useMemo(() => {
+    const functions = {};
+    projects.forEach((project) => {
+      functions[project.id] = () => handleImageLoad(project.id);
+    });
+    return functions;
+  }, [projects, handleImageLoad]);
+
   // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
   const visible = pageVisible && contentVisible && dataLoaded;
 
@@ -343,9 +363,13 @@ function ProjectsGrid({
                   key={project.id}
                   onClick={(event) => handleProjectClick(project.id, event)}
                   $isDarkMode={isDarkMode}
+                  $imageLoaded={loadedImages[project.id] || false}
                 >
-                  <ProjectImage imageUrl={getPrimaryImage(project)} />
-                  <Content visible={visible}>
+                  <ProjectImage
+                    imageUrl={getPrimaryImage(project)}
+                    onLoad={onLoadFunctions[project.id]}
+                  />
+                  <Content visible={dataLoaded}>
                     <ProjectTitle>{project.name}</ProjectTitle>
                     <Description>{project.description}</Description>
                   </Content>
