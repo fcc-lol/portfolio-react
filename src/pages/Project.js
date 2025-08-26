@@ -296,7 +296,6 @@ const PersonName = styled.span`
   ${PersonContainer}:hover &,
   ${PersonContainer}:active & {
     color: ${(props) => props.theme.textPrimary};
-    text-decoration: underline;
   }
 `;
 

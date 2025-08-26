@@ -77,7 +77,6 @@ const Link = styled.a`
 
   @media (hover: hover) {
     &:hover {
-      text-decoration: underline;
       color: ${(props) => props.theme.textPrimary};
       transform: scale(1.05);
     }
