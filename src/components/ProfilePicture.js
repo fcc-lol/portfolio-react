@@ -24,13 +24,13 @@ const ProfilePictureContainer = styled.div`
 
   @media (max-width: 768px) {
     width: ${(props) => {
-      if (props.size === "large") return "6rem";
+      if (props.size === "large") return "4rem";
       if (props.size === "medium") return "3rem";
       if (props.size === "small") return "2rem";
       return "2rem"; // default to small
     }};
     height: ${(props) => {
-      if (props.size === "large") return "6rem";
+      if (props.size === "large") return "4rem";
       if (props.size === "medium") return "3rem";
       if (props.size === "small") return "2rem";
       return "2rem"; // default to small

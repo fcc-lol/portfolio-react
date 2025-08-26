@@ -18,10 +18,27 @@ import ProfilePicture from "../components/ProfilePicture";
 import { FadeInWrapper } from "../components/AnimationHelpers";
 import { ANIMATION_DURATION } from "../constants";
 
+const AboutHeader = styled(Header)`
+  padding-right: 12rem;
+
+  @media (max-width: 1024px) {
+    padding-right: 0;
+  }
+`;
+
+const AboutHeaderLargeText = styled(LargeText)`
+  padding-right: 4rem;
+
+  @media (max-width: 768px) {
+    padding-right: 0;
+  }
+`;
+
 const LinksContainer = styled.div`
   display: flex;
   flex-direction: row;
   gap: 2rem;
+  margin-top: 0.75rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -57,11 +74,44 @@ const ProfileCard = styled(Card)`
 `;
 
 const ProfileInfo = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1.5rem;
+  }
+`;
+
+const ProfilePictureAndNameContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1.5rem;
+  }
+`;
+
+const Name = styled(Subheader)`
+  @media (max-width: 768px) {
+    margin: 0 0 0.125rem 0;
+  }
+`;
+
+const Description = styled(SmallText)`
+  @media (max-width: 768px) {
+    text-align: left;
+  }
 `;
 
 const ProfileLinksContainer = styled.div`
@@ -69,8 +119,12 @@ const ProfileLinksContainer = styled.div`
   flex-direction: row;
   gap: 2rem;
 
-  @media (max-width: 1160px) {
-    gap: 1.5rem;
+  @media (max-width: 768px) {
+    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
   }
 `;
 
@@ -132,14 +186,14 @@ function AboutPage() {
       <VStack>
         <Card>
           <HeaderTextContent>
-            <Header>
+            <AboutHeader>
               FCC Studio is a technology and art collective that makes fun
               software and hardware.
-            </Header>
-            <LargeText>
+            </AboutHeader>
+            <AboutHeaderLargeText>
               We design and build custom products to explore novel ways of
               interacting with electronics.
-            </LargeText>
+            </AboutHeaderLargeText>
             <LinksContainer>
               <Link
                 href="https://github.com/fcc-lol"
@@ -169,17 +223,19 @@ function AboutPage() {
         <ProfileCardsContainer>
           <ProfileCard>
             <ProfileInfo>
-              <ProfilePicture
-                src="/images/people/zach.jpg"
-                alt="Zach"
-                size="large"
-              />
-              <Subheader>Zach</Subheader>
-              <SmallText>
+              <ProfilePictureAndNameContainer>
+                <ProfilePicture
+                  src="/images/people/zach.jpg"
+                  alt="Zach"
+                  size="large"
+                />
+                <Name>Zach</Name>
+              </ProfilePictureAndNameContainer>
+              <Description>
                 I'm a curious tinkerer, who learns by doing. I like to work on
                 projects that present opportunities to think strategically and
                 execute nimbly.
-              </SmallText>
+              </Description>
             </ProfileInfo>
             <ProfileLinksContainer>
               <Link onClick={() => handlePersonClick("Zach")} noUnderline>
@@ -199,15 +255,17 @@ function AboutPage() {
           </ProfileCard>
           <ProfileCard>
             <ProfileInfo>
-              <ProfilePicture
-                src="/images/people/dan.jpg"
-                alt="Dan"
-                size="large"
-              />
-              <Subheader>Dan</Subheader>
-              <SmallText>
+              <ProfilePictureAndNameContainer>
+                <ProfilePicture
+                  src="/images/people/dan.jpg"
+                  alt="Dan"
+                  size="large"
+                />
+                <Name>Dan</Name>
+              </ProfilePictureAndNameContainer>
+              <Description>
                 I'm a guy that likes design and code. More to come.
-              </SmallText>
+              </Description>
             </ProfileInfo>
             <ProfileLinksContainer>
               <Link onClick={() => handlePersonClick("Dan")} noUnderline>
@@ -227,17 +285,19 @@ function AboutPage() {
           </ProfileCard>
           <ProfileCard>
             <ProfileInfo>
-              <ProfilePicture
-                src="/images/people/leo.jpg"
-                alt="Leo"
-                size="large"
-              />
-              <Subheader>Leo</Subheader>
-              <SmallText>
+              <ProfilePictureAndNameContainer>
+                <ProfilePicture
+                  src="/images/people/leo.jpg"
+                  alt="Leo"
+                  size="large"
+                />
+                <Name>Leo</Name>
+              </ProfilePictureAndNameContainer>
+              <Description>
                 I'm a designer, engineer, and artist. I believe design and
                 technology should encourage community, equal opportunity, and
                 social progress.
-              </SmallText>
+              </Description>
             </ProfileInfo>
             <ProfileLinksContainer>
               <Link onClick={() => handlePersonClick("Leo")} noUnderline>

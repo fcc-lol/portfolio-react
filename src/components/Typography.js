@@ -6,7 +6,7 @@ export const Header = styled.h1`
   margin: 0;
   padding-bottom: 1.5rem;
   border-bottom: 2px solid ${(props) => props.theme.border};
-  line-height: 1.125;
+  line-height: 1.25;
   color: ${(props) => props.theme.textPrimary};
 
   @media (max-width: 1024px) {
@@ -23,11 +23,15 @@ export const Subheader = styled.h2`
 `;
 
 export const LargeText = styled.p`
-  font-size: 1.75rem;
+  font-size: 2rem;
+  line-height: 1.375;
   font-weight: normal;
   margin: 0;
-  line-height: 1.375;
   color: ${(props) => props.theme.textPrimary};
+
+  @media (max-width: 1024px) {
+    font-size: 1.75rem;
+  }
 `;
 
 export const MediumText = styled.p`
