@@ -18,6 +18,7 @@ import {
 } from "../components/Typography";
 import ProfilePicture from "../components/ProfilePicture";
 import { useTheme } from "../contexts/ThemeContext";
+import { FadeInWrapper } from "../components/AnimationHelpers";
 import {
   FADE_TRANSITION,
   ANIMATION_DURATION,
@@ -45,11 +46,6 @@ const processMarkdownLinks = (htmlContent) => {
     }
   );
 };
-
-const FadeInWrapper = styled.div`
-  opacity: ${(props) => (props.visible ? 1 : 0)};
-  transition: ${FADE_TRANSITION};
-`;
 
 const MediaCard = styled(Card)`
   padding: 0;

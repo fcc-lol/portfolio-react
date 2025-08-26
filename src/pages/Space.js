@@ -5,11 +5,7 @@ import Card from "../components/Card";
 import { VStack } from "../components/Layout";
 import { useTheme } from "../contexts/ThemeContext";
 import { FADE_TRANSITION } from "../constants";
-
-const FadeInWrapper = styled.div`
-  opacity: ${(props) => (props.visible ? 1 : 0)};
-  transition: ${FADE_TRANSITION};
-`;
+import { FadeInWrapper } from "../components/AnimationHelpers";
 
 const ImageContainer = styled.div`
   width: 100%;

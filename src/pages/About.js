@@ -14,16 +14,12 @@ import {
   HeaderTextContent
 } from "../components/Typography";
 import ProfilePicture from "../components/ProfilePicture";
+import { FadeInWrapper } from "../components/AnimationHelpers";
 import {
   FADE_TRANSITION,
   ANIMATION_DURATION,
   TRANSFORM_TRANSITION
 } from "../constants";
-
-const FadeInWrapper = styled.div`
-  opacity: ${(props) => (props.visible ? 1 : 0)};
-  transition: ${FADE_TRANSITION};
-`;
 
 const ProfileCardsContainer = styled.div`
   display: grid;

@@ -11,16 +11,12 @@ import Card from "./Card";
 import { VStack } from "./Layout";
 import { Error, ProjectsSkeleton } from "./States";
 import { useTheme } from "../contexts/ThemeContext";
+import { FadeInWrapper } from "./AnimationHelpers";
 import {
   ANIMATION_DURATION,
   FADE_TRANSITION,
   TRANSFORM_TRANSITION
 } from "../constants";
-
-const FadeInWrapper = styled.div`
-  opacity: ${(props) => (props.visible ? 1 : 0)};
-  transition: ${FADE_TRANSITION};
-`;
 
 const Grid = styled.div`
   display: grid;
