@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useOutletContext, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGithub, faYoutube } from "@fortawesome/free-brands-svg-icons";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import Card from "../components/Card";
-import Button from "../components/Button";
 import { VStack, HStack } from "../components/Layout";
 import {
   Header,
@@ -21,6 +23,18 @@ import {
 const FadeInWrapper = styled.div`
   opacity: ${(props) => (props.visible ? 1 : 0)};
   transition: ${FADE_TRANSITION};
+`;
+
+const ProfileCardsContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  flex-direction: row;
+  gap: 3rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
 `;
 
 const ProfileCard = styled(Card)`
@@ -51,6 +65,31 @@ const ProfileCard = styled(Card)`
 
   @media (max-width: 768px) {
     padding: 2rem;
+  }
+`;
+
+const Link = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  color: ${(props) => props.theme.textSecondary};
+  font-weight: normal;
+  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION};
+  font-size: 1.125rem;
+  text-decoration: none;
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration: underline;
+      color: ${(props) => props.theme.textPrimary};
+      transform: scale(1.05);
+    }
+  }
+
+  &:active {
+    color: ${(props) => props.theme.textPrimary};
+    transform: scale(0.95);
   }
 `;
 
@@ -120,10 +159,31 @@ function AboutPage() {
               We design and build custom products to explore novel ways of
               interacting with electronics.
             </LargeText>
-            <Button link="mailto:studio@fcc.lol">Contact us</Button>
+            <HStack gap="2rem">
+              <Link
+                href="https://github.com/fcc-lol"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FontAwesomeIcon icon={faGithub} />
+                GitHub
+              </Link>
+              <Link
+                href="https://youtube.com/@fcc-lol"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FontAwesomeIcon icon={faYoutube} />
+                YouTube
+              </Link>
+              <Link href="mailto:studio@fcc.lol">
+                <FontAwesomeIcon icon={faEnvelope} />
+                Email
+              </Link>
+            </HStack>
           </HeaderTextContent>
         </Card>
-        <HStack>
+        <ProfileCardsContainer>
           <ProfileCard onClick={() => handlePersonClick("Zach")}>
             <ProfilePicture
               src="/images/people/zach.jpg"
@@ -161,7 +221,7 @@ function AboutPage() {
               social progress.
             </SmallText>
           </ProfileCard>
-        </HStack>
+        </ProfileCardsContainer>
       </VStack>
     </FadeInWrapper>
   );

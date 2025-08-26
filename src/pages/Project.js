@@ -325,6 +325,28 @@ const LinksContainer = styled.div`
   }
 `;
 
+const Link = styled.a`
+  display: inline-block;
+  color: ${(props) => props.theme.textSecondary};
+  text-decoration: underline;
+  font-weight: normal;
+  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION};
+  font-size: 1.125rem;
+  cursor: pointer;
+  user-select: none;
+
+  @media (hover: hover) {
+    &:hover {
+      color: ${(props) => props.theme.textPrimary};
+    }
+  }
+
+  &:active {
+    color: ${(props) => props.theme.textPrimary};
+    transform: scale(0.9);
+  }
+`;
+
 const TagsContainer = styled.div`
   display: contents;
 
@@ -335,28 +357,7 @@ const TagsContainer = styled.div`
   }
 `;
 
-const Tag = styled.button`
-  display: inline-block;
-  color: ${(props) => props.theme.textSecondary};
-  text-decoration: underline;
-  font-weight: normal;
-  font-size: 1.125rem;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION};
-
-  @media (hover: hover) {
-    &:hover {
-      color: ${(props) => props.theme.textPrimary};
-    }
-  }
-
-  &:active {
-    transform: scale(0.9);
-  }
-`;
+const Tag = styled(Link)``;
 
 const Separator = styled.span`
   color: ${(props) => props.theme.textSecondary};
@@ -365,25 +366,6 @@ const Separator = styled.span`
 
   @media (max-width: 768px) {
     display: none;
-  }
-`;
-
-const LinkButton = styled.a`
-  display: inline-block;
-  color: ${(props) => props.theme.textSecondary};
-  text-decoration: underline;
-  font-weight: normal;
-  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION};
-  font-size: 1.125rem;
-
-  @media (hover: hover) {
-    &:hover {
-      color: ${(props) => props.theme.textPrimary};
-    }
-  }
-
-  &:active {
-    transform: scale(0.9);
   }
 `;
 
@@ -712,14 +694,14 @@ function ProjectPage() {
                 {project.links && project.links.length > 0 && (
                   <LinksContainer>
                     {project.links.map((link, index) => (
-                      <LinkButton
+                      <Link
                         key={index}
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
                         {link.label}
-                      </LinkButton>
+                      </Link>
                     ))}
                   </LinksContainer>
                 )}

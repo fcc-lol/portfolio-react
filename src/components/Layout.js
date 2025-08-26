@@ -25,22 +25,20 @@ export const Container = styled.div`
 export const VStack = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: ${(props) => props.gap || "3rem"};
 
   @media (max-width: 1024px) {
-    gap: 2rem;
+    gap: ${(props) => props.gap * 0.6 || "2rem"};
   }
 `;
 
 export const HStack = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
   flex-direction: row;
-  gap: 3rem;
+  gap: ${(props) => props.gap || "3rem"};
 
   @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: ${(props) => props.gap * 0.6 || "2rem"};
   }
 `;
 
