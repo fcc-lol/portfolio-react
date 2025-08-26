@@ -16,6 +16,7 @@ import {
   HeaderTextContent,
   SmallText
 } from "../components/Typography";
+import { Link } from "../components/Link";
 import ProfilePicture from "../components/ProfilePicture";
 import { useTheme } from "../contexts/ThemeContext";
 import { FadeInWrapper } from "../components/AnimationHelpers";
@@ -319,28 +320,6 @@ const LinksContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-  }
-`;
-
-const Link = styled.a`
-  display: inline-block;
-  color: ${(props) => props.theme.textSecondary};
-  text-decoration: underline;
-  font-weight: normal;
-  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION};
-  font-size: 1.125rem;
-  cursor: pointer;
-  user-select: none;
-
-  @media (hover: hover) {
-    &:hover {
-      color: ${(props) => props.theme.textPrimary};
-    }
-  }
-
-  &:active {
-    color: ${(props) => props.theme.textPrimary};
-    transform: scale(0.9);
   }
 `;
 

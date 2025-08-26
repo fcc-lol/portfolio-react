@@ -13,6 +13,7 @@ import {
   SmallText,
   HeaderTextContent
 } from "../components/Typography";
+import { Link } from "../components/Link";
 import ProfilePicture from "../components/ProfilePicture";
 import { FadeInWrapper } from "../components/AnimationHelpers";
 import {
@@ -20,6 +21,17 @@ import {
   ANIMATION_DURATION,
   TRANSFORM_TRANSITION
 } from "../constants";
+
+const LinksContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+`;
 
 const ProfileCardsContainer = styled.div`
   display: grid;
@@ -61,30 +73,6 @@ const ProfileCard = styled(Card)`
 
   @media (max-width: 768px) {
     padding: 2rem;
-  }
-`;
-
-const Link = styled.a`
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.5rem;
-  color: ${(props) => props.theme.textSecondary};
-  font-weight: normal;
-  transition: color ${ANIMATION_DURATION}ms ease-in-out, ${TRANSFORM_TRANSITION};
-  font-size: 1.125rem;
-  text-decoration: none;
-
-  @media (hover: hover) {
-    &:hover {
-      color: ${(props) => props.theme.textPrimary};
-      transform: scale(1.05);
-    }
-  }
-
-  &:active {
-    color: ${(props) => props.theme.textPrimary};
-    transform: scale(0.95);
   }
 `;
 
@@ -154,11 +142,12 @@ function AboutPage() {
               We design and build custom products to explore novel ways of
               interacting with electronics.
             </LargeText>
-            <HStack gap="2rem">
+            <LinksContainer>
               <Link
                 href="https://github.com/fcc-lol"
                 target="_blank"
                 rel="noopener noreferrer"
+                noUnderline
               >
                 <FontAwesomeIcon icon={faGithub} />
                 GitHub
@@ -167,15 +156,16 @@ function AboutPage() {
                 href="https://youtube.com/@fcc-lol"
                 target="_blank"
                 rel="noopener noreferrer"
+                noUnderline
               >
                 <FontAwesomeIcon icon={faYoutube} />
                 YouTube
               </Link>
-              <Link href="mailto:studio@fcc.lol">
+              <Link href="mailto:studio@fcc.lol" noUnderline>
                 <FontAwesomeIcon icon={faEnvelope} />
                 Email
               </Link>
-            </HStack>
+            </LinksContainer>
           </HeaderTextContent>
         </Card>
         <ProfileCardsContainer>
