@@ -185,7 +185,11 @@ function ProjectsGrid({
   documentTitle,
   noResultsMessage
 }) {
-  const { isDarkMode } = useTheme();
+  const {
+    isDarkMode,
+    setCachedFilteredProjectsData,
+    getCachedFilteredProjectsData
+  } = useTheme();
   const navigate = useNavigate();
   const { pageVisible, contentVisible, handleFadeOut } = useOutletContext();
 
@@ -202,28 +206,59 @@ function ProjectsGrid({
   }, [documentTitle]);
 
   useEffect(() => {
+    // Start skeleton fade-in with consistent 50ms delay if we need to show loading state
+    if (loading) {
+      const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+      let frameCount = 0;
+
+      const waitForDelay = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
+          setSkeletonVisible(true);
+        } else {
+          requestAnimationFrame(waitForDelay);
+        }
+      };
+
+      requestAnimationFrame(waitForDelay);
+    }
+  }, [loading]);
+
+  useEffect(() => {
     // Reset state when apiEndpoint changes
-    setProjects([]);
-    setLoading(true);
     setError(null);
     setDataLoaded(false);
     setLoadedImages({});
     setSkeletonVisible(false);
 
-    // Start skeleton fade-in with consistent 50ms delay
-    const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
-    let frameCount = 0;
+    // Get cached data for this endpoint
+    const cachedData = getCachedFilteredProjectsData(apiEndpoint);
 
-    const waitForSkeletonDelay = () => {
-      frameCount++;
-      if (frameCount >= targetFrames) {
-        setSkeletonVisible(true);
-      } else {
-        requestAnimationFrame(waitForSkeletonDelay);
-      }
-    };
+    if (cachedData) {
+      // We have cached data - use it immediately
+      setProjects(cachedData);
+      setLoading(false);
 
-    requestAnimationFrame(waitForSkeletonDelay);
+      // Start fade-in after a short delay to ensure proper animation
+      const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+      let frameCount = 0;
+
+      const waitForDelay = () => {
+        frameCount++;
+        if (frameCount >= targetFrames) {
+          setDataLoaded(true);
+        } else {
+          requestAnimationFrame(waitForDelay);
+        }
+      };
+
+      requestAnimationFrame(waitForDelay);
+      return;
+    }
+
+    // No cached data - need to fetch
+    setProjects([]);
+    setLoading(true);
 
     const fetchProjects = async () => {
       try {
@@ -233,6 +268,7 @@ function ProjectsGrid({
         }
         const data = await response.json();
         setProjects(data);
+        setCachedFilteredProjectsData(apiEndpoint, data); // Cache the data
       } catch (err) {
         setError(err.message);
       } finally {
@@ -257,7 +293,11 @@ function ProjectsGrid({
     if (apiEndpoint) {
       fetchProjects();
     }
-  }, [apiEndpoint]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    apiEndpoint,
+    getCachedFilteredProjectsData,
+    setCachedFilteredProjectsData
+  ]);
 
   // Handle project click with fade-out animation
   const handleProjectClick = (projectId, event) => {
@@ -328,10 +368,7 @@ function ProjectsGrid({
         <FadeInWrapper
           visible={pageVisible && contentVisible && skeletonVisible}
         >
-          <VStack>
-            {headerComponent}
-            <ProjectsSkeleton />
-          </VStack>
+          <ProjectsSkeleton />
         </FadeInWrapper>
       );
     }
@@ -339,50 +376,50 @@ function ProjectsGrid({
     if (error) {
       return (
         <FadeInWrapper visible={visible}>
-          <VStack>
-            {headerComponent}
-            <Error>Error: {error}</Error>
-          </VStack>
+          <Error>Error: {error}</Error>
         </FadeInWrapper>
       );
     }
 
     return (
       <FadeInWrapper visible={visible}>
-        <VStack>
-          {headerComponent}
-
-          {projects.length > 0 ? (
-            <Grid>
-              {projects.map((project) => (
-                <Project
-                  key={project.id}
-                  onClick={(event) => handleProjectClick(project.id, event)}
-                  $isDarkMode={isDarkMode}
-                  $imageLoaded={loadedImages[project.id] || false}
-                >
-                  <ProjectImage
-                    imageUrl={getPrimaryImage(project)}
-                    onLoad={onLoadFunctions[project.id]}
-                  />
-                  <Content visible={dataLoaded}>
-                    <ProjectTitle>{project.name}</ProjectTitle>
-                    <Description>{project.description}</Description>
-                  </Content>
-                </Project>
-              ))}
-            </Grid>
-          ) : (
-            <Card $isDarkMode={isDarkMode}>
-              <p>{noResultsMessage}</p>
-            </Card>
-          )}
-        </VStack>
+        {projects.length > 0 ? (
+          <Grid>
+            {projects.map((project) => (
+              <Project
+                key={project.id}
+                onClick={(event) => handleProjectClick(project.id, event)}
+                $isDarkMode={isDarkMode}
+                $imageLoaded={loadedImages[project.id] || false}
+              >
+                <ProjectImage
+                  imageUrl={getPrimaryImage(project)}
+                  onLoad={onLoadFunctions[project.id]}
+                />
+                <Content visible={dataLoaded}>
+                  <ProjectTitle>{project.name}</ProjectTitle>
+                  <Description>{project.description}</Description>
+                </Content>
+              </Project>
+            ))}
+          </Grid>
+        ) : (
+          <Card $isDarkMode={isDarkMode}>
+            <p>{noResultsMessage}</p>
+          </Card>
+        )}
       </FadeInWrapper>
     );
   };
 
-  return <>{renderContent()}</>;
+  return (
+    <VStack>
+      <FadeInWrapper visible={pageVisible && contentVisible}>
+        {headerComponent}
+      </FadeInWrapper>
+      {renderContent()}
+    </VStack>
+  );
 }
 
 export default ProjectsGrid;

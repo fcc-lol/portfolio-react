@@ -3,7 +3,8 @@ import React, {
   useContext,
   useState,
   useEffect,
-  useCallback
+  useCallback,
+  useRef
 } from "react";
 import { ThemeProvider as StyledThemeProvider } from "styled-components";
 import GlobalStyles from "../components/GlobalStyles";
@@ -55,6 +56,7 @@ export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(getSystemTheme);
   const [loadedImages, setLoadedImages] = useState(new Set());
   const [cachedProjects, setCachedProjects] = useState(null);
+  const cachedFilteredProjectsRef = useRef(new Map());
 
   // Listen for changes to system theme preference
   useEffect(() => {
@@ -90,6 +92,14 @@ export const ThemeProvider = ({ children }) => {
     return cachedProjects;
   }, [cachedProjects]);
 
+  const setCachedFilteredProjectsData = useCallback((cacheKey, projects) => {
+    cachedFilteredProjectsRef.current = new Map(cachedFilteredProjectsRef.current).set(cacheKey, projects);
+  }, []);
+
+  const getCachedFilteredProjectsData = useCallback((cacheKey) => {
+    return cachedFilteredProjectsRef.current.get(cacheKey) || null;
+  }, []);
+
   const theme = isDarkMode ? darkTheme : lightTheme;
 
   const value = {
@@ -98,7 +108,9 @@ export const ThemeProvider = ({ children }) => {
     markImageAsLoaded,
     isImageLoaded,
     setCachedProjectsData,
-    getCachedProjectsData
+    getCachedProjectsData,
+    setCachedFilteredProjectsData,
+    getCachedFilteredProjectsData
   };
 
   return (

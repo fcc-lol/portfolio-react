@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import Card from "../components/Card";
@@ -10,7 +10,7 @@ import { useTheme } from "../contexts/ThemeContext";
 // import { ANIMATION_DURATION } from "../constants";
 
 const HeaderCard = styled(Card)`
-  min-height: ${props => props.$type === 'person' ? '6rem' : '4rem'};
+  min-height: ${(props) => (props.$type === "person" ? "6rem" : "4rem")};
 `;
 
 const HeaderTextContentWithProfilePicture = styled(HeaderTextContent)`
@@ -36,42 +36,54 @@ function FilteredProjectsPage({ type }) {
   // const navigate = useNavigate();
   // const { handleFadeOut } = useOutletContext();
 
-  // Get the parameter based on type
-  const paramName = type === 'person' ? params.personName : params.tagName;
-  
+  // Get the parameter based on type - memoized to prevent unnecessary recalculations
+  const paramName = useMemo(() => {
+    return type === "person" ? params.personName : params.tagName;
+  }, [type, params.personName, params.tagName]);
+
   // For person projects, capitalize the name for display
-  const displayName = type === 'person' && paramName
-    ? paramName.charAt(0).toUpperCase() + paramName.slice(1)
-    : paramName;
+  const displayName = useMemo(() => {
+    return type === "person" && paramName
+      ? paramName.charAt(0).toUpperCase() + paramName.slice(1)
+      : paramName;
+  }, [type, paramName]);
 
   // API endpoint based on type
-  const apiEndpoint = `https://portfolio-api.fcc.lol/projects/${type}/${paramName}`;
+  const apiEndpoint = useMemo(() => {
+    return `https://portfolio-api.fcc.lol/projects/${type}/${paramName}`;
+  }, [type, paramName]);
 
   // Document title based on type
-  const documentTitle = type === 'person' 
-    ? `FCC Studio – Projects with ${displayName}`
-    : `FCC Studio – Projects with #${paramName}`;
+  const documentTitle = useMemo(() => {
+    return type === "person"
+      ? `FCC Studio – Projects with ${displayName}`
+      : `FCC Studio – Projects with #${paramName}`;
+  }, [type, displayName, paramName]);
 
   // Header component - different for person vs tag
-  const headerComponent = type === 'person' ? (
-    <HeaderCard $isDarkMode={isDarkMode} $type={type}>
-      <HeaderTextContentWithProfilePicture>
-        <ProfilePicture alt={displayName} name={displayName} size="medium" />
-        <Title>Projects with {displayName}</Title>
-      </HeaderTextContentWithProfilePicture>
-    </HeaderCard>
-  ) : (
-    <HeaderCard $isDarkMode={isDarkMode} $type={type}>
-      <HeaderTextContent>
-        <Title>Projects with #{paramName}</Title>
-      </HeaderTextContent>
-    </HeaderCard>
-  );
+  const headerComponent = useMemo(() => {
+    return type === "person" ? (
+      <HeaderCard $isDarkMode={isDarkMode} $type={type}>
+        <HeaderTextContentWithProfilePicture>
+          <ProfilePicture alt={displayName} name={displayName} size="medium" />
+          <Title>Projects with {displayName}</Title>
+        </HeaderTextContentWithProfilePicture>
+      </HeaderCard>
+    ) : (
+      <HeaderCard $isDarkMode={isDarkMode} $type={type}>
+        <HeaderTextContent>
+          <Title>Projects with #{paramName}</Title>
+        </HeaderTextContent>
+      </HeaderCard>
+    );
+  }, [type, isDarkMode, displayName, paramName]);
 
   // No results message based on type
-  const noResultsMessage = type === 'person'
-    ? `No projects found for ${displayName}.`
-    : `No projects found with the tag #${paramName}.`;
+  const noResultsMessage = useMemo(() => {
+    return type === "person"
+      ? `No projects found for ${displayName}.`
+      : `No projects found with the tag #${paramName}.`;
+  }, [type, displayName, paramName]);
 
   return (
     <ProjectsGrid
