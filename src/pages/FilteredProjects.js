@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 import { useParams, useOutletContext } from "react-router-dom";
 import Card from "../components/Card";
@@ -6,9 +6,6 @@ import { HeaderTextContent, Subheader } from "../components/Typography";
 import ProfilePicture from "../components/ProfilePicture";
 import ProjectsGrid from "../components/ProjectsGrid";
 import { useTheme } from "../contexts/ThemeContext";
-import { FadeInWrapper } from "../components/AnimationHelpers";
-// import { useNavigate } from "react-router-dom";
-// import { ANIMATION_DURATION } from "../constants";
 
 const HeaderCard = styled(Card)`
   min-height: ${(props) => (props.$type === "person" ? "6rem" : "4rem")};
@@ -34,10 +31,6 @@ function FilteredProjectsPage({ type }) {
   const { isDarkMode } = useTheme();
   const { pageVisible, contentVisible } = useOutletContext();
   const params = useParams();
-  const [dataLoaded, setDataLoaded] = useState(false);
-  // Navigation hooks available if needed for future navigation functionality
-  // const navigate = useNavigate();
-  // const { handleFadeOut } = useOutletContext();
 
   // Get the parameter based on type - memoized to prevent unnecessary recalculations
   const paramName = useMemo(() => {
@@ -62,23 +55,6 @@ function FilteredProjectsPage({ type }) {
       ? `FCC Studio – Projects with ${displayName}`
       : `FCC Studio – Projects with #${paramName}`;
   }, [type, displayName, paramName]);
-
-  // Start fade-in after a short delay to ensure proper animation
-  useEffect(() => {
-    const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
-    let frameCount = 0;
-
-    const waitForDelay = () => {
-      frameCount++;
-      if (frameCount >= targetFrames) {
-        setDataLoaded(true);
-      } else {
-        requestAnimationFrame(waitForDelay);
-      }
-    };
-
-    requestAnimationFrame(waitForDelay);
-  }, []);
 
   // Header component - different for person vs tag
   const headerComponent = useMemo(() => {
@@ -105,18 +81,15 @@ function FilteredProjectsPage({ type }) {
       : `No projects found with the tag #${paramName}.`;
   }, [type, displayName, paramName]);
 
-  // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
-  const visible = pageVisible && contentVisible && dataLoaded;
-
   return (
-    <FadeInWrapper visible={visible}>
-      <ProjectsGrid
-        apiEndpoint={apiEndpoint}
-        headerComponent={headerComponent}
-        documentTitle={documentTitle}
-        noResultsMessage={noResultsMessage}
-      />
-    </FadeInWrapper>
+    <ProjectsGrid
+      apiEndpoint={apiEndpoint}
+      headerComponent={headerComponent}
+      documentTitle={documentTitle}
+      noResultsMessage={noResultsMessage}
+      pageVisible={pageVisible}
+      contentVisible={contentVisible}
+    />
   );
 }
 

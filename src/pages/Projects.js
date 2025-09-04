@@ -126,16 +126,30 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
   // Calculate wasLoadedBefore once on mount to avoid infinite loops
   const wasLoadedBefore = useRef(imageUrl ? isImageLoaded(imageUrl) : false);
 
-  // Start loaded=true if no image URL OR if it was loaded before, otherwise wait for load event
-  const [loaded, setLoaded] = useState(!imageUrl || wasLoadedBefore.current);
+  // Always start with loaded=false to ensure fade-in animation
+  const [loaded, setLoaded] = useState(false);
   const imageRef = useRef(null);
 
-  // Notify parent immediately if there's no image or image was loaded before
+  // For previously loaded images, animate to loaded=true after a short delay
   useEffect(() => {
-    if ((!imageUrl || wasLoadedBefore.current) && onLoad) {
-      onLoad(true);
+    if (wasLoadedBefore.current) {
+      // Short delay to ensure the fade-in animation is visible
+      const timer = setTimeout(() => {
+        setLoaded(true);
+        if (onLoad) {
+          onLoad(true);
+        }
+      }, 100); // 100ms delay for fade-in animation
+      
+      return () => clearTimeout(timer);
+    } else if (!imageUrl) {
+      // No image URL - set loaded immediately
+      setLoaded(true);
+      if (onLoad) {
+        onLoad(true);
+      }
     }
-  }, [imageUrl, onLoad]); // Now safe because onLoad is stable
+  }, [imageUrl, onLoad]);
 
   const handleImageLoad = () => {
     setLoaded(true);
