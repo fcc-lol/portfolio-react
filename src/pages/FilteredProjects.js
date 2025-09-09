@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useOutletContext } from "react-router-dom";
 import Card from "../components/Card";
@@ -31,6 +31,24 @@ function FilteredProjectsPage({ type }) {
   const { isDarkMode } = useTheme();
   const { pageVisible, contentVisible } = useOutletContext();
   const params = useParams();
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Start fade-in after a short delay to ensure proper animation
+  useEffect(() => {
+    const targetFrames = Math.ceil(50 / 16.67); // ~3 frames for 50ms
+    let frameCount = 0;
+
+    const waitForDelay = () => {
+      frameCount++;
+      if (frameCount >= targetFrames) {
+        setDataLoaded(true);
+      } else {
+        requestAnimationFrame(waitForDelay);
+      }
+    };
+
+    requestAnimationFrame(waitForDelay);
+  }, []);
 
   // Get the parameter based on type - memoized to prevent unnecessary recalculations
   const paramName = useMemo(() => {
@@ -81,14 +99,18 @@ function FilteredProjectsPage({ type }) {
       : `No projects found with the tag #${paramName}.`;
   }, [type, displayName, paramName]);
 
+  // Combine both pageVisible and contentVisible (for different fade-out types) with dataLoaded (for fade-in timing)
+  const combinedPageVisible = pageVisible && dataLoaded;
+  const combinedContentVisible = contentVisible && dataLoaded;
+
   return (
     <ProjectsGrid
       apiEndpoint={apiEndpoint}
       headerComponent={headerComponent}
       documentTitle={documentTitle}
       noResultsMessage={noResultsMessage}
-      pageVisible={pageVisible}
-      contentVisible={contentVisible}
+      pageVisible={combinedPageVisible}
+      contentVisible={combinedContentVisible}
     />
   );
 }
