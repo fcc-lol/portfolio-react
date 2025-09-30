@@ -24,6 +24,16 @@
   RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|redditbot|applebot) [NC]
   RewriteCond %{REQUEST_URI} ^/project/[a-zA-Z0-9-]+/?$
   RewriteRule ^project/([a-zA-Z0-9-]+)/?$ https://portfolio-api.fcc.lol/projects/prerender/$1? [R=302,L]
+
+  # Space page prerendering
+  RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|redditbot|applebot) [NC]
+  RewriteCond %{REQUEST_URI} ^/space/?$
+  RewriteRule ^space/?$ https://portfolio-api.fcc.lol/space/prerender? [R=302,L]
+
+  # About page prerendering
+  RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|redditbot|applebot) [NC]
+  RewriteCond %{REQUEST_URI} ^/about/?$
+  RewriteRule ^about/?$ https://portfolio-api.fcc.lol/about/prerender? [R=302,L]
   
   # Serve existing files directly
   RewriteCond %{REQUEST_FILENAME} -f
