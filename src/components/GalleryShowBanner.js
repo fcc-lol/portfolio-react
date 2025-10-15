@@ -37,12 +37,13 @@ const Title = styled.h2`
   font-weight: 600;
   font-family: "DM Mono", monospace !important;
   position: absolute;
-  top: 1px;
-  left: 12px;
+  top: 0px;
+  left: 2px;
   background: ${(props) => props.theme.background};
-  padding: 10px 24px;
+  padding: 10px 0;
   border-radius: 0.75rem;
   margin: 0;
+  width: 100%;
 `;
 
 const Description = styled.div`
