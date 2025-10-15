@@ -125,8 +125,8 @@ const ShareButton = styled.button`
 function GalleryShowBanner() {
   const handleShare = async () => {
     const shareData = {
-      title: "FCC Gallery Show",
-      text: "November 8-9, 2025 · 618 E 9th St, New York",
+      title: "FCC Studio Gallery Show",
+      text: "FCC Studio Gallery Show\n\nNovember 8-9, 2025\n\n618 E 9th St, New York",
       url: window.location.href
     };
 
