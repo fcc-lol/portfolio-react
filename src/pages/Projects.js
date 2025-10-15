@@ -140,7 +140,7 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
           onLoad(true);
         }
       }, 100); // 100ms delay for fade-in animation
-      
+
       return () => clearTimeout(timer);
     } else if (!imageUrl) {
       // No image URL - set loaded immediately
