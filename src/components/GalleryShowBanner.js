@@ -149,7 +149,7 @@ function GalleryShowBanner() {
         <Title>gallery show</Title>
         <Description>
           <DescriptionLink
-            href="https://static.fcc.lol/nov-2025-gallery-show/FCC%20Gallery%20Show.ics"
+            href="https://static.fcc.lol/nov-2025-gallery-show/FCC%20Studio%20Gallery%20Show.ics"
             target="_blank"
             rel="noopener noreferrer"
           >
