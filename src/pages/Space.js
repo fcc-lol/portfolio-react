@@ -54,15 +54,23 @@ function SpaceImageComponent({ imageUrl, imageKey, imageRef }) {
     markImageAsLoaded(imageUrl);
   };
 
+  const handleImageError = () => {
+    // Don't show broken images, just show the container background
+    setLoaded(false);
+  };
+
   return (
     <ImageContainer $isDarkMode={isDarkMode} loaded={loaded}>
-      <FadeInImage
-        ref={imageRef}
-        src={imageUrl}
-        alt="Studio photo"
-        loaded={loaded}
-        onLoad={handleImageLoad}
-      />
+      {imageUrl && (
+        <FadeInImage
+          ref={imageRef}
+          src={imageUrl}
+          alt="Studio photo"
+          loaded={loaded}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+        />
+      )}
     </ImageContainer>
   );
 }

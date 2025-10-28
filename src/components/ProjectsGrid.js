@@ -141,10 +141,10 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
           onLoad(true);
         }
       }, 100); // 100ms delay for fade-in animation
-      
+
       return () => clearTimeout(timer);
     } else if (!imageUrl) {
-      // No image URL - set loaded immediately
+      // No image URL - set loaded immediately and notify parent
       setLoaded(true);
       if (onLoad) {
         onLoad(true);
@@ -160,15 +160,20 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
       markImageAsLoaded(imageUrl);
     }
 
-    // Notify parent component
+    // Notify parent component of successful load
     if (onLoad) {
       onLoad(true);
     }
   };
 
   const handleImageError = () => {
-    // Don't show broken images
+    // Don't show broken images, show container background instead
     setLoaded(false);
+
+    // Notify parent that image failed to load (so no border animation)
+    if (onLoad) {
+      onLoad(false);
+    }
   };
 
   return (
@@ -208,7 +213,7 @@ function ProjectsGrid({
   } = useTheme();
   const navigate = useNavigate();
   const outletContext = useOutletContext();
-  
+
   // Use props if provided, otherwise fall back to outlet context
   const pageVisible = propPageVisible ?? outletContext?.pageVisible;
   const contentVisible = propContentVisible ?? outletContext?.contentVisible;
@@ -364,10 +369,10 @@ function ProjectsGrid({
     );
   };
 
-  const handleImageLoad = useCallback((projectId) => {
+  const handleImageLoad = useCallback((projectId, success = true) => {
     setLoadedImages((prev) => ({
       ...prev,
-      [projectId]: true
+      [projectId]: success
     }));
   }, []);
 
@@ -375,7 +380,7 @@ function ProjectsGrid({
   const onLoadFunctions = useMemo(() => {
     const functions = {};
     projects.forEach((project) => {
-      functions[project.id] = () => handleImageLoad(project.id);
+      functions[project.id] = (success) => handleImageLoad(project.id, success);
     });
     return functions;
   }, [projects, handleImageLoad]);

@@ -120,6 +120,11 @@ function ProfilePicture({ src, alt, name, size = "small" }) {
     }
   };
 
+  const handleImageError = () => {
+    // Don't show broken images, just show the container background
+    setLoaded(false);
+  };
+
   return (
     <>
       {imageSrc && (
@@ -127,6 +132,7 @@ function ProfilePicture({ src, alt, name, size = "small" }) {
           ref={imageRef}
           src={imageSrc}
           onLoad={handleImageLoad}
+          onError={handleImageError}
           alt=""
         />
       )}
@@ -135,13 +141,16 @@ function ProfilePicture({ src, alt, name, size = "small" }) {
         $isDarkMode={isDarkMode}
         $loaded={loaded}
       >
-        <ProfilePictureImg
-          src={imageSrc}
-          alt={alt}
-          loaded={loaded}
-          shouldAnimate={shouldAnimate}
-          wasLoadedBefore={wasLoadedBefore}
-        />
+        {imageSrc && (
+          <ProfilePictureImg
+            src={imageSrc}
+            alt={alt}
+            loaded={loaded}
+            shouldAnimate={shouldAnimate}
+            wasLoadedBefore={wasLoadedBefore}
+            onError={handleImageError}
+          />
+        )}
       </ProfilePictureContainer>
     </>
   );
