@@ -331,7 +331,7 @@ function ProjectsPage() {
 
   const getPrimaryImage = (project) => {
     return (
-      project.primaryImage.url ||
+      project.primaryImage?.url ||
       (project.media && project.media.length > 0 ? project.media[0].url : null)
     );
   };
