@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGithub, faYoutube } from "@fortawesome/free-brands-svg-icons";
+import {
+  faGithub,
+  faYoutube,
+  faTwitch,
+  faInstagram
+} from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faLink, faUser } from "@fortawesome/free-solid-svg-icons";
 import Card from "../components/Card";
 import { VStack } from "../components/Layout";
@@ -212,6 +217,24 @@ function AboutPage() {
               >
                 <FontAwesomeIcon icon={faYoutube} />
                 YouTube
+              </Link>
+              <Link
+                href="https://twitch.tv/fcclol"
+                target="_blank"
+                rel="noopener noreferrer"
+                noUnderline
+              >
+                <FontAwesomeIcon icon={faTwitch} />
+                Twitch
+              </Link>
+              <Link
+                href="https://www.instagram.com/fcclol/"
+                target="_blank"
+                rel="noopener noreferrer"
+                noUnderline
+              >
+                <FontAwesomeIcon icon={faInstagram} />
+                Instagram
               </Link>
               <Link href="mailto:studio@fcc.lol" noUnderline>
                 <FontAwesomeIcon icon={faEnvelope} />
