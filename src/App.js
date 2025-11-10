@@ -17,7 +17,7 @@ import ProjectPage from "./pages/Project";
 import FilteredProjectsPage from "./pages/FilteredProjects";
 import SpacePage from "./pages/Space";
 import AboutPage from "./pages/About";
-import GalleryShowBanner from "./components/GalleryShowBanner";
+import NewsletterContactBanner from "./components/NewsletterContactBanner";
 import { ANIMATION_DURATION } from "./constants";
 
 // Root layout component that includes ScrollRestoration and Navigation
@@ -89,7 +89,7 @@ function RootLayout() {
   return (
     <Page>
       <Container>
-        <GalleryShowBanner />
+        <NewsletterContactBanner />
         <Navigation
           showBackButton={showBackButton}
           onBackClick={handleBackClick}
