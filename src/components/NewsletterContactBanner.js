@@ -96,7 +96,7 @@ const BannerLink = styled(Link)`
 function NewsletterContactBanner() {
   return (
     <Container>
-      <Title>thanks for joining the gallery show!</Title>
+      <Title>thanks for visiting the gallery!</Title>
       <BannerLinksContainer>
         <BannerLink
           href="https://forms.gle/J8rMgwjYFKZNyqnE9"
