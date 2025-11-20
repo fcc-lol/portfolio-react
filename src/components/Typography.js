@@ -30,7 +30,7 @@ export const LargeText = styled.p`
   color: ${(props) => props.theme.textPrimary};
 
   @media (max-width: 1024px) {
-    font-size: 1.75rem;
+    font-size: 1.675rem;
   }
 `;
 

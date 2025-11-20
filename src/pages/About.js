@@ -32,10 +32,28 @@ const AboutHeader = styled(Header)`
 `;
 
 const AboutHeaderLargeText = styled(LargeText)`
-  padding-right: 4rem;
+  padding-right: 5rem;
 
   @media (max-width: 768px) {
     padding-right: 0;
+  }
+
+  a {
+    color: ${(props) => props.theme.textPrimary};
+    text-decoration: underline;
+    font-weight: normal;
+    transition: color ${ANIMATION_DURATION}ms ease-in-out;
+    cursor: pointer;
+
+    @media (hover: hover) {
+      &:hover {
+        color: ${(props) => props.theme.textSecondary};
+      }
+    }
+
+    &:active {
+      color: ${(props) => props.theme.textTertiary};
+    }
   }
 `;
 
@@ -196,8 +214,15 @@ function AboutPage() {
               software and hardware.
             </AboutHeader>
             <AboutHeaderLargeText>
-              We design and build custom products to explore novel ways of
-              interacting with electronics.
+              We love to explore novel ways of
+              interacting with electronics. For updates,{" "}
+              <a
+                href="https://forms.gle/J8rMgwjYFKZNyqnE9"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                join our newsletter
+              </a>!
             </AboutHeaderLargeText>
             <LinksContainer>
               <Link
