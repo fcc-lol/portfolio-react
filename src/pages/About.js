@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,7 +21,8 @@ import {
 import { Link } from "../components/Link";
 import ProfilePicture from "../components/ProfilePicture";
 import { FadeInWrapper } from "../components/AnimationHelpers";
-import { ANIMATION_DURATION } from "../constants";
+import { useTheme } from "../contexts/ThemeContext";
+import { ANIMATION_DURATION, FADE_TRANSITION } from "../constants";
 
 const AboutHeader = styled(Header)`
   padding-right: 12rem;
@@ -151,10 +152,80 @@ const ProfileLinksContainer = styled.div`
   }
 `;
 
+const ImageContainer = styled.div`
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 200px;
+  overflow: hidden;
+  position: relative;
+  background: ${(props) => props.theme.cardBackground};
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 1.5rem;
+    opacity: ${(props) => (props.$isDarkMode || !props.loaded ? 0 : 1)};
+    transition: ${FADE_TRANSITION};
+  }
+`;
+
+const FadeInImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: ${(props) => (props.loaded ? 1 : 0)};
+  transition: ${FADE_TRANSITION};
+`;
+
+const spaceImageUrls = [
+  "https://static.fcc.lol/studio-photos/IMG_8796.jpeg",
+  "https://static.fcc.lol/studio-photos/IMG_8806.jpeg",
+  "https://static.fcc.lol/studio-photos/IMG_8813.jpeg"
+];
+
+function SpaceImageComponent({ imageUrl, imageRef }) {
+  const { markImageAsLoaded, isDarkMode } = useTheme();
+  const [loaded, setLoaded] = useState(false);
+
+  const handleImageLoad = () => {
+    setLoaded(true);
+    markImageAsLoaded(imageUrl);
+  };
+
+  const handleImageError = () => {
+    setLoaded(false);
+  };
+
+  return (
+    <ImageContainer $isDarkMode={isDarkMode} loaded={loaded}>
+      {imageUrl && (
+        <FadeInImage
+          ref={imageRef}
+          src={imageUrl}
+          alt="Studio photo"
+          loaded={loaded}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+        />
+      )}
+    </ImageContainer>
+  );
+}
+
 function AboutPage() {
   const { pageVisible, contentVisible, handleFadeOut } = useOutletContext();
   const navigate = useNavigate();
   const [dataLoaded, setDataLoaded] = useState(false);
+  const image1Ref = useRef(null);
+  const image2Ref = useRef(null);
+  const image3Ref = useRef(null);
 
   useEffect(() => {
     // Update browser title
@@ -364,6 +435,24 @@ function AboutPage() {
             </ProfileLinksContainer>
           </ProfileCard>
         </ProfileCardsContainer>
+        <Card style={{ padding: "0" }}>
+          <SpaceImageComponent
+            imageUrl={spaceImageUrls[0]}
+            imageRef={image1Ref}
+          />
+        </Card>
+        <Card style={{ padding: "0" }}>
+          <SpaceImageComponent
+            imageUrl={spaceImageUrls[1]}
+            imageRef={image2Ref}
+          />
+        </Card>
+        <Card style={{ padding: "0" }}>
+          <SpaceImageComponent
+            imageUrl={spaceImageUrls[2]}
+            imageRef={image3Ref}
+          />
+        </Card>
       </VStack>
     </FadeInWrapper>
   );

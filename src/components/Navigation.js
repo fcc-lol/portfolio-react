@@ -138,7 +138,7 @@ function Navigation({
   // Get current tab from pathname
   const getCurrentTab = () => {
     const path = location.pathname;
-    if (path === "/space") return "space";
+    if (path === "/apps") return "apps";
     if (path === "/about") return "about";
     if (
       path.startsWith("/project/") ||
@@ -242,10 +242,10 @@ function Navigation({
           Projects
         </TabButton>
         <TabButton
-          $isActive={displayActiveTab === "space"}
-          onClick={() => handleTabClick("space")}
+          $isActive={displayActiveTab === "apps"}
+          onClick={() => handleTabClick("apps")}
         >
-          Space
+          Apps
         </TabButton>
         <TabButton
           $isActive={displayActiveTab === "about"}

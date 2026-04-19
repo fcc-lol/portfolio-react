@@ -15,7 +15,7 @@ import { Page, Container } from "./components/Layout";
 import ProjectsPage from "./pages/Projects";
 import ProjectPage from "./pages/Project";
 import FilteredProjectsPage from "./pages/FilteredProjects";
-import SpacePage from "./pages/Space";
+import AppsPage from "./pages/Apps";
 import AboutPage from "./pages/About";
 import { ANIMATION_DURATION } from "./constants";
 
@@ -133,8 +133,8 @@ const router = createBrowserRouter([
         element: <ProjectsPage />
       },
       {
-        path: "/space",
-        element: <SpacePage />
+        path: "/apps",
+        element: <AppsPage />
       },
       {
         path: "/about",
