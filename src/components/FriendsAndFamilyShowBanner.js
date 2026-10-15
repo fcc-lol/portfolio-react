@@ -7,7 +7,7 @@ const Card = styled.a`
   align-items: stretch;
   background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.25rem;
+  border-radius: 1.5rem;
   overflow: hidden;
   margin-bottom: 1.5rem;
   text-decoration: none;
@@ -35,7 +35,7 @@ const Artwork = styled.img`
   height: clamp(4rem, 22vw, 9rem);
   object-fit: cover;
   display: block;
-  border-radius: 0.75rem;
+  border-radius: 0.875rem;
 `;
 
 const TextBlock = styled.div`
@@ -48,8 +48,11 @@ const TextBlock = styled.div`
   padding: clamp(0.625rem, 3vw, 1rem) clamp(0.75rem, 4vw, 1.25rem);
 `;
 
-// Shared by title and date so they render at the same size.
-const headingFontSize = "clamp(0.75rem, 3.2vw, 1.125rem)";
+// Shared by title and date so they render at the same size. Matches the
+// 1.5rem h2 size used for card titles elsewhere on the site (e.g. the
+// Apps page), scaling down fluidly on narrow screens instead of a fixed
+// small size.
+const headingFontSize = "clamp(1rem, 4vw, 1.5rem)";
 
 const EventTitle = styled.h2`
   margin: 0;
@@ -76,7 +79,7 @@ const RsvpLabel = styled.span`
   font-family: "DM Mono", monospace;
   font-weight: 300;
   color: #f0ece3;
-  font-size: clamp(0.625rem, 2.2vw, 0.875rem);
+  font-size: clamp(0.8125rem, 3vw, 1rem);
   letter-spacing: 0.02em;
 `;
 
