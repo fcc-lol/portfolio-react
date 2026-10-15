@@ -11,6 +11,7 @@ import { StyleSheetManager } from "styled-components";
 import isPropValid from "@emotion/is-prop-valid";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Navigation from "./components/Navigation";
+import FriendsAndFamilyShowBanner from "./components/FriendsAndFamilyShowBanner";
 import { Page, Container } from "./components/Layout";
 import ProjectsPage from "./pages/Projects";
 import ProjectPage from "./pages/Project";
@@ -86,35 +87,38 @@ function RootLayout() {
     location.pathname.startsWith("/tag/");
 
   return (
-    <Page>
-      <Container>
-        <Navigation
-          showBackButton={showBackButton}
-          onBackClick={handleBackClick}
-          onFadeOut={handleFadeOut}
-          onContentFadeOut={handleContentFadeOut}
-          isNavigating={isNavigating}
-        />
-        <Outlet
-          context={{
-            isNavigating,
-            setIsNavigating,
-            handleBackClick,
-            pageVisible,
-            contentVisible,
-            handleFadeOut,
-            handleContentFadeOut,
-            handleProjectNavigation
-          }}
-        />
-        <ScrollRestoration
-          getKey={(location, matches) => {
-            // Use location.pathname + location.search as the key
-            return location.pathname + location.search;
-          }}
-        />
-      </Container>
-    </Page>
+    <>
+      <FriendsAndFamilyShowBanner />
+      <Page>
+        <Container>
+          <Navigation
+            showBackButton={showBackButton}
+            onBackClick={handleBackClick}
+            onFadeOut={handleFadeOut}
+            onContentFadeOut={handleContentFadeOut}
+            isNavigating={isNavigating}
+          />
+          <Outlet
+            context={{
+              isNavigating,
+              setIsNavigating,
+              handleBackClick,
+              pageVisible,
+              contentVisible,
+              handleFadeOut,
+              handleContentFadeOut,
+              handleProjectNavigation
+            }}
+          />
+          <ScrollRestoration
+            getKey={(location, matches) => {
+              // Use location.pathname + location.search as the key
+              return location.pathname + location.search;
+            }}
+          />
+        </Container>
+      </Page>
+    </>
   );
 }
 
