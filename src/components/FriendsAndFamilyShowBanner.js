@@ -6,6 +6,7 @@ const Card = styled.a`
   flex-direction: row;
   align-items: stretch;
   background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1.25rem;
   overflow: hidden;
   margin-bottom: 1.5rem;
