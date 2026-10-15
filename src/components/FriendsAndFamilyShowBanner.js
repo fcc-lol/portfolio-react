@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-const Card = styled.article`
+const Card = styled.a`
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -9,6 +9,13 @@ const Card = styled.article`
   border-radius: 1.25rem;
   overflow: hidden;
   margin-bottom: 1.5rem;
+  text-decoration: none;
+
+  @media (hover: hover) {
+    &:hover {
+      opacity: 0.9;
+    }
+  }
 `;
 
 // Fluid square sizing instead of a breakpoint — keeps the image-next-to-text
@@ -59,7 +66,9 @@ const EventDate = styled.p`
   line-height: 1.3;
 `;
 
-const RsvpLink = styled.a`
+// Plain text, not its own <a> — the whole Card is already an anchor, and
+// nested anchors are invalid HTML.
+const RsvpLabel = styled.span`
   display: inline-block;
   width: fit-content;
   margin-top: 0.25rem;
@@ -68,18 +77,15 @@ const RsvpLink = styled.a`
   color: #f0ece3;
   font-size: clamp(0.625rem, 2.2vw, 0.875rem);
   letter-spacing: 0.02em;
-  text-decoration: none;
-
-  @media (hover: hover) {
-    &:hover {
-      opacity: 0.7;
-    }
-  }
 `;
 
 function FriendsAndFamilyShowBanner() {
   return (
-    <Card>
+    <Card
+      href="https://partiful.com/e/aYnleCf3ErqeV0mw8bB2?c=_7gE16Ic"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <ArtworkWrapper>
         <Artwork
           src="https://static.fcc.lol/art-show-square-dark.gif"
@@ -90,13 +96,7 @@ function FriendsAndFamilyShowBanner() {
       <TextBlock>
         <EventTitle>FCC Friends and Family Show</EventTitle>
         <EventDate>Nov 14–15</EventDate>
-        <RsvpLink
-          href="https://partiful.com/e/aYnleCf3ErqeV0mw8bB2?c=_7gE16Ic"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          RSVP on Partiful
-        </RsvpLink>
+        <RsvpLabel>RSVP on Partiful</RsvpLabel>
       </TextBlock>
     </Card>
   );
