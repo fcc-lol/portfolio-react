@@ -1,65 +1,69 @@
 import React from "react";
 import styled from "styled-components";
 
-const BannerWrapper = styled.div`
-  width: 100%;
-  background: #000000;
-  box-sizing: border-box;
-`;
-
-const Inner = styled.div`
-  max-width: 64rem;
-  margin: 0 auto;
-  padding: 0.875rem 1.25rem 1.125rem;
-
-  @media (min-width: 768px) {
-    padding: 0.875rem 3rem 1.125rem;
-  }
-`;
-
-const Divider = styled.div`
-  border-top: 1px solid rgba(240, 236, 227, 0.3);
-  margin-bottom: 0.875rem;
-`;
-
-const Content = styled.div`
+const Card = styled.article`
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
+  background: #000000;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
 
   @media (max-width: 560px) {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.375rem;
   }
 `;
 
-const EventInfo = styled.div`
+const Artwork = styled.img`
+  width: 9rem;
+  height: 9rem;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: block;
+
+  @media (max-width: 560px) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+`;
+
+const TextBlock = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 1rem 1.25rem;
+`;
+
+const EventTitle = styled.h2`
+  margin: 0;
   color: #f0ece3;
+  font-weight: 600;
+  font-size: clamp(0.9375rem, 2.5vw, 1.125rem);
   line-height: 1.3;
 `;
 
-const EventTitle = styled.div`
+const EventDate = styled.p`
+  margin: 0;
+  color: #f0ece3;
   font-weight: 600;
-  font-size: clamp(0.875rem, 2.5vw, 1.0625rem);
-`;
-
-const EventDate = styled.div`
-  font-weight: 600;
-  font-size: clamp(0.875rem, 2.5vw, 1.0625rem);
+  font-size: clamp(0.875rem, 2.2vw, 1rem);
+  line-height: 1.3;
 `;
 
 const Wordmark = styled.a`
+  display: inline-block;
+  width: fit-content;
+  margin-top: 0.25rem;
   font-family: "DM Mono", monospace;
   font-weight: 300;
   color: #f0ece3;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   letter-spacing: 0.02em;
-  white-space: nowrap;
   text-decoration: none;
-  flex-shrink: 0;
 
   @media (hover: hover) {
     &:hover {
@@ -70,18 +74,18 @@ const Wordmark = styled.a`
 
 function FriendsAndFamilyShowBanner() {
   return (
-    <BannerWrapper>
-      <Inner>
-        <Divider />
-        <Content>
-          <EventInfo>
-            <EventTitle>FCC Friends and Family Show</EventTitle>
-            <EventDate>Nov 14–15</EventDate>
-          </EventInfo>
-          <Wordmark href="/">fcc.lol</Wordmark>
-        </Content>
-      </Inner>
-    </BannerWrapper>
+    <Card>
+      <Artwork
+        src="https://static.fcc.lol/art-show-square-dark.gif"
+        alt="FCC Friends and Family Show collage artwork"
+        loading="lazy"
+      />
+      <TextBlock>
+        <EventTitle>FCC Friends and Family Show</EventTitle>
+        <EventDate>Nov 14–15</EventDate>
+        <Wordmark href="/">fcc.lol</Wordmark>
+      </TextBlock>
+    </Card>
   );
 }
 

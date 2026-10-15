@@ -87,38 +87,36 @@ function RootLayout() {
     location.pathname.startsWith("/tag/");
 
   return (
-    <>
-      <FriendsAndFamilyShowBanner />
-      <Page>
-        <Container>
-          <Navigation
-            showBackButton={showBackButton}
-            onBackClick={handleBackClick}
-            onFadeOut={handleFadeOut}
-            onContentFadeOut={handleContentFadeOut}
-            isNavigating={isNavigating}
-          />
-          <Outlet
-            context={{
-              isNavigating,
-              setIsNavigating,
-              handleBackClick,
-              pageVisible,
-              contentVisible,
-              handleFadeOut,
-              handleContentFadeOut,
-              handleProjectNavigation
-            }}
-          />
-          <ScrollRestoration
-            getKey={(location, matches) => {
-              // Use location.pathname + location.search as the key
-              return location.pathname + location.search;
-            }}
-          />
-        </Container>
-      </Page>
-    </>
+    <Page>
+      <Container>
+        <FriendsAndFamilyShowBanner />
+        <Navigation
+          showBackButton={showBackButton}
+          onBackClick={handleBackClick}
+          onFadeOut={handleFadeOut}
+          onContentFadeOut={handleContentFadeOut}
+          isNavigating={isNavigating}
+        />
+        <Outlet
+          context={{
+            isNavigating,
+            setIsNavigating,
+            handleBackClick,
+            pageVisible,
+            contentVisible,
+            handleFadeOut,
+            handleContentFadeOut,
+            handleProjectNavigation
+          }}
+        />
+        <ScrollRestoration
+          getKey={(location, matches) => {
+            // Use location.pathname + location.search as the key
+            return location.pathname + location.search;
+          }}
+        />
+      </Container>
+    </Page>
   );
 }
 
