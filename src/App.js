@@ -11,7 +11,6 @@ import { StyleSheetManager } from "styled-components";
 import isPropValid from "@emotion/is-prop-valid";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Navigation from "./components/Navigation";
-import FriendsAndFamilyShowBanner from "./components/FriendsAndFamilyShowBanner";
 import { Page, Container } from "./components/Layout";
 import ProjectsPage from "./pages/Projects";
 import ProjectPage from "./pages/Project";
@@ -89,7 +88,6 @@ function RootLayout() {
   return (
     <Page>
       <Container>
-        <FriendsAndFamilyShowBanner />
         <Navigation
           showBackButton={showBackButton}
           onBackClick={handleBackClick}
