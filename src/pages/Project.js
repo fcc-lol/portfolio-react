@@ -149,7 +149,7 @@ const NotesContainer = styled.div`
   }
 
   code {
-    background: ${(props) => props.theme.cardBackground};
+    background: ${(props) => props.theme.border};
     padding: 0.25rem 0.5rem;
     border-radius: 0.25rem;
     font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
@@ -159,7 +159,7 @@ const NotesContainer = styled.div`
   }
 
   pre {
-    background: ${(props) => props.theme.cardBackground};
+    background: ${(props) => props.theme.border};
     padding: 1rem;
     border-radius: 0.5rem;
     overflow-x: auto;

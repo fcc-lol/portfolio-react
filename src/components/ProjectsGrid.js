@@ -11,6 +11,7 @@ import Card from "./Card";
 import { VStack } from "./Layout";
 import { Error, ProjectsSkeleton } from "./States";
 import { useTheme } from "../contexts/ThemeContext";
+import { useInfiniteList } from "../hooks/useInfiniteList";
 import { FadeInWrapper } from "./AnimationHelpers";
 import {
   ANIMATION_DURATION,
@@ -70,6 +71,12 @@ const Project = styled(Card)`
   }
 `;
 
+const LoadMoreSentinel = styled.div`
+  grid-column: 1 / -1;
+  height: 1px;
+  margin-top: -2rem;
+`;
+
 const ImageContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -121,7 +128,7 @@ const Description = styled.p`
   margin: 0;
 `;
 
-function ProjectImage({ imageUrl, onLoad, ...props }) {
+function ProjectImage({ imageUrl, onLoad, onError, ...props }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
 
   // Calculate wasLoadedBefore once on mount to avoid infinite loops
@@ -167,6 +174,11 @@ function ProjectImage({ imageUrl, onLoad, ...props }) {
   };
 
   const handleImageError = () => {
+    // Let the parent swap in a fallback URL (e.g. full image if the thumbnail fails)
+    if (onError) {
+      onError();
+    }
+
     // Don't show broken images, show container background instead
     setLoaded(false);
 
@@ -225,6 +237,11 @@ function ProjectsGrid({
   const [dataLoaded, setDataLoaded] = useState(false);
   const [loadedImages, setLoadedImages] = useState({});
   const [skeletonVisible, setSkeletonVisible] = useState(false);
+  const [failedThumbnails, setFailedThumbnails] = useState({});
+  const { visibleCount, hasMore, sentinelRef } = useInfiniteList(
+    apiEndpoint,
+    projects.length
+  );
 
   useEffect(() => {
     // Update browser title
@@ -363,6 +380,12 @@ function ProjectsGrid({
   };
 
   const getPrimaryImage = (project) => {
+    // Prefer the small card thumbnail; fall back to the full image if the
+    // thumbnail is missing or failed to load
+    const thumbnailUrl = project.primaryImage?.thumbnailUrl;
+    if (thumbnailUrl && !failedThumbnails[project.id]) {
+      return thumbnailUrl;
+    }
     return (
       project.primaryImage?.url ||
       (project.media && project.media.length > 0 ? project.media[0].url : null)
@@ -411,7 +434,7 @@ function ProjectsGrid({
       <FadeInWrapper visible={visible}>
         {projects.length > 0 ? (
           <Grid>
-            {projects.map((project) => (
+            {projects.slice(0, visibleCount).map((project) => (
               <Project
                 key={project.id}
                 onClick={(event) => handleProjectClick(project.id, event)}
@@ -419,7 +442,13 @@ function ProjectsGrid({
                 $imageLoaded={loadedImages[project.id] || false}
               >
                 <ProjectImage
+                  key={getPrimaryImage(project)}
                   imageUrl={getPrimaryImage(project)}
+                  onError={() =>
+                    setFailedThumbnails((prev) =>
+                      prev[project.id] ? prev : { ...prev, [project.id]: true }
+                    )
+                  }
                   onLoad={onLoadFunctions[project.id]}
                 />
                 <Content visible={dataLoaded}>
@@ -428,6 +457,7 @@ function ProjectsGrid({
                 </Content>
               </Project>
             ))}
+            {hasMore && <LoadMoreSentinel ref={sentinelRef} />}
           </Grid>
         ) : (
           <Card $isDarkMode={isDarkMode}>
