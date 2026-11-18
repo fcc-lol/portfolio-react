@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import {
   useParams,
@@ -401,11 +401,35 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
   const [loaded, setLoaded] = useState(!mediaUrl);
   const [hasError, setHasError] = useState(false);
+  // Videos only start downloading once they are near the viewport, so a page
+  // with several of them doesn't fetch them all (and starve the images) on load
+  const [videoNearViewport, setVideoNearViewport] = useState(
+    typeof IntersectionObserver === "undefined"
+  );
+  const videoContainerRef = useRef(null);
 
   // Only calculate video/loading state for non-notes media
   const isVideo = !isNotes && isVideoFile(mediaUrl);
   const wasLoadedBefore =
     !isNotes && mediaUrl ? isImageLoaded(mediaUrl) : false;
+
+  useEffect(() => {
+    if (!isVideo || videoNearViewport) return;
+    const node = videoContainerRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setVideoNearViewport(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "400px 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [isVideo, videoNearViewport]);
 
   // All other useEffect hooks for image/video loading (skip for notes)
   useEffect(() => {
@@ -479,9 +503,10 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
 
   if (isVideo) {
     return (
-      <MediaContainer>
+      <MediaContainer ref={videoContainerRef}>
         <FadeInVideo
-          src={mediaUrl}
+          src={videoNearViewport ? mediaUrl : undefined}
+          preload={videoNearViewport ? "auto" : "none"}
           autoPlay
           muted
           loop
@@ -501,6 +526,7 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
       <FadeInImage
         src={mediaUrl}
         alt={`${projectName} - ${index + 1}`}
+        loading={index > 1 ? "lazy" : undefined}
         loaded={loaded}
         shouldAnimate={!!mediaUrl}
         wasLoadedBefore={wasLoadedBefore}
