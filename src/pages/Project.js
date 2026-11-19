@@ -401,6 +401,13 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
   const { markImageAsLoaded, isImageLoaded } = useTheme();
   const [loaded, setLoaded] = useState(!mediaUrl);
   const [hasError, setHasError] = useState(false);
+  // Images load a downscaled version from the API when it offers one, and
+  // fall back to the original file if that fails
+  const [displayFailed, setDisplayFailed] = useState(false);
+  const displayUrl =
+    typeof mediaItem === "object" && !displayFailed
+      ? mediaItem.displayUrl
+      : null;
   // Videos only start downloading once they are near the viewport, so a page
   // with several of them doesn't fetch them all (and starve the images) on load
   const [videoNearViewport, setVideoNearViewport] = useState(
@@ -496,6 +503,10 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
   };
 
   const handleMediaError = () => {
+    if (!isVideo && displayUrl) {
+      setDisplayFailed(true);
+      return;
+    }
     setHasError(true);
     setLoaded(false); // Don't show broken image
     // Don't notify parent - no border for broken images
@@ -524,7 +535,7 @@ function MediaItem({ mediaItem, projectName, index, onLoad }) {
   return (
     <MediaContainer>
       <FadeInImage
-        src={mediaUrl}
+        src={displayUrl || mediaUrl}
         alt={`${projectName} - ${index + 1}`}
         loading={index > 1 ? "lazy" : undefined}
         loaded={loaded}
